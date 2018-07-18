@@ -4,7 +4,7 @@ namespace Funky.Tokens{
     class TAssignment : TExpression {
         TExpression value;
         TVariable var;
-        //TOperator operator;
+        TOperator op;
 
         static Regex SET = new Regex(@"=");
 
@@ -15,6 +15,9 @@ namespace Funky.Tokens{
             if(toAssign == null){
                 return null;
             }
+
+            TOperator newOp = TOperator.claim(claimer);
+
             Claim c = claimer.Claim(SET);
             if(!c.success){
                 failTo.Fail();
@@ -27,13 +30,20 @@ namespace Funky.Tokens{
             }
             TAssignment newAssign = new TAssignment();
             newAssign.var = toAssign;
+            newAssign.op = newOp;
             newAssign.value = assignValue;
 
             return newAssign;
         }
 
         override public Var Parse(Scope scope){
-            return var.Set(scope, value.Parse(scope));
+            if(op != null){
+                Var left = var.Get(scope);
+                Var val = value.Parse(scope);
+                val = op.Parse(left, val);
+                return var.Set(scope, val);
+            }else
+                return var.Set(scope, value.Parse(scope));
         }
     }
 }

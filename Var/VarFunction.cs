@@ -16,15 +16,12 @@ namespace Funky{
         }
     }
 
-
-    delegate Var Func(CallData data);
-
     class VarFunction : Var{
-        public Func action;
+        public System.Func<CallData, Var> action;
 
         public string FunctionText = "[internal function]";
 
-        public VarFunction(Func todo) : base(){
+        public VarFunction(System.Func<CallData, Var> todo) : base(){
             this.action = todo;
         }
 

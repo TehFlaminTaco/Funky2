@@ -6,8 +6,8 @@ namespace Funky
     {
         static void Main(string[] args)
         {
-            VarList l = Meta.meta;
-            TProgram prog = TProgram.claim(new StringClaimer(@"x = 3; print(x)"));
+            Meta.GetMeta();
+            TProgram prog = TProgram.claim(new StringClaimer(@"print(5 + 3)"));
             prog.Parse();
         }
     }

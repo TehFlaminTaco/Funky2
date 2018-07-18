@@ -3,8 +3,13 @@ using System.Text;
 
 namespace Funky{
     class Meta{
-        public static VarList meta = generateMeta();
-        public static VarList generateMeta(){
+        private static VarList meta;
+
+        public static VarList GetMeta(){
+            return meta ?? (meta = GenerateMeta());
+        }
+
+        public static VarList GenerateMeta(){
             VarList metas = new VarList();
             metas["list"] = _List();
             metas["string"] = _String();
@@ -30,7 +35,11 @@ namespace Funky{
         private static VarList _Number(){
             VarList num = new VarList();
 
-            num["tostring"] = new VarFunction(delegate(CallData dat){
+            num["add[side=left,left=number,right=number]"] = new VarFunction(dat => {
+                return new VarNumber(dat.num_args[0].asNumber() + dat.num_args[1].asNumber());
+            });
+
+            num["tostring"] = new VarFunction(dat => {
                 return new VarString((dat.num_args[0] as VarNumber).value.ToString());
             });
 
@@ -51,17 +60,17 @@ namespace Funky{
             return sb.ToString();
         }
 
-        private static bool flop(bool[] list){
-            return flop(list, 0);
+        private static bool Flop(bool[] list){
+            return Flop(list, 0);
         }
-        private static bool flop(bool[] list, int pos){
+        private static bool Flop(bool[] list, int pos){
             if(list[pos] == true){
                 list[pos] = false;
                 return false;
             }else{
                 list[pos] = true;
                 if(pos + 1 < list.Length){
-                    return flop(list, pos + 1);
+                    return Flop(list, pos + 1);
                 }else{
                     return true;
                 }
@@ -90,7 +99,7 @@ namespace Funky{
                 if(var_meta.string_vars.ContainsKey(check_name))
                     return var_meta.string_vars[check_name];
                 
-                if(flop(opUse))
+                if(Flop(opUse))
                     break;
             }
             if(var_meta.string_vars.ContainsKey(name))

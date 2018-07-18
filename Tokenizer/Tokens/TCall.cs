@@ -23,6 +23,10 @@ namespace Funky.Tokens{
             return -1;
         }
 
+        override public Associativity GetAssociativity(){
+            return Associativity.NA;
+        }
+
         new public static TCall leftClaim(StringClaimer claimer, TExpression left){
             Claim lb = claimer.Claim(LEFT_BRACKET);
             if(!lb.success){ // Left Bracket is a requirement.

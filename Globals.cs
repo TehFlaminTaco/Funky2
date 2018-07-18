@@ -12,7 +12,7 @@ namespace Funky{
                     string chunker = "";
                     for(int i=0; dat.num_args.ContainsKey(i); i++){
                         sb.Append(chunker);
-                        sb.Append(dat.num_args[i].asString());
+                        sb.Append(dat.num_args[i]?.asString() ?? "null");
                         chunker = "\t";
                     }
                     string outStr = sb.ToString();

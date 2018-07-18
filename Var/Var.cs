@@ -86,7 +86,7 @@ namespace Funky{
                 }
                 return outp as VarFunction;
             }
-            return new VarFunction(delegate(CallData dat){
+            return new VarFunction(dat => {
                 return this.Call(dat);
             });
         }

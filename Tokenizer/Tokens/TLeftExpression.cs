@@ -1,4 +1,10 @@
 namespace Funky.Tokens{
+    enum Associativity{
+        NA,
+        LEFT_TO_RIGHT,
+        RIGHT_TO_LEFT
+    }
+
     // "Left Expressions" are tokens that use an expression as their first argument.
     // They require a "GetLeft" method, which returns their leftmost expression, and a "SetLeft" method, to overrite it.
     // They should also provide a "GetPrecedence" function, which returns an int representing it's Operator Precedence. Lower numbers are tighter grouped than higher numbers. Eg, + might have a precedence of 1, whilst * has a precedence of 2. (Not neccesarily true, just an example.)
@@ -8,6 +14,8 @@ namespace Funky.Tokens{
         public abstract TExpression GetLeft();
         public abstract void SetLeft(TExpression newLeft);
         public abstract int GetPrecedence();
+
+        public abstract Associativity GetAssociativity();
 
         public static TLeftExpression leftClaim(StringClaimer claimer, TExpression left){return null;}
 

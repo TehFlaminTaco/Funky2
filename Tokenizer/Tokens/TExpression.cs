@@ -18,7 +18,8 @@ namespace Funky.Tokens{
         }
 
         private static TExpression post_claim(StringClaimer claimer, TExpression last_claim){
-            return TCall.leftClaim(claimer, last_claim);
+            return  TCall.leftClaim(claimer, last_claim)    as TExpression ??
+            TArithmetic.leftClaim(claimer, last_claim)      as TExpression;
         }
 
         public abstract Var Parse(Scope scope); // Although Expression requires a Parse function, it fails to implement it, because it shouldn't be possible to have a raw "TExpression" token.

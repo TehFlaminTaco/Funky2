@@ -13,12 +13,10 @@ namespace Funky{
         }
 
         public Var ThisGet(Var key){
-            if(key is VarNumber){
-                double n = key as VarNumber;
+            if(key is VarNumber n){
                 return double_vars.ContainsKey(n) ? double_vars[n] : base.Get(key);
             }
-            if(key is VarString){
-                string s = key as VarString;
+            if(key is VarString s){
                 return string_vars.ContainsKey(s) ? string_vars[s] : base.Get(key);
             }
             return other_vars.ContainsKey(key) ? other_vars[key] : base.Get(key);
@@ -37,17 +35,17 @@ namespace Funky{
             bool assignHere = false;
             if(parent == null)
                 assignHere = true;
-            else if (key is VarString && defined.Contains(key as VarString))
+            else if (key is VarString s && defined.Contains(s))
                 assignHere = true;
             else if (ThisGet(key) != null)
                 assignHere = true;
             
             if(assignHere){
-                if(key is VarNumber){
-                    return double_vars[key as VarNumber] = val;
+                if(key is VarNumber n){
+                    return double_vars[n] = val;
                 }
-                if(key is VarString){
-                    return string_vars[key as VarString] = val;
+                if(key is VarString s){
+                    return string_vars[s] = val;
                 }
                 return other_vars[key] = val;
             }else
