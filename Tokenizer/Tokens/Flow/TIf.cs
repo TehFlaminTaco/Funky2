@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Funky.Tokens{
+namespace Funky.Tokens.Flow{
     class TIf : TExpression{
 
         private static Regex IF = new Regex(@"if");

@@ -6,7 +6,28 @@ using System;
 namespace Funky.Tokens{
     abstract class TLiteral : TExpression{
         new public static TLiteral Claim(StringClaimer claimer){
-            return TLiteralNumber.Claim(claimer) as TLiteral;
+            return TLiteralNumber.Claim(claimer)    as TLiteral ??
+            TLiteralStringSimple.Claim(claimer)     as TLiteral;
+        }
+    }
+
+    class TLiteralStringSimple : TLiteral{
+        VarString value;
+        static Regex STRING = new Regex(@"^(?<qoute>'|"")(?<text>(\\\\|\\[^\\]|[^\\])*?)\k<qoute>");
+
+        new public static TLiteralStringSimple Claim(StringClaimer claimer){
+            Claim c = claimer.Claim(STRING);
+            if(!c.success){
+                return null;
+            }
+            c.Pass();
+            TLiteralStringSimple str = new TLiteralStringSimple();
+            str.value = new VarString(Regex.Unescape(c.GetMatch().Groups["text"].Value));
+            return str;
+        }
+
+        override public Var Parse(Scope scope){
+            return value;
         }
     }
 

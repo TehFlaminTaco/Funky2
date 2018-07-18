@@ -1,3 +1,4 @@
+using Funky.Tokens.Flow;
 namespace Funky.Tokens{
     abstract class TExpression : Token{
         new public static TExpression Claim(StringClaimer claimer){
@@ -13,6 +14,7 @@ namespace Funky.Tokens{
         private static TExpression pre_claim(StringClaimer claimer){
             return TAssignment.Claim(claimer)   as TExpression ??
             TIf.Claim(claimer)                  as TExpression ??
+            TWhile.Claim(claimer)               as TExpression ??
             TVariable.Claim(claimer)            as TExpression ??
             TLiteral.Claim(claimer)             as TExpression ??
             TParenExpression.Claim(claimer)     as TExpression ??
