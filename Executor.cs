@@ -8,7 +8,8 @@ namespace Funky
         {
             Meta.GetMeta();
             TProgram prog = TProgram.Claim(new StringClaimer(@"
-            print(""Hello, World!"")
+            for i=0 i<10 i+=1
+                print(i)
         "));
             prog.Parse();
         }
