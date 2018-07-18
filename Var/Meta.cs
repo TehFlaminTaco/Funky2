@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using System;
 
 namespace Funky{
     class Meta{
@@ -35,9 +36,25 @@ namespace Funky{
         private static VarList _Number(){
             VarList num = new VarList();
 
-            num["add[side=left,left=number,right=number]"] = new VarFunction(dat => {
-                return new VarNumber(dat.num_args[0].asNumber() + dat.num_args[1].asNumber());
-            });
+            num["add[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() + dat.num_args[1].asNumber());});
+            num["sub[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() - dat.num_args[1].asNumber());});
+            num["mult[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() * dat.num_args[1].asNumber());});
+            num["div[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() / dat.num_args[1].asNumber());});
+            num["intdiv[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)(dat.num_args[0].asNumber() / dat.num_args[1].asNumber()));});
+            num["pow[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(Math.Pow(dat.num_args[0].asNumber(), dat.num_args[1].asNumber()));});
+            num["mod[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() % dat.num_args[1].asNumber());});
+            num["concat[side=left]"] = new VarFunction(dat => {return new VarString(dat.num_args[0].asString() + dat.num_args[1].asString());});
+            num["bitor[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value | (int)dat.num_args[1].asNumber().value);});
+            num["bitand[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value & (int)dat.num_args[1].asNumber().value);});
+            num["bitxor[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value ^ (int)dat.num_args[1].asNumber().value);});
+            num["bitshiftl[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value << (int)dat.num_args[1].asNumber().value);});
+            num["bitshiftr[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value >> (int)dat.num_args[1].asNumber().value);});
+            num["lt[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() < dat.num_args[1].asNumber() ? 1 : 0);});
+            num["le[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() <= dat.num_args[1].asNumber() ? 1 : 0);});
+            num["gt[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() > dat.num_args[1].asNumber() ? 1 : 0);});
+            num["ge[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() >= dat.num_args[1].asNumber() ? 1 : 0);});
+            num["eq[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() == dat.num_args[1].asNumber() ? 1 : 0);});
+            num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() != dat.num_args[1].asNumber() ? 1 : 0);});
 
             num["tostring"] = new VarFunction(dat => {
                 return new VarString((dat.num_args[0] as VarNumber).value.ToString());
