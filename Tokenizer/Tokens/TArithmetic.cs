@@ -26,6 +26,7 @@ namespace Funky.Tokens{
             Claim failTo = claimer.failPoint();
             TOperator operand = TOperator.Claim(claimer);
             if(operand == null){
+                failTo.Fail();
                 return null;
             }
             TExpression right = TExpression.Claim(claimer);

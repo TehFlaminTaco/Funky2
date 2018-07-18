@@ -23,6 +23,7 @@ namespace Funky.Tokens{
             Claim failTo = claimer.failPoint();
             TExpression newLeft = TExpression.Claim(claimer);
             if(newLeft == null){
+                failTo.Fail();
                 return null;
             }
             newLeft = leftClaim(claimer, newLeft);

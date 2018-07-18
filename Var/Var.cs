@@ -91,6 +91,18 @@ namespace Funky{
             });
         }
 
+        public virtual bool asBool(){
+            Var callFunc = Meta.Get(this, "tobool");
+            if(callFunc != null){
+                Var outp = callFunc.Call(new CallData(this));
+                if(!(outp is VarNumber n)){
+                    return outp.asBool();
+                }
+                return n.value != 0;
+            }
+            return false;
+        }
+
         public static implicit operator Var(string v){
             return new VarString(v);
         }
@@ -113,10 +125,13 @@ namespace Funky{
         public override VarNumber asNumber(){
             return this;
         }
+        public override bool asBool(){
+            return this!=0;
+        }
     }
 
     class VarString : Var {
-        string data;
+        public string data;
         public static implicit operator string(VarString var){
             return var.data;
         }

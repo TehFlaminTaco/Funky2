@@ -15,6 +15,7 @@ namespace Funky{
             metas["list"] = _List();
             metas["string"] = _String();
             metas["number"] = _Number();
+            metas["function"] = _Function();
 
             return metas;
         }
@@ -22,19 +23,46 @@ namespace Funky{
         private static VarList _String(){
             VarList str = new VarList();
 
-            
+            str["tobool"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data.Length);});
+
+            str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == -1 ? 1 : 0);});
+            str["le[side=left,left=string,right=string]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) <= 0 ? 1 : 0);});
+            str["gt[side=left,left=string,right=string]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == 1 ? 1 : 0);});
+            str["ge[side=left,left=string,right=string]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) >= 0 ? 1 : 0);});
+            str["eq[side=left,left=string,right=string]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data == dat.num_args[1].asString().data ? 1 : 0);});
+            str["ne[side=left,left=string,right=string]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asString().data != dat.num_args[1].asString().data ? 1 : 0);});
+            str["eq"] = new VarFunction(dat => new VarNumber(0));
+            str["ne"] = new VarFunction(dat => new VarNumber(1));
 
             return str;
         }
 
+        private static VarList _Function(){
+            VarList fnc = new VarList();
+
+            fnc["tobool"] = new VarFunction(dat => {return new VarNumber(1);});
+
+            fnc["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
+            fnc["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));
+
+            return fnc;
+        }
+
         private static VarList _List(){
             VarList lst = new VarList();
+
+            lst["tobool"] = new VarFunction(dat => {return new VarNumber(1);});
+
+            lst["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
+            lst["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));
 
             return lst;
         }
 
         private static VarList _Number(){
             VarList num = new VarList();
+
+            num["tobool"] = new VarFunction(dat => {return dat.num_args[0];});
 
             num["add[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() + dat.num_args[1].asNumber());});
             num["sub[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() - dat.num_args[1].asNumber());});
@@ -49,12 +77,15 @@ namespace Funky{
             num["bitxor[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value ^ (int)dat.num_args[1].asNumber().value);});
             num["bitshiftl[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value << (int)dat.num_args[1].asNumber().value);});
             num["bitshiftr[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber((int)dat.num_args[0].asNumber().value >> (int)dat.num_args[1].asNumber().value);});
-            num["lt[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() < dat.num_args[1].asNumber() ? 1 : 0);});
-            num["le[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() <= dat.num_args[1].asNumber() ? 1 : 0);});
-            num["gt[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() > dat.num_args[1].asNumber() ? 1 : 0);});
-            num["ge[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() >= dat.num_args[1].asNumber() ? 1 : 0);});
-            num["eq[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() == dat.num_args[1].asNumber() ? 1 : 0);});
-            num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber() != dat.num_args[1].asNumber() ? 1 : 0);});
+            num["lt[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber().value < dat.num_args[1].asNumber().value ? 1 : 0);});
+            num["le[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber().value <= dat.num_args[1].asNumber().value ? 1 : 0);});
+            num["gt[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber().value > dat.num_args[1].asNumber().value ? 1 : 0);});
+            num["ge[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber().value >= dat.num_args[1].asNumber().value ? 1 : 0);});
+            num["eq[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber().value == dat.num_args[1].asNumber().value ? 1 : 0);});
+            num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => {return new VarNumber(dat.num_args[0].asNumber().value != dat.num_args[1].asNumber().value ? 1 : 0);});
+            num["eq"] = new VarFunction(dat => new VarNumber(0));
+            num["ne"] = new VarFunction(dat => new VarNumber(1));
+
 
             num["tostring"] = new VarFunction(dat => {
                 return new VarString((dat.num_args[0] as VarNumber).value.ToString());

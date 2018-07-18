@@ -11,11 +11,15 @@ namespace Funky.Tokens{
 
         override public Var Parse(Scope scope){
             Var ret = null;
+            Scope newScope = new Scope();
+            newScope.variables = new VarList();
+            newScope.variables.parent = scope.variables;
+            newScope.escape = scope.escape;
             for(int i=0; i < expressions.Count; i++){
                 if(scope.escape.Count > 0){
                     return scope.escape.Peek().value;
                 }
-                ret = expressions[i].Parse(scope);
+                ret = expressions[i].Parse(newScope);
             }
             return ret;
         }
@@ -29,12 +33,12 @@ namespace Funky.Tokens{
             TBlock newBlock = new TBlock();
             TExpression nExp;
             while((nExp = TExpression.Claim(claimer)) != null){
+                newBlock.expressions.Add(nExp);
+                claimer.Claim(SEMI_COLON);
                 if((c = claimer.Claim(RIGHT_BRACKET)).success){
                     c.Pass();
                     return newBlock;
                 }
-                newBlock.expressions.Add(nExp);
-                claimer.Claim(SEMI_COLON);
             }
             return newBlock;
         }

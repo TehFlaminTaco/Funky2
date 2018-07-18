@@ -8,6 +8,7 @@ namespace Funky.Tokens{
 
         private static Regex LEFT_BRACKET = new Regex("^\\(");
         private static Regex RIGHT_BRACKET = new Regex("^\\)");
+        private static Regex COMMA = new Regex("^,");
 
         public static VarList hackMeta;
         
@@ -49,6 +50,7 @@ namespace Funky.Tokens{
                     break;
                 }
                 newCall.arguments.Add(newArg);
+                claimer.Claim(COMMA);
             }
 
             return newCall;

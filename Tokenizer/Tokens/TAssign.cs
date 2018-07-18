@@ -14,6 +14,7 @@ namespace Funky.Tokens{
 
             TVariable toAssign = TVariable.Claim(claimer);
             if(toAssign == null){
+                failTo.Fail();
                 return null;
             }
 
