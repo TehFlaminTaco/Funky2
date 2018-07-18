@@ -14,7 +14,8 @@ namespace Funky.Tokens{
             return TAssignment.Claim(claimer)   as TExpression ??
             TVariable.Claim(claimer)            as TExpression ??
             TLiteral.Claim(claimer)             as TExpression ??
-            TParenExpression.Claim(claimer)     as TExpression;
+            TParenExpression.Claim(claimer)     as TExpression ??
+            TBlock.Claim(claimer)               as TExpression;
         }
 
         private static TExpression post_claim(StringClaimer claimer, TExpression last_claim){

@@ -15,9 +15,11 @@ namespace Funky{
 
     struct Scope {
         public VarList variables;
+        public Stack<Escaper> escape;
 
         public Scope(VarList v){
             variables = v;
+            escape = new Stack<Escaper>();
         }
     }
 
