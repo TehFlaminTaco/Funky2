@@ -139,7 +139,7 @@ namespace Funky{
             Var lMeta = Get(l, name, newOptions);
             newOptions[0] = "side=right";
             if(lMeta == null || (!lValue && rValue))
-                return Get(r, name, newOptions);
+                return Get(r, name, newOptions) ?? lMeta;
             return lMeta;
         }
 
