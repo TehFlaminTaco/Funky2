@@ -1,9 +1,10 @@
 using System.Text.RegularExpressions;
+using System.Text;
 namespace Funky.Tokens{
     abstract class TVariable : TExpression{
-        new public static TVariable claim(StringClaimer claimer){
+        new public static TVariable Claim(StringClaimer claimer){
             TVariable result;
-            if((result = TIdentifier.claim(claimer))!=null)return result;
+            if((result = TIdentifier.Claim(claimer))!=null)return result;
             return null;
         }
 
@@ -21,7 +22,7 @@ namespace Funky.Tokens{
         static Regex LOCAL = new Regex(@"local|var|let");
         static Regex IDENTIFIER = new Regex(@"^[a-zA-Z_]\w*");
 
-        new public static TIdentifier claim(StringClaimer claimer){   
+        new public static TIdentifier Claim(StringClaimer claimer){   
             TIdentifier ident = new TIdentifier();
             Claim c = claimer.Claim(LOCAL);
             if(c.success){
@@ -44,6 +45,5 @@ namespace Funky.Tokens{
         public override Var Set(Scope scope, Var value){
             return isLocal ? scope.variables.string_vars[name] = value : scope.variables.Set(name, value);
         }
-        
     }
 }

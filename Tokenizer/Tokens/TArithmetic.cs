@@ -1,3 +1,4 @@
+using System.Text;
 namespace Funky.Tokens{
     class TArithmetic : TLeftExpression{
 
@@ -21,40 +22,39 @@ namespace Funky.Tokens{
             return op.GetAssociativity();
         }
 
-        new public static TArithmetic leftClaim(StringClaimer claimer, TExpression left){
+        new public static TLeftExpression leftClaim(StringClaimer claimer, TExpression left){
             Claim failTo = claimer.failPoint();
-            TOperator operand = TOperator.claim(claimer);
+            TOperator operand = TOperator.Claim(claimer);
             if(operand == null){
                 return null;
             }
-            TExpression right = TExpression.claim(claimer);
+            TExpression right = TExpression.Claim(claimer);
             if(right == null){
                 failTo.Fail();
                 return null;
             }
 
             TArithmetic newArith = new TArithmetic();
+            newArith.leftArg = left;
+            newArith.rightArg = right;
+            newArith.op = operand;
 
             if(right is TLeftExpression t && t.GetAssociativity() != Associativity.NA){
                 int prec = operand.GetPrecedence();
                 int r_prec = t.GetPrecedence();
                 if (prec < r_prec || (prec == r_prec && operand.GetAssociativity() == Associativity.LEFT_TO_RIGHT)){
-                    right = t.GetLeft();
+                    newArith.rightArg = t.GetLeft();
                     t.SetLeft(newArith);
+                    return t;
                 }
             }
-            newArith.leftArg = left;
-            newArith.rightArg = right;
-            newArith.op = operand;
             
-
             return newArith;
         }
 
         override public Var Parse(Scope scope){
             return op.Parse(leftArg.Parse(scope), rightArg.Parse(scope));
         }
-
 
     }
 }

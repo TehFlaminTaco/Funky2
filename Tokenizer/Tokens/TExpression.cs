@@ -1,6 +1,6 @@
 namespace Funky.Tokens{
     abstract class TExpression : Token{
-        new public static TExpression claim(StringClaimer claimer){
+        new public static TExpression Claim(StringClaimer claimer){
             TExpression preClaimed = pre_claim(claimer);
             if(preClaimed == null)
                 return null;
@@ -11,10 +11,10 @@ namespace Funky.Tokens{
         }
 
         private static TExpression pre_claim(StringClaimer claimer){
-            return TAssignment.claim(claimer)   as TExpression ??
-            TVariable.claim(claimer)            as TExpression ??
-            TLiteral.claim(claimer)             as TExpression ??
-            TParenExpression.claim(claimer)     as TExpression;
+            return TAssignment.Claim(claimer)   as TExpression ??
+            TVariable.Claim(claimer)            as TExpression ??
+            TLiteral.Claim(claimer)             as TExpression ??
+            TParenExpression.Claim(claimer)     as TExpression;
         }
 
         private static TExpression post_claim(StringClaimer claimer, TExpression last_claim){

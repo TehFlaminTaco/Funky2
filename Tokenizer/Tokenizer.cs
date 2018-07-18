@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Text;
 using System;
 using Funky.Tokens;
 
@@ -33,11 +34,11 @@ namespace Funky{
     class TProgram : Token{
         List<TExpression> expressions = new List<TExpression>();
         static Regex SEMI_COLON = new Regex(@";");
-        new public static TProgram claim(StringClaimer claimer){
+        new public static TProgram Claim(StringClaimer claimer){
             TProgram prog = new TProgram();
 
             TExpression e;
-            while((e = TExpression.claim(claimer))!=null){
+            while((e = TExpression.Claim(claimer))!=null){
                 claimer.Claim(SEMI_COLON);
                 prog.expressions.Add(e);
             }

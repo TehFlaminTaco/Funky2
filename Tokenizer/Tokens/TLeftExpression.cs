@@ -19,9 +19,9 @@ namespace Funky.Tokens{
 
         public static TLeftExpression leftClaim(StringClaimer claimer, TExpression left){return null;}
 
-        new public static TLeftExpression claim(StringClaimer claimer){
+        new public static TLeftExpression Claim(StringClaimer claimer){
             Claim failTo = claimer.failPoint();
-            TExpression newLeft = TExpression.claim(claimer);
+            TExpression newLeft = TExpression.Claim(claimer);
             if(newLeft == null){
                 return null;
             }

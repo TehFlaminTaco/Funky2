@@ -1,18 +1,19 @@
 using System.Text.RegularExpressions;
 using System.Globalization;
+using System.Text;
 using System;
 
 namespace Funky.Tokens{
     abstract class TLiteral : TExpression{
-        new public static TLiteral claim(StringClaimer claimer){
-            return TLiteralNumber.claim(claimer) as TLiteral;
+        new public static TLiteral Claim(StringClaimer claimer){
+            return TLiteralNumber.Claim(claimer) as TLiteral;
         }
     }
 
     class TLiteralNumber : TLiteral{
         VarNumber value;
         static Regex NUMBER = new Regex(@"^(?<negative>-?)(?:(?<integer>0(?:x(?<hex_val>[0-9A-Fa-f]+)|b(?<bin_val>[01]+)))|(?:(?<float>(?<int_comp>\d*)\.(?<float_comp>\d+))|(?<int>\d+))(?:e(?<expon>-?\d+))?)");
-        new public static TLiteralNumber claim(StringClaimer claimer){
+        new public static TLiteralNumber Claim(StringClaimer claimer){
             TLiteralNumber numb = new TLiteralNumber();
 
             Claim claim = claimer.Claim(NUMBER);

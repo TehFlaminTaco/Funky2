@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Text;
 
 namespace Funky.Tokens{
     class TAssignment : TExpression {
@@ -8,22 +9,22 @@ namespace Funky.Tokens{
 
         static Regex SET = new Regex(@"=");
 
-        new public static TAssignment claim(StringClaimer claimer){
+        new public static TAssignment Claim(StringClaimer claimer){
             Claim failTo = claimer.failPoint();
 
-            TVariable toAssign = TVariable.claim(claimer);
+            TVariable toAssign = TVariable.Claim(claimer);
             if(toAssign == null){
                 return null;
             }
 
-            TOperator newOp = TOperator.claim(claimer);
+            TOperator newOp = TOperator.Claim(claimer);
 
             Claim c = claimer.Claim(SET);
             if(!c.success){
                 failTo.Fail();
                 return null;
             }
-            TExpression assignValue = TExpression.claim(claimer);
+            TExpression assignValue = TExpression.Claim(claimer);
             if(assignValue == null){
                 failTo.Fail();
                 return null;

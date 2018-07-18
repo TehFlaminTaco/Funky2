@@ -7,7 +7,7 @@ namespace Funky
         static void Main(string[] args)
         {
             Meta.GetMeta();
-            TProgram prog = TProgram.claim(new StringClaimer(@"print(5 + 3)"));
+            TProgram prog = TProgram.Claim(new StringClaimer(@"print(3 * 5 + 3 * 2)"));
             prog.Parse();
         }
     }

@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Text;
 namespace Funky.Tokens{
     class TCall : TLeftExpression{
         TExpression caller;
@@ -43,7 +44,7 @@ namespace Funky.Tokens{
                     rb.Pass();
                     break;
                 }
-                TArgument newArg = TArgument.claim(claimer);
+                TArgument newArg = TArgument.Claim(claimer);
                 if(newArg == null){
                     break;
                 }
@@ -94,8 +95,8 @@ namespace Funky.Tokens{
         public abstract int AppendArguments(VarList argumentList, int index, Scope scope);
         override public Var Parse(Scope scope){return null;} // Never parse. Never.
 
-        new public static TArgument claim(StringClaimer claimer){
-            return TArgExpression.claim(claimer);
+        new public static TArgument Claim(StringClaimer claimer){
+            return TArgExpression.Claim(claimer);
         } 
     }
 
@@ -106,8 +107,8 @@ namespace Funky.Tokens{
             return index+1;
         }
 
-        new public static TArgExpression claim(StringClaimer claimer){
-            TExpression heldExpr = TExpression.claim(claimer);
+        new public static TArgExpression Claim(StringClaimer claimer){
+            TExpression heldExpr = TExpression.Claim(claimer);
             if(heldExpr == null)
                 return null;
             TArgExpression newArgExp = new TArgExpression();

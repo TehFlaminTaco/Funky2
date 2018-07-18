@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Text;
 namespace Funky.Tokens{
 
     // Lower Operator Precedence is "More Sticky".
@@ -37,7 +38,7 @@ namespace Funky.Tokens{
             return op.associativity;
         }
 
-        new public static TOperator claim(StringClaimer claimer){
+        new public static TOperator Claim(StringClaimer claimer){
             for(int i = 0; i < operators.Length; i++){
                 SOperator thisOp = operators[i];
                 Claim c = claimer.Claim(thisOp.regex);
