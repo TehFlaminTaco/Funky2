@@ -22,7 +22,7 @@ namespace Funky.Tokens{
             return op.GetAssociativity();
         }
 
-        new public static TLeftExpression leftClaim(StringClaimer claimer, TExpression left){
+        new public static TLeftExpression LeftClaim(StringClaimer claimer, TExpression left){
             Claim failTo = claimer.failPoint();
             TOperator operand = TOperator.Claim(claimer);
             if(operand == null){

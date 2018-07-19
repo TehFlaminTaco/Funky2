@@ -2,17 +2,36 @@ using System.Text.RegularExpressions;
 using System.Text;
 
 namespace Funky.Tokens{
-    class TAssignment : TExpression {
+    class TAssignment : TLeftExpression {
         TExpression value;
         TVariable var;
         TOperator op;
 
         static Regex SET = new Regex(@"=");
 
-        new public static TAssignment Claim(StringClaimer claimer){
-            Claim failTo = claimer.failPoint();
+        override public void SetLeft(TExpression newLeft){
+            if(newLeft is TVariable v){
+                var = v;
+            }
+        }
 
-            TVariable toAssign = TVariable.Claim(claimer);
+        override public TExpression GetLeft(){
+            return var;
+        }
+
+        override public int GetPrecedence(){
+            return -1;
+        }
+
+        override public Associativity GetAssociativity(){
+            return Associativity.NA;
+        }
+
+        new public static TAssignment LeftClaim(StringClaimer claimer, TExpression left){
+            if(!(left is TVariable toAssign)){
+                return null;
+            }
+            Claim failTo = claimer.failPoint();
             if(toAssign == null){
                 failTo.Fail();
                 return null;

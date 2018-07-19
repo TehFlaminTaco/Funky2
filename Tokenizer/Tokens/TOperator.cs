@@ -29,7 +29,7 @@ namespace Funky.Tokens{
             new SOperator(@"!=", "ne", 11)
         };
 
-        SOperator op;
+        public SOperator op;
         public int GetPrecedence(){
             return op.precedence;
         }

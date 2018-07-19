@@ -44,6 +44,7 @@ namespace Funky{
             VarList fnc = new VarList();
 
             fnc["tobool"] = new VarFunction(dat => new VarNumber(1));
+            fnc["tostring"] = new VarFunction(dat => dat.num_args[0].asFunction().FunctionText);
 
             fnc["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
             fnc["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));
@@ -55,6 +56,47 @@ namespace Funky{
             VarList lst = new VarList();
 
             lst["tobool"] = new VarFunction(dat => new VarNumber(1));
+            lst["tostring"] = new VarFunction(dat => {
+                VarList l = dat.num_args[0].asList();
+                StringBuilder sb = new StringBuilder();
+                string joiner = "";
+                sb.Append("[");
+                
+                int largest = -1;
+                for(int i=0; l.double_vars.ContainsKey(i); i++){
+                    sb.Append(joiner);
+                    sb.Append(l.double_vars[i].asString());
+                    joiner = ", ";
+                    largest = i;
+                }
+                foreach(KeyValuePair<double, Var> kv in l.double_vars){
+                    if(kv.Key >= 0 && kv.Key <= largest){
+                        continue;
+                    }
+                    sb.Append(joiner);
+                    sb.Append(kv.Key);
+                    sb.Append("=");
+                    sb.Append(kv.Value.asString());
+                    joiner = ", ";
+                }
+                foreach(KeyValuePair<string, Var> kv in l.string_vars){
+                    sb.Append(joiner);
+                    sb.Append(kv.Key);
+                    sb.Append("=");
+                    sb.Append(kv.Value.asString());
+                    joiner = ", ";
+                }
+                foreach(KeyValuePair<Var, Var> kv in l.other_vars){
+                    sb.Append(joiner);
+                    sb.Append(kv.Key.asString());
+                    sb.Append("=");
+                    sb.Append(kv.Value.asString());
+                    joiner = ", ";
+                }
+
+                sb.Append("]");
+                return new VarString(sb.ToString());
+            });
 
             lst["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
             lst["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));

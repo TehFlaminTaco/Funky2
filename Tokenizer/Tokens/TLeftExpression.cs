@@ -17,7 +17,7 @@ namespace Funky.Tokens{
 
         public abstract Associativity GetAssociativity();
 
-        public static TLeftExpression leftClaim(StringClaimer claimer, TExpression left){return null;}
+        public static TLeftExpression LeftClaim(StringClaimer claimer, TExpression left){return null;}
 
         new public static TLeftExpression Claim(StringClaimer claimer){
             Claim failTo = claimer.failPoint();
@@ -26,7 +26,7 @@ namespace Funky.Tokens{
                 failTo.Fail();
                 return null;
             }
-            newLeft = leftClaim(claimer, newLeft);
+            newLeft = LeftClaim(claimer, newLeft);
             if(newLeft == null || !(newLeft is TLeftExpression)){
                 failTo.Fail();
                 return null;

@@ -11,6 +11,16 @@ namespace Funky.Tokens{
         }
     }
 
+    class TListLiteral : TLiteral{
+        new public static TListLiteral Claim(StringClaimer claimer){
+            return null;
+        }
+
+        override public Var Parse(Scope scope){
+            return null;
+        }
+    }
+
     class TLiteralStringSimple : TLiteral{
         VarString value;
         static Regex STRING = new Regex(@"^(?<qoute>'|"")(?<text>(\\\\|\\[^\\]|[^\\])*?)\k<qoute>");

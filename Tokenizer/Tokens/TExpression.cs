@@ -12,19 +12,23 @@ namespace Funky.Tokens{
         }
 
         private static TExpression pre_claim(StringClaimer claimer){
-            return TAssignment.Claim(claimer)   as TExpression ??
-            TIf.Claim(claimer)                  as TExpression ??
+            return TIf.Claim(claimer)           as TExpression ??
             TFor.Claim(claimer)                 as TExpression ??
             TWhile.Claim(claimer)               as TExpression ??
-            TVariable.Claim(claimer)            as TExpression ??
+            TVariable.RightClaim(claimer)       as TExpression ??
             TLiteral.Claim(claimer)             as TExpression ??
             TParenExpression.Claim(claimer)     as TExpression ??
-            TBlock.Claim(claimer)               as TExpression;
+            TBlock.Claim(claimer)               as TExpression ??
+            TDeoperator.Claim(claimer)          as TExpression ??
+            TRightCrementor.Claim(claimer)      as TExpression;
         }
 
         private static TExpression post_claim(StringClaimer claimer, TExpression last_claim){
-            return  TCall.leftClaim(claimer, last_claim)    as TExpression ??
-            TArithmetic.leftClaim(claimer, last_claim)      as TExpression;
+            return  TCall.LeftClaim(claimer, last_claim)    as TExpression ??
+            TAssignment.LeftClaim(claimer, last_claim)      as TExpression ??
+            TVariable.LeftClaim(claimer, last_claim)        as TExpression ??
+            TLeftCrementor.LeftClaim(claimer, last_claim)   as TExpression ??
+            TArithmetic.LeftClaim(claimer, last_claim)      as TExpression;
         }
 
         public abstract Var Parse(Scope scope); // Although Expression requires a Parse function, it fails to implement it, because it shouldn't be possible to have a raw "TExpression" token.

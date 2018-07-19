@@ -9,8 +9,6 @@ namespace Funky.Tokens{
         private static Regex LEFT_BRACKET = new Regex("^\\(");
         private static Regex RIGHT_BRACKET = new Regex("^\\)");
         private static Regex COMMA = new Regex("^,");
-
-        public static VarList hackMeta;
         
 
         override public TExpression GetLeft(){
@@ -29,7 +27,7 @@ namespace Funky.Tokens{
             return Associativity.NA;
         }
 
-        new public static TCall leftClaim(StringClaimer claimer, TExpression left){
+        new public static TCall LeftClaim(StringClaimer claimer, TExpression left){
             Claim lb = claimer.Claim(LEFT_BRACKET);
             if(!lb.success){ // Left Bracket is a requirement.
                 return null;
@@ -60,8 +58,7 @@ namespace Funky.Tokens{
             Scope hackedScope = new Scope();
             VarList argList = new VarList();
             hackedScope.variables = argList;
-            argList.string_vars["_parent"] = scope.variables;
-            argList.meta = getHackMeta();
+            argList.parent = scope.variables;
             int index = 0;
             for(int i=0; i < arguments.Count; i++){
                 index = arguments[i].AppendArguments(argList, index, hackedScope);
@@ -75,20 +72,6 @@ namespace Funky.Tokens{
             callData.str_args = argList.string_vars;
             callData.var_args = argList.other_vars;
             return callVar.Call(callData);
-        }
-
-        private static VarList getHackMeta(){
-            if(hackMeta == null){
-                hackMeta = new VarList();
-                hackMeta["get"] = new VarFunction(delegate(CallData data){
-                    Var father = data.num_args[0].Get("_parent");
-                    if(father == null){
-                        return null;
-                    }
-                    return father.Get(data.num_args[1]);
-                });
-            }
-            return hackMeta;
         }
 
     }

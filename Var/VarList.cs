@@ -8,6 +8,10 @@ namespace Funky{
 
         public VarList parent;
 
+        public override VarList asList(){
+            return this;
+        }
+
         public override Var Get(Var key){
             return ThisGet(key) ?? (parent != null ? parent.Get(key) : null);
         }
