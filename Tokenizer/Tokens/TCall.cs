@@ -55,13 +55,10 @@ namespace Funky.Tokens{
         }
 
         override public Var Parse(Scope scope){
-            Scope hackedScope = new Scope();
             VarList argList = new VarList();
-            hackedScope.variables = argList;
-            argList.parent = scope.variables;
             int index = 0;
             for(int i=0; i < arguments.Count; i++){
-                index = arguments[i].AppendArguments(argList, index, hackedScope);
+                index = arguments[i].AppendArguments(argList, index, scope);
             }
             Var callVar = caller.Parse(scope);
             if(callVar == null){
@@ -74,31 +71,5 @@ namespace Funky.Tokens{
             return callVar.Call(callData);
         }
 
-    }
-
-    abstract class TArgument : TExpression{
-        public abstract int AppendArguments(VarList argumentList, int index, Scope scope);
-        override public Var Parse(Scope scope){return null;} // Never parse. Never.
-
-        new public static TArgument Claim(StringClaimer claimer){
-            return TArgExpression.Claim(claimer);
-        } 
-    }
-
-    class TArgExpression : TArgument{
-        TExpression heldExp;
-        override public int AppendArguments(VarList argumentList, int index, Scope scope){
-            argumentList.double_vars[index] = heldExp.Parse(scope);
-            return index+1;
-        }
-
-        new public static TArgExpression Claim(StringClaimer claimer){
-            TExpression heldExpr = TExpression.Claim(claimer);
-            if(heldExpr == null)
-                return null;
-            TArgExpression newArgExp = new TArgExpression();
-            newArgExp.heldExp = heldExpr;
-            return newArgExp;
-        }
     }
 }

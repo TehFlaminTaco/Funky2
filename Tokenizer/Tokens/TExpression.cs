@@ -1,4 +1,5 @@
 using Funky.Tokens.Flow;
+using Funky.Tokens.Literal;
 namespace Funky.Tokens{
     abstract class TExpression : Token{
         new public static TExpression Claim(StringClaimer claimer){

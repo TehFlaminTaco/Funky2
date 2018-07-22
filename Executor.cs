@@ -8,10 +8,7 @@ namespace Funky
         {
             var file = args.FirstOrDefault();
             var code = file is null
-                ? @"
-                    for i=0 i<10 i+=1
-                        print(i)
-                "
+                ? @"print('Please specify a file.')"
                 : File.ReadAllText(file);
             Meta.GetMeta();
             TProgram prog = TProgram.Claim(new StringClaimer(code));
