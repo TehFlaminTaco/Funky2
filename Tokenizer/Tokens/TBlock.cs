@@ -10,7 +10,7 @@ namespace Funky.Tokens{
         private static Regex SEMI_COLON = new Regex(@";");
 
         override public Var Parse(Scope scope){
-            Var ret = null;
+            Var ret = Var.nil;
             Scope newScope = new Scope();
             newScope.variables = new VarList();
             newScope.variables.parent = scope.variables;

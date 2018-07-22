@@ -33,8 +33,8 @@ namespace Funky.Tokens.Flow{
         }
 
         override public Var Parse(Scope scope){
-            Var ret = null;
-            while(condition.Parse(scope)?.asBool() ?? false){
+            Var ret = Var.nil;
+            while(condition.Parse(scope).asBool()){
                 ret = action.Parse(scope);
                 if(scope.escape.Count > 0){
                     Escaper esc = scope.escape.Peek();

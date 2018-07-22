@@ -7,41 +7,66 @@ namespace Funky{
         private static VarList meta;
 
         public static VarList GetMeta(){
-            return meta ?? (meta = GenerateMeta());
+            return meta ?? GenerateMeta();
         }
 
         public static VarList GenerateMeta(){
-            VarList metas = new VarList();
-            metas["list"] = _List();
-            metas["string"] = _String();
-            metas["number"] = _Number();
-            metas["function"] = _Function();
+            meta = new VarList();
+            meta["base"] = _Base();
 
-            return metas;
+            meta["list"] = _List();
+            meta["string"] = _String();
+            meta["number"] = _Number();
+            meta["function"] = _Function();
+            meta["null"] = _Null();
+
+            return meta;
+        }
+
+        private static VarList newMeta(){
+            VarList l = new VarList();
+            l.readParent = meta["base"] as VarList;
+            return l;
+        }
+
+        private static VarList _Base(){
+            VarList bas = newMeta();
+            bas["concat"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
+            bas["eq"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
+            bas["ne"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 0 : 1);
+            return bas;
+        }
+
+        private static VarList _Null(){
+            VarList nul = newMeta();
+            nul["tostring"] = new VarFunction(dat => dat.num_args[0] is VarNull n ? n.id : "what? stop");
+            nul["tobool"] = new VarFunction(dat => 0);
+            nul["eq[left=null,right=null]"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
+
+            return nul;
         }
 
         private static VarList _String(){
-            VarList str = new VarList();
+            VarList str = newMeta();
 
             str["tobool"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data.Length));
 
-            str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == -1 ? 1 : 0));
-            str["le[side=left,left=string,right=string]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) <= 0 ? 1 : 0));
-            str["gt[side=left,left=string,right=string]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == 1 ? 1 : 0));
-            str["ge[side=left,left=string,right=string]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) >= 0 ? 1 : 0));
-            str["eq[side=left,left=string,right=string]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data == dat.num_args[1].asString().data ? 1 : 0));
-            str["ne[side=left,left=string,right=string]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data != dat.num_args[1].asString().data ? 1 : 0));
-            str["eq"] = new VarFunction(dat => new VarNumber(0));
-            str["ne"] = new VarFunction(dat => new VarNumber(1));
+            str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == -1 ? 1 : 0);
+            str["le[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) <= 0 ? 1 : 0);
+            str["gt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == 1 ? 1 : 0);
+            str["ge[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) >= 0 ? 1 : 0);
+            str["eq[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data == dat.num_args[1].asString().data ? 1 : 0);
+            str["ne[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data != dat.num_args[1].asString().data ? 1 : 0);
+            str["eq"] = new VarFunction(dat => 0);
+            str["ne"] = new VarFunction(dat => 1);
 
             str["add"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
-            str["concat"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
 
             return str;
         }
 
         private static VarList _Function(){
-            VarList fnc = new VarList();
+            VarList fnc = newMeta();
 
             fnc["tobool"] = new VarFunction(dat => new VarNumber(1));
             fnc["tostring"] = new VarFunction(dat => dat.num_args[0].asFunction().FunctionText);
@@ -53,7 +78,7 @@ namespace Funky{
         }
 
         private static VarList _List(){
-            VarList lst = new VarList();
+            VarList lst = newMeta();
 
             lst["tobool"] = new VarFunction(dat => new VarNumber(1));
             lst["tostring"] = new VarFunction(dat => {
@@ -105,7 +130,7 @@ namespace Funky{
         }
 
         private static VarList _Number(){
-            VarList num = new VarList();
+            VarList num = newMeta();
 
             num["tobool"] = new VarFunction(dat => dat.num_args[0]);
 
@@ -180,8 +205,13 @@ namespace Funky{
             newOptions[0] = "side=left";
             Var lMeta = Get(l, name, newOptions);
             newOptions[0] = "side=right";
-            if(lMeta == null || (!lValue && rValue))
-                return Get(r, name, newOptions) ?? lMeta;
+            if(lMeta is VarNull || (!lValue && rValue)){
+                Var rMeta = Get(r, name, newOptions);
+                if(rMeta is VarNull){
+                    return lMeta;
+                }
+                return rMeta;
+            }
             return lMeta;
         }
 
@@ -191,9 +221,9 @@ namespace Funky{
                 var_meta = val.meta;
             }else{
                 if(meta == null)
-                    return null;
+                    return Var.nil;
                 if(!meta.string_vars.ContainsKey(val.type)){
-                    return null;
+                    return Var.nil;
                 }
                 var_meta = (VarList)meta.string_vars[val.type];
             }
@@ -212,7 +242,7 @@ namespace Funky{
             }
             if(var_meta.string_vars.ContainsKey(name))
                 return var_meta.string_vars[name];
-            return null;
+            return Var.nil;
         }
     }
 }

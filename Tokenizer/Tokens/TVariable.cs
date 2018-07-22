@@ -85,7 +85,10 @@ namespace Funky.Tokens{
         }
 
         public override Var Get(Scope scope){
-            return isLocal ? (scope.variables.string_vars.ContainsKey(name) ? scope.variables.string_vars[name] : null) : scope.variables.Get(name);
+            if(isLocal && !scope.variables.string_vars.ContainsKey(name)){
+                scope.variables.string_vars[name] = Var.undefined;
+            }
+            return isLocal ? scope.variables.string_vars[name] : scope.variables.Get(name);
         }
 
         public override Var Set(Scope scope, Var value){

@@ -21,7 +21,7 @@ namespace Funky.Tokens{
                 func.FunctionText = raw;
                 return func;
             }
-            return null;
+            return Var.nil;
         }
 
         new public static TDeoperator Claim(StringClaimer claimer){

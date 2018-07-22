@@ -54,9 +54,9 @@ namespace Funky.Tokens{
 
         public Var Parse(Var left, Var right){
             Var metaMethod = Meta.LR_Get(left, right, op.name, $"left={left.type}", $"right={right.type}");
-            if(metaMethod != null)
+            if(!(metaMethod is VarNull))
                 return metaMethod.Call(new CallData(left, right));
-            return null;
+            return Var.nil;
         }
     }
 

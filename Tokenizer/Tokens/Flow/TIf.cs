@@ -49,7 +49,7 @@ namespace Funky.Tokens.Flow{
 
         override public Var Parse(Scope scope){
             Var should = condition.Parse(scope);
-            return should?.asBool()??false?action.Parse(scope):otherwise?.Parse(scope);
+            return (should.asBool()?action.Parse(scope):otherwise?.Parse(scope))??Var.nil;
         }
     }
 }

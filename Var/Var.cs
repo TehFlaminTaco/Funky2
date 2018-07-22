@@ -4,6 +4,10 @@ namespace Funky{
         public string type;
         public VarList meta;
 
+        public static VarNull nil = new VarNull("nil");
+        public static VarNull undefined = new VarNull("undefined");
+        
+
         // Sometimes you want a string representation of the type, but you want to do it Programatically.
         // AKA: Making real coders cry.
         public Var(){type = this.GetType().Name.Substring(3).ToLower();}
@@ -14,14 +18,14 @@ namespace Funky{
 
         public virtual Var Get(Var key){
             Var callFunc = Meta.Get(this, "get", $"key({key.type})");
-            if(callFunc != null)
+            if(!(callFunc is VarNull))
                 return callFunc.Call(new CallData(this, (VarString)key));
-            return null;
+            return nil;
         }
 
         public virtual Var Set(Var key, Var val){
             Var callFunc = Meta.Get(this, "set", $"key({key.type})", $"value({val.type})");
-            if(callFunc != null)
+            if(!(callFunc is VarNull))
                 return callFunc.Call(new CallData(this, (VarString)key, val));
             return val;
         }
@@ -43,7 +47,7 @@ namespace Funky{
 
         public virtual VarString asString(){
             Var callFunc = Meta.Get(this, "tostring");
-            if(callFunc != null){
+            if(!(callFunc is VarNull)){
                 Var outp = callFunc.Call(new CallData(this));
                 if(!(outp is VarString)){
                     return outp.asString();
@@ -54,7 +58,7 @@ namespace Funky{
         }
         public virtual VarNumber asNumber(){
             Var callFunc = Meta.Get(this, "tonumber");
-            if(callFunc != null){
+            if(!(callFunc is VarNull)){
                 Var outp = callFunc.Call(new CallData(this));
                 if(!(outp is VarNumber)){
                     return outp.asNumber();
@@ -65,7 +69,7 @@ namespace Funky{
         }
         public virtual VarList asList(){
             Var callFunc = Meta.Get(this, "tolist");
-            if(callFunc != null){
+            if(!(callFunc is VarNull)){
                 Var outp = callFunc.Call(new CallData(this));
                 if(!(outp is VarList)){
                     return outp.asList();
@@ -79,7 +83,7 @@ namespace Funky{
 
         public virtual VarFunction asFunction(){
             Var callFunc = Meta.Get(this, "tofunction");
-            if(callFunc != null){
+            if(!(callFunc is VarNull)){
                 Var outp = callFunc.Call(new CallData(this));
                 if(!(outp is VarFunction)){
                     return outp.asFunction();
@@ -93,7 +97,7 @@ namespace Funky{
 
         public virtual bool asBool(){
             Var callFunc = Meta.Get(this, "tobool");
-            if(callFunc != null){
+            if(!(callFunc is VarNull)){
                 Var outp = callFunc.Call(new CallData(this));
                 if(!(outp is VarNumber n)){
                     return outp.asBool();
@@ -143,6 +147,12 @@ namespace Funky{
         public override VarString asString(){
             return this;
         }
+    }
 
+    class VarNull : Var {
+        public string id;
+        public VarNull(string id){
+            this.id = id;
+        }
     }
 }

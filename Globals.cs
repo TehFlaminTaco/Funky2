@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System;
 namespace Funky{
    class Globals{
-       static VarList globals;
+       static VarList globals = null;
        public static VarList get(){
            if(globals == null){
                 globals = new VarList();
@@ -13,7 +13,7 @@ namespace Funky{
                     string chunker = "";
                     for(int i=0; dat.num_args.ContainsKey(i); i++){
                         sb.Append(chunker);
-                        sb.Append(dat.num_args[i]?.asString() ?? "null");
+                        sb.Append(dat.num_args[i].asString());
                         chunker = "\t";
                     }
                     string outStr = sb.ToString();

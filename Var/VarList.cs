@@ -6,14 +6,28 @@ namespace Funky{
         public Dictionary<double, Var> double_vars = new Dictionary<double, Var>();
         public Dictionary<Var, Var> other_vars     = new Dictionary<Var, Var>();
 
-        public VarList parent;
+        public VarList readParent;
+        public VarList writeParent;
+        public VarList parent {
+            get{
+                return readParent ?? writeParent;
+            }
+            set{
+                readParent = value;
+                writeParent = value;
+            }
+        }
 
         public override VarList asList(){
             return this;
         }
 
         public override Var Get(Var key){
-            return ThisGet(key) ?? (parent != null ? parent.Get(key) : null);
+            Var t = ThisGet(key);
+            if(t == Var.nil){
+                return readParent != null ? readParent.Get(key) : Var.nil;
+            }
+            return t;
         }
 
         public Var ThisGet(Var key){
@@ -33,15 +47,15 @@ namespace Funky{
         public Var ThisSet(Var key, Var val){
             Var metaFunc = Meta.Get(this, "set", $"key({key.type})", $"value({val.type})");
 
-            if(metaFunc != null)
+            if(!(metaFunc is VarNull))
                 return metaFunc.Call(new CallData((VarString)key, val));
             
             bool assignHere = false;
-            if(parent == null)
+            if(writeParent == null)
                 assignHere = true;
             else if (key is VarString s && defined.Contains(s))
                 assignHere = true;
-            else if (ThisGet(key) != null)
+            else if ((ThisGet(key)??Var.nil) != Var.nil) // We ?? just incase. Because, /shrug.
                 assignHere = true;
             
             if(assignHere){
@@ -53,7 +67,7 @@ namespace Funky{
                 }
                 return other_vars[key] = val;
             }else
-                return parent.Set(key, val);
+                return writeParent.Set(key, val);
         }
     }
 }

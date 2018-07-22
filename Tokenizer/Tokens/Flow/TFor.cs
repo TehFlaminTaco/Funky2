@@ -45,9 +45,9 @@ namespace Funky.Tokens.Flow{
 
         override public Var Parse(Scope scope){
             initial?.Parse(scope);
-            Var ret = null;
-            while(condition == null || (condition.Parse(scope)?.asBool() ?? false)){
-                ret = body?.Parse(scope);
+            Var ret = Var.nil;
+            while(condition == null || (condition.Parse(scope).asBool())){
+                ret = body?.Parse(scope)??ret;
                 if(scope.escape.Count > 0){
                     Escaper esc = scope.escape.Peek();
                     if(esc.method == Escape.BREAK)

@@ -61,8 +61,8 @@ namespace Funky.Tokens{
                 index = arguments[i].AppendArguments(argList, index, scope);
             }
             Var callVar = caller.Parse(scope);
-            if(callVar == null){
-                return null;
+            if(callVar is VarNull){
+                return Var.nil;
             }
             CallData callData = new CallData();
             callData.num_args = argList.double_vars;

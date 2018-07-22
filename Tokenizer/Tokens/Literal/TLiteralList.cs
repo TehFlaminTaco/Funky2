@@ -22,7 +22,7 @@ namespace Funky.Tokens.Literal{
         }
 
         override public Var Parse(Scope scope){
-            return null;
+            return Var.nil;
         }
     }
 }
