@@ -64,7 +64,7 @@ namespace Funky.Tokens{
 
     class TIdentifier : TVariable{
         public string name;
-        bool isLocal = false;
+        public bool isLocal = false;
         static Regex LOCAL = new Regex(@"local|var|let");
         static Regex IDENTIFIER = new Regex(@"^[a-zA-Z_]\w*");
 

@@ -27,7 +27,8 @@ namespace Funky.Tokens{
         }
 
         private static TExpression post_claim(StringClaimer claimer, TExpression last_claim){
-            return  TCall.LeftClaim(claimer, last_claim)    as TExpression ??
+            return  TVariable.LeftClaim(claimer, last_claim)as TExpression ??
+            TCall.LeftClaim(claimer, last_claim)            as TExpression ??
             TAssignment.LeftClaim(claimer, last_claim)      as TExpression ??
             TVariable.LeftClaim(claimer, last_claim)        as TExpression ??
             TLeftCrementor.LeftClaim(claimer, last_claim)   as TExpression ??

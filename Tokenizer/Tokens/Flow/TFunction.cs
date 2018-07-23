@@ -37,6 +37,7 @@ namespace Funky.Tokens.Flow{
 
         new public static TFunction Claim(StringClaimer claimer){
             Claim failPoint = claimer.failPoint();
+            int startPoint = claimer.Location();
             Claim c;
             if((c = claimer.Claim(FUNCTION)).success){ // Chunky form.
                 TVariable name = TVariable.Claim(claimer); // Surprisingly optional.
@@ -54,6 +55,7 @@ namespace Funky.Tokens.Flow{
                 func.name = name;
                 func.body = body;
                 func.args = args;
+                func.raw = claimer.SubString(startPoint);
                 return func; // OH MY, A SUCCESSFUL RETURN. THE GODS BE PRAISED.
             }else{ // Lightweight form.
                 TArgVariable ident = TArgVariable.Claim(claimer);
@@ -81,6 +83,7 @@ namespace Funky.Tokens.Flow{
                 TFunction func = new TFunction();
                 func.body = body;
                 func.args = args;
+                func.raw = claimer.SubString(startPoint);
                 return func;
             }
         }
@@ -120,6 +123,7 @@ namespace Funky.Tokens.Flow{
                 return body.Parse(subscope);
             });
             func.scope = scope;
+            func.FunctionText = raw;
             if(name != null){
                 name.Set(scope, func);
             }
@@ -142,6 +146,7 @@ namespace Funky.Tokens.Flow{
             TIdentifier v = TIdentifier.Claim(claimer);
             if(v != null){
                 TArgVariable argV = new TArgVariable();
+                v.isLocal = true;
                 argV.var = v;
                 return argV;
             }
@@ -154,7 +159,7 @@ namespace Funky.Tokens.Flow{
             }else{
                 var.Set(scopetarget, Var.undefined);
             }
-            return index++;
+            return ++index;
         }
     }
 }
