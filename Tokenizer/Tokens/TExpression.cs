@@ -14,6 +14,7 @@ namespace Funky.Tokens{
 
         private static TExpression pre_claim(StringClaimer claimer){
             return TIf.Claim(claimer)           as TExpression ??
+            TFunction.Claim(claimer)            as TExpression ??
             TFor.Claim(claimer)                 as TExpression ??
             TWhile.Claim(claimer)               as TExpression ??
             TNil.Claim(claimer)                 as TExpression ??
