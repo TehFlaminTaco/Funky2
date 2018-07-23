@@ -27,8 +27,8 @@ namespace Funky.Tokens{
         }
 
         new public static TDeoperator Claim(StringClaimer claimer){
-            Claim c = claimer.Claim(ATSYMBOL);
             int start = claimer.Location();
+            Claim c = claimer.Claim(ATSYMBOL);
             if(!c.success){
                 return null;
             }
