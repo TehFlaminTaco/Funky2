@@ -5,8 +5,9 @@ using System.Collections.Generic;
 namespace Funky.Tokens.Flow{
     class TFor : TExpression{
         private static Regex FOR = new Regex(@"for");
-        private static Regex LEFT_BRACKET = new Regex("^\\(");
-        private static Regex RIGHT_BRACKET = new Regex("^\\)");
+        private static Regex LEFT_BRACKET = new Regex(@"^\(");
+        private static Regex RIGHT_BRACKET = new Regex(@"^\)");
+        private static Regex SEMI_COLON = new Regex(@";");
 
         TExpression initial;
         TExpression condition;
@@ -25,6 +26,7 @@ namespace Funky.Tokens.Flow{
                 if((exprs[claimed] = TExpression.Claim(claimer))==null){ // Out of Expressions. :(
                     break;
                 }
+                claimer.Claim(SEMI_COLON);
             }
             claimed--;
             c = claimer.Claim(RIGHT_BRACKET);
