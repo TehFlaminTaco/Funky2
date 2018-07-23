@@ -34,6 +34,21 @@ namespace Funky{
                     return dat.num_args[0];
                 });
 
+                globals["setscope"] = new VarFunction(dat => {
+                    VarFunction fnc = dat.num_args[0].asFunction();
+                    if(fnc.scope.escape != null){
+                        fnc.scope.variables = dat.num_args[1].asList();
+                    }
+                    return fnc;
+                });
+                globals["getscope"] = new VarFunction(dat => {
+                    VarFunction fnc = dat.num_args[0].asFunction();
+                    if(fnc.scope.escape != null){
+                        return fnc.scope.variables;
+                    }
+                    return Var.nil;
+                });
+
            }
            return globals;
        }

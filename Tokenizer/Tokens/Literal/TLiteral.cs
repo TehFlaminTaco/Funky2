@@ -8,6 +8,7 @@ namespace Funky.Tokens.Literal{
         new public static TLiteral Claim(StringClaimer claimer){
             return TLiteralNumber.Claim(claimer)    as TLiteral ??
             TLiteralString.Claim(claimer)           as TLiteral ??
+            TLiteralStringTemplate.Claim(claimer)   as TLiteral ??
             TLiteralList.Claim(claimer)             as TLiteral;
         }
     }

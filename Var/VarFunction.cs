@@ -19,6 +19,8 @@ namespace Funky{
     class VarFunction : Var{
         public System.Func<CallData, Var> action;
 
+        public Scope scope;
+
         public string FunctionText = "[internal function]";
 
         public VarFunction(System.Func<CallData, Var> todo) : base(){
