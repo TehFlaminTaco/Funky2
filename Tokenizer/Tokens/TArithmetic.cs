@@ -54,7 +54,7 @@ namespace Funky.Tokens{
         }
 
         override public Var Parse(Scope scope){
-            return op.Parse(leftArg.Parse(scope), rightArg.Parse(scope));
+            return op.Parse(scope, leftArg, rightArg);
         }
 
     }

@@ -59,9 +59,7 @@ namespace Funky.Tokens{
 
         override public Var Parse(Scope scope){
             if(op != null){
-                Var left = var.Get(scope);
-                Var val = value.Parse(scope);
-                val = op.Parse(left, val);
+                Var val = op.Parse(scope, var, value);
                 return var.Set(scope, val);
             }else
                 return var.Set(scope, value.Parse(scope));

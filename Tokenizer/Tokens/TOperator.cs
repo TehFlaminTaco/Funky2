@@ -15,6 +15,8 @@ namespace Funky.Tokens{
             new SOperator(@"\%", "mod", 6),
             new SOperator(@"&&", "and", 15),
             new SOperator(@"\|\|", "or", 16),
+            new SOperator(@"and", "and", 15),
+            new SOperator(@"or", "or", 16),
             new SOperator(@"\.\.", "concat", 8),
             new SOperator(@"\|", "bitor", 14),
             new SOperator(@"&", "bitand", 12),
@@ -52,7 +54,38 @@ namespace Funky.Tokens{
             return null;
         }
 
+        public Var Parse(Scope scope, TExpression left, TExpression right){
+            Var l = Var.nil;
+            if(op.name == "and"){
+                l = left.Parse(scope);
+                if(!l.asBool()){
+                    return l;
+                }
+                return right.Parse(scope);
+            }
+            if(op.name == "or"){
+                l = left.Parse(scope);
+                if(l.asBool()){
+                    return l;
+                }
+                return right.Parse(scope);
+            }
+            return Parse(left.Parse(scope), right.Parse(scope));
+        }
+
         public Var Parse(Var left, Var right){
+            if(op.name == "and"){
+                if(!left.asBool()){
+                    return left;
+                }
+                return right;
+            }
+            if(op.name == "or"){
+                if(left.asBool()){
+                    return left;
+                }
+                return right;
+            }
             Var metaMethod = Meta.LR_Get(left, right, op.name, $"left={left.type}", $"right={right.type}");
             if(!(metaMethod is VarNull))
                 return metaMethod.Call(new CallData(left, right));
