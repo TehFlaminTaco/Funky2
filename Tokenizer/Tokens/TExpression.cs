@@ -18,6 +18,7 @@ namespace Funky.Tokens{
             TFor.Claim(claimer)                 as TExpression ??
             TWhile.Claim(claimer)               as TExpression ??
             TNil.Claim(claimer)                 as TExpression ??
+            TReturn.Claim(claimer)              as TExpression ??
             TVariable.RightClaim(claimer)       as TExpression ??
             TLiteral.Claim(claimer)             as TExpression ??
             TParenExpression.Claim(claimer)     as TExpression ??
