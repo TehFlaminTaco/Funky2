@@ -120,7 +120,15 @@ namespace Funky.Tokens.Flow{
                 for(int i=0; i < args.Count; i++){
                     index = args[i].AppendToScope(index, func.scope, dat, subscope);
                 }
-                return body.Parse(subscope);
+                Var o = body.Parse(subscope);
+                if(subscope.escape.Count>0){
+                    Escaper esc = subscope.escape.Peek();
+                    if(esc.method == Escape.RETURN){
+                        subscope.escape.Pop();
+                    }
+                    return esc.value;
+                }
+                return o;
             });
             func.scope = scope;
             func.FunctionText = raw;
