@@ -30,7 +30,7 @@ namespace Funky.Tokens{
         }
 
         public static TCall ExpressionClaim(StringClaimer claimer, TExpression left){
-            TExpression exp = TDeoperator.Claim(claimer) as TExpression ?? TBlock.Claim(claimer) as TExpression ?? TLiteral.Claim(claimer) as TExpression;
+            TExpression exp = TDeoperator.Claim(claimer) as TExpression ?? TBlock.Claim(claimer) as TExpression ?? TLiteralString.Claim(claimer) as TExpression ?? TLiteralStringTemplate.Claim(claimer);
             if(exp != null){
                 TCall newCall = new TCall();
                 newCall.caller = left;
