@@ -33,5 +33,33 @@ namespace Funky.Tokens{
             }
             return newLeft as TLeftExpression;
         }
+
+        public LeftSteal StealLeft(int precedence, Associativity assoc, TExpression stealer){
+            if(GetAssociativity() == Associativity.NA){
+                return new LeftSteal(stealer, this);
+            }
+            int my_prec = GetPrecedence();
+            if(precedence < my_prec || (precedence == my_prec && assoc != Associativity.RIGHT_TO_LEFT)){
+                TExpression leftExp = GetLeft();
+                if(leftExp is TLeftExpression l){
+                    LeftSteal stole = l.StealLeft(precedence, assoc, stealer);
+                    SetLeft(stole.returnExp);
+                    stole.returnExp = this;
+                    return stole;
+                }
+                SetLeft(stealer);
+                return new LeftSteal(this, leftExp);
+            }else{
+                return new LeftSteal(stealer, this);
+            }
+        }
+    }
+    struct LeftSteal{
+        public TExpression returnExp;
+        public TExpression rightExp;
+        public LeftSteal(TExpression returnExp, TExpression rightExp){
+            this.returnExp = returnExp;
+            this.rightExp = rightExp;
+        }
     }
 }

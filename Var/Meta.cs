@@ -34,6 +34,11 @@ namespace Funky{
             bas["concat"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
             bas["eq"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
             bas["ne"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 0 : 1);
+
+            bas["unp"] = new VarFunction(dat => dat.num_args[0].asNumber());
+            bas["unm"] = new VarFunction(dat => -dat.num_args[0].asNumber().value);
+            bas["not"] = new VarFunction(dat => dat.num_args[0].asBool() ? 0 : 1);
+            bas["len"] = new VarFunction(dat => 0);
             return bas;
         }
 
@@ -49,7 +54,8 @@ namespace Funky{
         private static VarList _String(){
             VarList str = newMeta();
 
-            str["tobool"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asString().data.Length));
+            str["tobool"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);
+            str["len"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);
 
             str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == -1 ? 1 : 0);
             str["le[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) <= 0 ? 1 : 0);
@@ -121,6 +127,13 @@ namespace Funky{
 
                 sb.Append("]");
                 return new VarString(sb.ToString());
+            });
+            lst["len"] = new VarFunction(dat => {
+                VarList l = dat.num_args[0].asList();
+                int i=0;
+                while(l.double_vars.ContainsKey(i) && !(l.double_vars[i] is VarNull))
+                    i++;
+                return i;
             });
 
             lst["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));

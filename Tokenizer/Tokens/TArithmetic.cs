@@ -22,7 +22,7 @@ namespace Funky.Tokens{
             return op.GetAssociativity();
         }
 
-        new public static TLeftExpression LeftClaim(StringClaimer claimer, TExpression left){
+        new public static TExpression LeftClaim(StringClaimer claimer, TExpression left){
             Claim failTo = claimer.failPoint();
             TOperator operand = TOperator.Claim(claimer);
             if(operand == null){
@@ -40,14 +40,10 @@ namespace Funky.Tokens{
             newArith.rightArg = right;
             newArith.op = operand;
 
-            if(right is TLeftExpression t && t.GetAssociativity() != Associativity.NA){
-                int prec = operand.GetPrecedence();
-                int r_prec = t.GetPrecedence();
-                if (prec < r_prec || (prec == r_prec && operand.GetAssociativity() == Associativity.LEFT_TO_RIGHT)){
-                    newArith.rightArg = t.GetLeft();
-                    t.SetLeft(newArith);
-                    return t;
-                }
+            if(right is TLeftExpression t){
+                LeftSteal ls = t.StealLeft(newArith.GetPrecedence(), newArith.GetAssociativity(), newArith);
+                newArith.rightArg = ls.rightExp;
+                return ls.returnExp;
             }
             
             return newArith;
