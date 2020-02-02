@@ -54,6 +54,15 @@ namespace Funky{
         private static VarList _String(){
             VarList str = newMeta();
 
+            str["get"] = new VarFunction(dat => {
+                VarString s = dat.num_args[0].asString();
+                Var n = dat.num_args[1];
+                if (n is VarNumber){
+                    return (VarString)(""+s.data[(int)(Math.Abs(n.asNumber().value)%s.data.Length)]);
+                }
+                return Var.nil;
+            });
+
             str["tobool"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);
             str["len"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);
 

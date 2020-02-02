@@ -19,14 +19,14 @@ namespace Funky{
         public virtual Var Get(Var key){
             Var callFunc = Meta.Get(this, "get", $"key({key.type})");
             if(!(callFunc is VarNull))
-                return callFunc.Call(new CallData(this, (VarString)key));
+                return callFunc.Call(new CallData(this, key));
             return nil;
         }
 
         public virtual Var Set(Var key, Var val){
             Var callFunc = Meta.Get(this, "set", $"key({key.type})", $"value({val.type})");
             if(!(callFunc is VarNull))
-                return callFunc.Call(new CallData(this, (VarString)key, val));
+                return callFunc.Call(new CallData(this, key, val));
             return val;
         }
 
