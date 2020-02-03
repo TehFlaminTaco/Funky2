@@ -48,7 +48,7 @@ namespace Funky{
             Var metaFunc = Meta.Get(this, "set", $"key({key.type})", $"value({val.type})");
 
             if(!(metaFunc is VarNull))
-                return metaFunc.Call(new CallData((VarString)key, val));
+                return metaFunc.Call(new CallData(this, (VarString)key, val));
             
             bool assignHere = false;
             if(writeParent == null)
