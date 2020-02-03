@@ -164,11 +164,13 @@ class Globals{
                     return Var.nil;
                 });
             });
+            string groupFinder = @"^(?:(?<!\\)(?:\\\\)*\(.*?){3}((?:.|\\\)|\\\\)*?)\)";
             str["gsub"] = new VarFunction(dat => {
                 string haystack = dat.num_args[0].asString();
                 string needle = dat.num_args[1].asString();
                 Var replacement = dat.num_args[2];
                 Regex matcher = new Regex(needle);
+                
                 if(replacement is VarFunction){
                     StringBuilder result = new StringBuilder();
                     MatchCollection M = matcher.Matches(haystack);
@@ -181,12 +183,16 @@ class Globals{
                         cd.num_args = new Dictionary<double, Var>();
                         cd.str_args = new Dictionary<string, Var>();
                         cd.var_args = new Dictionary<Var,    Var>();
-                        for(int c = 0; c < m.Groups.Count; c++){
-                            if(m.Groups[c].Length == 0)
-                                cd.str_args[m.Groups[c].Name] = cd.num_args[c] = m.Groups[c].Index;
-                            else
-                                cd.str_args[m.Groups[c].Name] = cd.num_args[c] = m.Groups[c].Value;
-                        }
+                        if(m.Groups.Count > 1)
+                            for(int c = 1; c < m.Groups.Count; c++){
+                                string groupText = Regex.Match(needle, Regex.Replace(groupFinder, "3", ""+c)).Groups[1].Value;
+                                if(groupText.Length == 0)
+                                    cd.str_args[m.Groups[c].Name] = cd.num_args[c-1] = m.Groups[c].Index;
+                                else
+                                    cd.str_args[m.Groups[c].Name] = cd.num_args[c-1] = m.Groups[c].Value;
+                            }
+                        else
+                            cd.num_args[0] = m.Groups[0].Value;
                         result.Append(replacement.Call(cd).asString().data);
                     }
                     result.Append(haystack.Substring(lastPoint));
