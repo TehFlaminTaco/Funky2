@@ -6,7 +6,7 @@ using System;
 namespace Funky.Tokens.Literal{
 
     class TLiteralString : TLiteral{
-        VarString value;
+        public VarString value;
         static Regex STRING = new Regex(@"^(?<qoute>'|"")(?<text>(\\\\|\\[^\\]|[^\\])*?)\k<qoute>");
 
         new public static TLiteralString Claim(StringClaimer claimer){

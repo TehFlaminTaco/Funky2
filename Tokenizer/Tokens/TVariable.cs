@@ -1,5 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Text;
+using Funky.Tokens.Literal;
+
 namespace Funky.Tokens{
     abstract class TVariable : TExpression{
         new public static TVariable Claim(StringClaimer claimer){
@@ -34,23 +36,40 @@ namespace Funky.Tokens{
 
         private static Regex LEFT_BRACKET = new Regex(@"\[");
         private static Regex RIGHT_BRACKET = new Regex(@"\]");
+        private static Regex DOT = new Regex(@"\.");
 
         new public static TIndex LeftClaim(StringClaimer claimer, TExpression left){
             Claim c = claimer.Claim(LEFT_BRACKET);
-            if(!c.success){
-                return null;
-            }
-            TExpression index = TExpression.Claim(claimer);
-            if(index == null){
-                c.Fail();
-                return null;
-            }
-            TIndex ind = new TIndex();
-            ind.indexed = left;
-            ind.index = index;
-            claimer.Claim(RIGHT_BRACKET);
+            if(c.success){
+                TExpression index = TExpression.Claim(claimer);
+                if(index == null){
+                    c.Fail();
+                    return null;
+                }
+                TIndex ind = new TIndex();
+                ind.indexed = left;
+                ind.index = index;
+                claimer.Claim(RIGHT_BRACKET);
 
-            return ind;
+                return ind;
+            }else{
+                c = claimer.Claim(DOT);
+                if(c.success){
+                    TIdentifier ident = TIdentifier.Claim(claimer);
+                    if(ident == null){
+                        c.Fail();
+                        return null;
+                    }
+                    TIndex ind = new TIndex();
+                    TLiteralString indexName = new TLiteralString();
+                    indexName.value = new VarString(ident.name);
+                    ind.indexed = left;
+                    ind.index = indexName;
+                    return ind;
+                }else{
+                    return null;
+                }
+            }
         }
 
         override public Var Get(Scope scope){
