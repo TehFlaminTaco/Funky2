@@ -76,6 +76,50 @@ namespace Funky{
             str["ne"] = new VarFunction(dat => 1);
 
             str["add"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
+            str["mult[side=left,left=string,right=number]"] = new VarFunction(dat => {
+                double repeatAmt = dat.num_args[1].asNumber().value;
+                string builtString = "";
+                string baseString = dat.num_args[0].asString().data;
+                bool doFlip = false;
+                if(repeatAmt < 0d){
+                    repeatAmt = -repeatAmt;
+                    doFlip = true;
+                }
+                for(int i = 0; i < repeatAmt; i++)
+                    builtString += baseString;
+                float remaining = (float)(repeatAmt%1f);
+                if(remaining > 0f)
+                    builtString += baseString.Substring(0, (int)(baseString.Length * remaining));
+                
+                if(doFlip){
+                    char[] arr = builtString.ToCharArray();
+                    Array.Reverse(arr);
+                    builtString = new String(arr);
+                }
+                return new VarString(builtString);
+            });
+            str["mult[side=right,left=number,right=string]"] = new VarFunction(dat => {
+                double repeatAmt = dat.num_args[0].asNumber().value;
+                string builtString = "";
+                string baseString = dat.num_args[1].asString().data;
+                bool doFlip = false;
+                if(repeatAmt < 0d){
+                    repeatAmt = -repeatAmt;
+                    doFlip = true;
+                }
+                for(int i = 0; i < repeatAmt; i++)
+                    builtString += baseString;
+                float remaining = (float)(repeatAmt%1f);
+                if(remaining > 0f)
+                    builtString += baseString.Substring(0, (int)(baseString.Length * remaining));
+                
+                if(doFlip){
+                    char[] arr = builtString.ToCharArray();
+                    Array.Reverse(arr);
+                    builtString = new String(arr);
+                }
+                return new VarString(builtString);
+            });
 
             return str;
         }

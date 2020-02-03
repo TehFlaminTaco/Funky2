@@ -21,6 +21,16 @@ namespace Funky{
                     return outStr;
                 });
 
+                globals["write"] = new VarFunction(dat => {
+                    StringBuilder sb = new StringBuilder();
+                    for(int i=0; dat.num_args.ContainsKey(i); i++){
+                        sb.Append(dat.num_args[i].asString());
+                    }
+                    string outStr = sb.ToString();
+                    Console.Write(outStr);
+                    return outStr;
+                });
+
                 globals["list"] = new VarFunction(dat => {
                     VarList l = new VarList();
                     l.double_vars = dat.num_args;
