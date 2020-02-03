@@ -60,6 +60,8 @@ class Globals{
                 globals["string"] = LibString();
                 globals["list"] = LibList();
                 globals["io"] = LibIO();
+
+                globals["_G"] = globals;
             }
             return globals;
         }

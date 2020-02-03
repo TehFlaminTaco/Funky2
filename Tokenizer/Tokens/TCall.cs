@@ -30,7 +30,7 @@ namespace Funky.Tokens{
         }
 
         public static TCall ExpressionClaim(StringClaimer claimer, TExpression left){
-            TExpression exp = TDeoperator.Claim(claimer) as TExpression ?? TBlock.Claim(claimer) as TExpression ?? TLiteralString.Claim(claimer) as TExpression ?? TLiteralStringTemplate.Claim(claimer);
+            TExpression exp = TDeoperator.Claim(claimer) as TExpression ?? TLiteralString.Claim(claimer) as TExpression ?? TLiteralStringTemplate.Claim(claimer);
             if(exp != null){
                 TCall newCall = new TCall();
                 newCall.caller = left;
@@ -70,13 +70,7 @@ namespace Funky.Tokens{
         override public Var Parse(Scope scope){
             VarList argList = new VarList();
             if(special_call != null){
-                if(special_call is TBlock){
-                    VarFunction func = null;
-                    argList.double_vars[0] = func = new VarFunction(dat => special_call.Parse(func.scope));
-                    func.scope = scope;
-                }else{
-                    argList.double_vars[0] = special_call.Parse(scope);
-                }
+                argList.double_vars[0] = special_call.Parse(scope);
             }else{
                 int index = 0;
                 for(int i=0; i < arguments.Count; i++){
