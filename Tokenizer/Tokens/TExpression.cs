@@ -15,13 +15,14 @@ namespace Funky.Tokens{
         private static TExpression pre_claim(StringClaimer claimer){
             return TIf.Claim(claimer)           as TExpression ??
             TFunction.Claim(claimer)            as TExpression ??
+            TForIn.Claim(claimer)               as TExpression ??
             TFor.Claim(claimer)                 as TExpression ??
             TWhile.Claim(claimer)               as TExpression ??
             TNil.Claim(claimer)                 as TExpression ??
             TReturn.Claim(claimer)              as TExpression ??
             TVariable.RightClaim(claimer)       as TExpression ??
             TLiteral.Claim(claimer)             as TExpression ??
-            TUnaryArithmetic.Claim(claimer)       as TExpression ??
+            TUnaryArithmetic.Claim(claimer)     as TExpression ??
             TParenExpression.Claim(claimer)     as TExpression ??
             TBlock.Claim(claimer)               as TExpression ??
             TDeoperator.Claim(claimer)          as TExpression ??

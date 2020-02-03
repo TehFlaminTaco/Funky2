@@ -59,6 +59,8 @@ namespace Funky{
                 Var n = dat.num_args[1];
                 if (n is VarNumber){
                     return (VarString)(""+s.data[(int)(Math.Abs(n.asNumber().value)%s.data.Length)]);
+                }else{
+                    return Globals.get()["string"].Get(n);
                 }
                 return Var.nil;
             });
