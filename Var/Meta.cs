@@ -62,7 +62,6 @@ namespace Funky{
                 }else{
                     return Globals.get()["string"].Get(n);
                 }
-                return Var.nil;
             });
 
             str["tobool"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);

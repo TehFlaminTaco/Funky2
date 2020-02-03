@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using System.Text;
+using System.Collections.Generic;
 using Funky.Tokens.Literal;
 
 namespace Funky.Tokens{
@@ -36,7 +37,9 @@ namespace Funky.Tokens{
 
         private static Regex LEFT_BRACKET = new Regex(@"\[");
         private static Regex RIGHT_BRACKET = new Regex(@"\]");
-        private static Regex DOT = new Regex(@"\.");
+        private static Regex DOT = new Regex(@"[.:]");
+
+        public bool curry = false;
 
         new public static TIndex LeftClaim(StringClaimer claimer, TExpression left){
             Claim c = claimer.Claim(LEFT_BRACKET);
@@ -65,6 +68,7 @@ namespace Funky.Tokens{
                     indexName.value = new VarString(ident.name);
                     ind.indexed = left;
                     ind.index = indexName;
+                    ind.curry = c.GetText()==":";
                     return ind;
                 }else{
                     return null;
@@ -73,7 +77,29 @@ namespace Funky.Tokens{
         }
 
         override public Var Get(Scope scope){
-            return indexed.Parse(scope)?.Get(index.Parse(scope));
+            if(curry){
+                return new VarFunction(dat => {
+                    Var frm = indexed.Parse(scope);
+                    
+                    Var oldFunc = frm?.Get(index.Parse(scope));
+
+                    CallData newCD = new CallData();
+                    newCD.num_args = new Dictionary<double, Var>();
+                    newCD.str_args = new Dictionary<string, Var>();
+                    newCD.var_args = new Dictionary<Var,    Var>();
+
+                    foreach(KeyValuePair<string, Var> kv in dat.str_args)
+                        newCD.str_args[kv.Key] = kv.Value;
+                    foreach(KeyValuePair<Var, Var> kv in dat.var_args)
+                        newCD.var_args[kv.Key] = kv.Value;
+                    foreach(KeyValuePair<double, Var> kv in dat.num_args)
+                        newCD.num_args[kv.Key+1] = kv.Value;
+                    newCD.num_args[0d] = frm;
+
+                    return oldFunc.Call(newCD);
+                });
+            }else
+                return indexed.Parse(scope)?.Get(index.Parse(scope));
         }
 
         override public Var Set(Scope scope, Var value){
