@@ -141,10 +141,58 @@ namespace Funky.Tokens.Flow{
 
     abstract class TArgNamer : Token{
         new public static TArgNamer Claim(StringClaimer claimer){
-            return TArgVariable.Claim(claimer) as TArgNamer;
+            return  TArgVariableSplat.Claim(claimer) as TArgNamer ??
+                    TArgVariable.Claim(claimer) as TArgNamer;
         }
 
         public abstract int AppendToScope(int index, Scope called, CallData callData, Scope scopetarget);
+    }
+
+    class TArgVariableSplat : TArgNamer{
+        TIdentifier var;
+        private static Regex SPLAT = new Regex(@"\.\.\.");
+
+        new public static TArgVariableSplat Claim(StringClaimer claimer){
+            Claim fb = claimer.failPoint();
+            TIdentifier v = TIdentifier.Claim(claimer);
+            if(v != null){
+                if(!claimer.Claim(SPLAT).success){
+                    fb.Fail();
+                    return null;
+                }
+                TArgVariableSplat argV = new TArgVariableSplat();
+                v.isLocal = true;
+                argV.var = v;
+                return argV;
+            }
+            return null;
+        }
+
+        override public int AppendToScope(int index, Scope called, CallData callData, Scope scopetarget){
+            VarList vl = new VarList();
+
+            /*if(callData.num_args.ContainsKey(index)){
+                var.Set(scopetarget, callData.num_args[index]);
+            }else{
+                var.Set(scopetarget, Var.undefined);
+            }*/
+
+            foreach(var kv in callData.str_args){
+                vl.string_vars[kv.Key] = kv.Value;
+            }
+            foreach(var kv in callData.var_args){
+                vl.other_vars[kv.Key] = kv.Value;
+            }
+
+            int i = 0;
+            while(callData.num_args.ContainsKey(index+i)){
+                vl.double_vars[i] = callData.num_args[index+i];
+                i++;
+            }
+
+            var.Set(scopetarget, vl);
+            return index+i+1;
+        }
     }
 
     class TArgVariable : TArgNamer{
