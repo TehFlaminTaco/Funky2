@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 namespace Funky{
-    class Var{
+    public class Var{
         public string type;
         public VarList meta;
 
@@ -116,7 +116,7 @@ namespace Funky{
         }
     }
 
-    class VarNumber : Var{
+    public class VarNumber : Var{
         public double value;
 
         public static implicit operator double(VarNumber var){
@@ -134,7 +134,7 @@ namespace Funky{
         }
     }
 
-    class VarString : Var {
+    public class VarString : Var {
         public string data;
         public static implicit operator string(VarString var){
             return var.data;
@@ -149,7 +149,7 @@ namespace Funky{
         }
     }
 
-    class VarNull : Var {
+    public class VarNull : Var {
         public string id;
         public VarNull(string id){
             this.id = id;

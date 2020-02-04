@@ -53,7 +53,7 @@ namespace Funky.Tokens.Flow{
                 }else{
                     lList.Set(dat.num_args[1], dat.num_args[2]);
                 }
-                return resVar;
+                return dat.num_args[2];
             });
 
             Scope subScope = new Scope(scopeList);

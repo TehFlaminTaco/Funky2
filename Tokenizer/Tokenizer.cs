@@ -9,11 +9,11 @@ namespace Funky{
         
     }
 
-    enum Escape{
+    public enum Escape{
         RETURN, BREAK
     }
 
-    struct Scope {
+    public struct Scope {
         public VarList variables;
         public Stack<Escaper> escape;
 
@@ -23,7 +23,7 @@ namespace Funky{
         }
     }
 
-    struct Escaper{
+    public struct Escaper{
         public Escape method;
         public Var value;
 

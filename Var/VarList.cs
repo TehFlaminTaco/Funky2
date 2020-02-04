@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 namespace Funky{
-    class VarList : Var{
+    public class VarList : Var{
         public Dictionary<string, Var> string_vars = new Dictionary<string, Var>();
         public List<string> defined = new List<string>();
         public Dictionary<double, Var> double_vars = new Dictionary<double, Var>();

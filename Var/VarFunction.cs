@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 namespace Funky{
 
-    struct CallData{
+    public struct CallData{
         public Dictionary<double, Var> num_args;
         public Dictionary<string, Var> str_args;
         public Dictionary<Var, Var>    var_args;
@@ -16,7 +16,7 @@ namespace Funky{
         }
     }
 
-    class VarFunction : Var{
+    public class VarFunction : Var{
         public System.Func<CallData, Var> action;
 
         public Scope scope;
