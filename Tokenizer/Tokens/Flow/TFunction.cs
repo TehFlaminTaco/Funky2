@@ -197,16 +197,29 @@ namespace Funky.Tokens.Flow{
 
     class TArgVariable : TArgNamer{
         TIdentifier var;
+        TExpression defValue = null;
+
+        private static Regex EQUALS = new Regex(@"=");
 
         new public static TArgVariable Claim(StringClaimer claimer){
             TIdentifier v = TIdentifier.Claim(claimer);
-            if(v != null){
-                TArgVariable argV = new TArgVariable();
-                v.isLocal = true;
-                argV.var = v;
-                return argV;
+            if(v == null)
+                return null;
+            TArgVariable argV = new TArgVariable();
+            v.isLocal = true;
+            argV.var = v;
+
+            Claim c = claimer.Claim(EQUALS);
+            if(c.success){
+                TExpression defVal = TExpression.Claim(claimer);
+                if(defVal == null)
+                    c.Fail();
+                else{
+                    argV.defValue = defVal;
+                }
             }
-            return null;
+
+            return argV;
         }
 
         override public int AppendToScope(int index, Scope called, CallData callData, Scope scopetarget){
@@ -215,7 +228,10 @@ namespace Funky.Tokens.Flow{
             else if(callData.num_args.ContainsKey(index)){
                 var.Set(scopetarget, callData.num_args[index]);
             }else{
-                var.Set(scopetarget, Var.undefined);
+                if(defValue == null)
+                    var.Set(scopetarget, Var.undefined);
+                else
+                    var.Set(scopetarget, defValue.Parse(scopetarget));
             }
             return ++index;
         }
