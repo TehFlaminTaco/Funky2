@@ -210,7 +210,9 @@ namespace Funky.Tokens.Flow{
         }
 
         override public int AppendToScope(int index, Scope called, CallData callData, Scope scopetarget){
-            if(callData.num_args.ContainsKey(index)){
+            if(callData.str_args.ContainsKey(var.name))
+                var.Set(scopetarget, callData.str_args[var.name]);
+            else if(callData.num_args.ContainsKey(index)){
                 var.Set(scopetarget, callData.num_args[index]);
             }else{
                 var.Set(scopetarget, Var.undefined);

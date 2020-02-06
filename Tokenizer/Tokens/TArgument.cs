@@ -99,7 +99,7 @@ namespace Funky.Tokens{
         new public static TArgAssign Claim(StringClaimer claimer){
             Claim failPoint = claimer.failPoint();
             TArgAssign assn = new TArgAssign();
-            assn = ClaimLiteral(claimer, assn) ?? ClaimIdentifier(claimer, assn);
+            assn = ClaimLiteral(claimer, assn);// ?? ClaimIdentifier(claimer, assn);
             if(assn == null){
                 failPoint.Fail();
                 return null;
