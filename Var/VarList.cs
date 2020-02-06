@@ -25,19 +25,19 @@ namespace Funky{
         public override Var Get(Var key){
             Var t = ThisGet(key);
             if(t == Var.nil){
-                return readParent != null ? readParent.Get(key) : Var.nil;
+                return readParent != null ? readParent.Get(key) : base.Get(key);
             }
             return t;
         }
 
         public Var ThisGet(Var key){
             if(key is VarNumber n){
-                return double_vars.ContainsKey(n) ? double_vars[n] : base.Get(key);
+                return double_vars.ContainsKey(n) ? double_vars[n] : Var.nil;
             }
             if(key is VarString s){
-                return string_vars.ContainsKey(s) ? string_vars[s] : base.Get(key);
+                return string_vars.ContainsKey(s) ? string_vars[s] : Var.nil;
             }
-            return other_vars.ContainsKey(key) ? other_vars[key] : base.Get(key);
+            return other_vars.ContainsKey(key) ? other_vars[key] : Var.nil;
         }
 
         public override Var Set(Var key, Var value){

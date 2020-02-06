@@ -107,6 +107,18 @@ namespace Funky{
             return false;
         }
 
+        public virtual VarEvent asEvent(){
+            Var callFunc = Meta.Get(this, "toevent");
+            if(!(callFunc is VarNull)){
+                Var outp = callFunc.Call(new CallData(this));
+                if(!(outp is VarEvent)){
+                    return outp.asEvent();
+                }
+                return outp as VarEvent;
+            }
+            return new VarEvent();
+        }
+
         public static implicit operator Var(string v){
             return new VarString(v);
         }

@@ -59,6 +59,7 @@ class Globals{
                 globals["string"] = LibString.Generate();
                 globals["list"] = LibList.Generate();
                 globals["io"] = LibIO.Generate();
+                globals["event"] = LibEvent.Generate();
 
                 globals["_G"] = globals;
             }

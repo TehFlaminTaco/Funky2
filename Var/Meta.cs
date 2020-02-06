@@ -18,6 +18,7 @@ namespace Funky{
             meta["string"] = _String();
             meta["number"] = _Number();
             meta["function"] = _Function();
+            meta["event"] = _Event();
             meta["null"] = _Null();
 
             return meta;
@@ -193,6 +194,8 @@ namespace Funky{
             lst["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
             lst["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));
 
+            lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.num_args[1]));
+
             return lst;
         }
 
@@ -229,6 +232,16 @@ namespace Funky{
             });
 
             return num;
+        }
+
+        private static VarList _Event(){
+            VarList evt = newMeta();
+            evt["tostring"] = new VarFunction(dat => $"Event({dat.num_args[0].asEvent().name})");
+            evt["tobool"] = new VarFunction(dat => 1);
+            evt["eq[left=null,right=null]"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
+            evt["get"] = new VarFunction(dat => Globals.get()["event"].Get(dat.num_args[1]));
+
+            return evt;
         }
 
         private static string MakeOptions(string[] options, bool[] toggled){
