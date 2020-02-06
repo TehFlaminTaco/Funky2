@@ -155,7 +155,7 @@ namespace Funky{
                     largest = i;
                 }
                 foreach(KeyValuePair<double, Var> kv in l.double_vars){
-                    if(kv.Key >= 0 && kv.Key <= largest){
+                    if(kv.Key >= 0 && kv.Key <= largest && kv.Key%1==0){
                         continue;
                     }
                     sb.Append(joiner);

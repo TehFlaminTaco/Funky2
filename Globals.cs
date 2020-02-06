@@ -39,10 +39,7 @@ class Globals{
                     l.other_vars = dat.var_args;
                     return l;
                 });
-                globals["setmeta"] = new VarFunction(dat => {
-                    dat.num_args[0].meta = dat.num_args[1]?.asList();
-                    return dat.num_args[0];
-                });
+                
                 globals["setscope"] = new VarFunction(dat => {
                     VarFunction fnc = dat.num_args[0].asFunction();
                     if(fnc.scope.escape != null){
