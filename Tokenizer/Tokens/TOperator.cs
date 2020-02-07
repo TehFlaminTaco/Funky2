@@ -23,10 +23,10 @@ namespace Funky.Tokens{
             new SOperator(@"~", "bitxor", 13),
             new SOperator(@"<<", "bitshiftl", 9),
             new SOperator(@">>", "bitshiftr", 9),
-            new SOperator(@"<", "lt", 10),
             new SOperator(@"<=", "le", 10),
-            new SOperator(@">", "gt", 10),
+            new SOperator(@"<", "lt", 10),
             new SOperator(@">=", "ge", 10),
+            new SOperator(@">", "gt", 10),
             new SOperator(@"==", "eq", 11),
             new SOperator(@"!=", "ne", 11)
         };

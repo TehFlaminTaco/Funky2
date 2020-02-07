@@ -39,6 +39,11 @@ namespace Funky.Tokens{
 
             TOperator newOp = TOperator.Claim(claimer);
 
+            if(newOp != null && (newOp.op.name == "lt" || newOp.op.name == "gt")){
+                failTo.Fail();
+                return null;
+            }
+
             Claim c = claimer.Claim(SET);
             if(!c.success){
                 failTo.Fail();

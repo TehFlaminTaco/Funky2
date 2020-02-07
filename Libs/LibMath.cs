@@ -49,7 +49,7 @@ namespace Funky.Libs{
             math["abs"] = new VarFunction(dat => Math.Abs(dat.num_args[0].asNumber()));
             math["deg"] = new VarFunction(dat => dat.num_args[0].asNumber() * (180.0d / Math.PI));
             math["rad"] = new VarFunction(dat => Math.PI * dat.num_args[0].asNumber() / 180.0d);
-            math["pi"] = new VarFunction(dat => Math.PI);
+            math["pi"] = Math.PI;
             return math;
         }
     }

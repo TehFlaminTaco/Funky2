@@ -24,11 +24,11 @@ namespace Funky.Tokens{
             TReturn.Claim(claimer)              as TExpression ??
             TVariable.RightClaim(claimer)       as TExpression ??
             TLiteral.Claim(claimer)             as TExpression ??
+            TRightCrementor.Claim(claimer)      as TExpression ??
             TUnaryArithmetic.Claim(claimer)     as TExpression ??
             TParenExpression.Claim(claimer)     as TExpression ??
             TBlock.Claim(claimer)               as TExpression ??
-            TDeoperator.Claim(claimer)          as TExpression ??
-            TRightCrementor.Claim(claimer)      as TExpression;
+            TDeoperator.Claim(claimer)          as TExpression;
         }
 
         private static TExpression post_claim(StringClaimer claimer, TExpression last_claim){

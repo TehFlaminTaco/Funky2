@@ -23,7 +23,7 @@ namespace Funky.Tokens.Flow{
                 return null;
             }
             TExpression action = TExpression.Claim(claimer);
-            if(condition == null){
+            if(action == null){
                 failpoint.Fail();
                 return null;
             }
