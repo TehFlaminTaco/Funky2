@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Funky.Tokens.Flow{
     class TWhen : TExpression{
@@ -33,7 +34,20 @@ namespace Funky.Tokens.Flow{
 
         override public Var Parse(Scope scope){
             VarEvent hookTo = evnt.Parse(scope).asEvent();
-            hookTo.Hook(dat => block.Parse(scope));
+            
+            hookTo.Hook(dat => {
+                Scope newScope = new Scope();
+                newScope.variables = new VarList();
+                newScope.variables.parent = scope.variables;
+                newScope.escape = new Stack<Escaper>();
+                foreach(var kv in dat.num_args)
+                    newScope.variables.double_vars[kv.Key] = kv.Value;
+                foreach(var kv in dat.str_args)
+                    newScope.variables.string_vars[kv.Key] = kv.Value;
+                foreach(var kv in dat.var_args)
+                    newScope.variables.other_vars[kv.Key] = kv.Value;
+                return block.Parse(newScope);
+            });
             return hookTo;
         }
     }

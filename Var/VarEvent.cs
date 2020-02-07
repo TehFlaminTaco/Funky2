@@ -32,11 +32,7 @@ namespace Funky{
         public override Var Call(CallData unusedCD){
             Var lastRet = Var.nil;
             foreach(Var action in callbacks){
-                CallData cd = new CallData();
-                cd.num_args = new Dictionary<double, Var>();
-                cd.str_args = new Dictionary<string, Var>();
-                cd.var_args = new Dictionary<Var,    Var>();
-                Var thisRet = action.Call(cd);
+                Var thisRet = action.Call(unusedCD);
                 if(thisRet != Var.nil)
                     lastRet = thisRet;
             }

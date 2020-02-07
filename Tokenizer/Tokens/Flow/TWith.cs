@@ -57,6 +57,7 @@ namespace Funky.Tokens.Flow{
             });
 
             Scope subScope = new Scope(scopeList);
+            subScope.escape = scope.escape;
             return block.Parse(subScope);
         }
     }
