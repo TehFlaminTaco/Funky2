@@ -8,6 +8,7 @@ using OpenGL.CoreUI;
 using System.Threading;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 
 namespace Funky.Libs{
     public static class LibDraw{
@@ -15,6 +16,8 @@ namespace Funky.Libs{
         public static Dictionary<VarList, uint> textureLists = new Dictionary<VarList, uint>();
         public static Dictionary<VarList, Bitmap> bitmapLists = new Dictionary<VarList, Bitmap>();
         public static Dictionary<VarList, Font> fontLists = new Dictionary<VarList, Font>();
+        public static Dictionary<VarList, uint> shaderLists = new Dictionary<VarList, uint>();
+        public static Dictionary<VarList, uint> programLists = new Dictionary<VarList, uint>();
 
         public static VarList foregroundColor = new VarList();
 
@@ -89,10 +92,8 @@ namespace Funky.Libs{
                 t.Start();
                 return windowList;
             });
-
             draw["getWidth"] = new VarFunction(dat => lastWidth);
             draw["getHeight"] = new VarFunction(dat => lastHeight);
-
             draw["loadFont"] = new VarFunction(dat => {
                 VarList l = new VarList();
                 string family = (string)FunkyHelpers.ReadArgument(dat, 0, "family", "Arial").asString();
@@ -221,7 +222,6 @@ namespace Funky.Libs{
 
                 return draw;
             });
-
             draw["text"] = draw["print"] = new VarFunction(dat => {
                 string showText = (string)FunkyHelpers.ReadArgument(dat, 0, "text", "").asString();
                 float x         = (float)FunkyHelpers.ReadArgument(dat, 1, "x", 0f).asNumber();
@@ -290,7 +290,6 @@ namespace Funky.Libs{
 
                 return draw;
             });
-
             draw["setColor"] = new VarFunction(dat => {
                 foregroundColor.double_vars[0] = (float)FunkyHelpers.ReadArgument(dat, 0, "r", 0.0f).asNumber();
                 foregroundColor.double_vars[1] = (float)FunkyHelpers.ReadArgument(dat, 1, "g", 0.0f).asNumber();
@@ -298,6 +297,56 @@ namespace Funky.Libs{
                 foregroundColor.double_vars[3] = (float)FunkyHelpers.ReadArgument(dat, 3, "a", 1.0f).asNumber();
                 Gl.Color4((float)foregroundColor.double_vars[0].asNumber(), (float)foregroundColor.double_vars[1].asNumber(), (float)foregroundColor.double_vars[2].asNumber(), (float)foregroundColor.double_vars[3].asNumber());
                 return foregroundColor;
+            });
+            draw["createShader"] = new VarFunction(dat => {
+                string source       = FunkyHelpers.ReadArgument(dat, 0, "source", "").asString();
+                string shadertype   = FunkyHelpers.ReadArgument(dat, 1, "type", "frag").asString();
+                if(source == "")
+                    return Var.nil; // No source??!?!?
+                ShaderType typ = shadertype.ToLower().Substring(0, 4) == "frag" ? ShaderType.FragmentShader : ShaderType.VertexShader;
+
+                uint shader = Gl.CreateShader(typ);
+                Gl.ShaderSource(shader, source.Split('\n').Select(x=>x.Replace('\r',' ') +"\n").ToArray());
+                Gl.CompileShader(shader);
+                int compiled;
+
+	            Gl.GetShader(shader, ShaderParameterName.CompileStatus, out compiled);
+                if(compiled != 0){
+                    VarList shaderList = new VarList();
+                    shaderLists[shaderList] = shader;
+                    return shaderList;
+                }
+                const int logMaxLength = 1024;
+                StringBuilder infolog = new StringBuilder(logMaxLength);
+                int infologLength;
+                Gl.GetShaderInfoLog(shader, logMaxLength, out infologLength, infolog);
+                Gl.DeleteShader(shader);
+
+                return infolog.ToString();
+            });
+            draw["useShaders"] = draw["useShaders"] = new VarFunction(dat => {
+                Var shad = FunkyHelpers.ReadArgument(dat, 0, "shaders", Var.nil);
+                if(shad is VarNull)
+                    return draw; // No action
+                VarList s = shad.asList();
+                if(programLists.ContainsKey(s)){
+                    Gl.UseProgram(programLists[s]);
+                }
+                return draw;
+            });
+            draw["createShaderScheme"] = draw["createProgram"] = draw["makeShaders"] = new VarFunction(dat => {
+                uint prog = Gl.CreateProgram();
+                VarList pList = new VarList();
+                programLists[pList] = prog;
+
+                for(int i=0; dat.num_args.ContainsKey(i); i++){
+                    VarList l = dat.num_args[i].asList();
+                    if(shaderLists.ContainsKey(l))
+                        Gl.AttachShader(prog, shaderLists[l]);
+                }
+                Gl.LinkProgram(prog);
+
+                return pList;
             });
 
             return draw;
