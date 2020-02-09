@@ -118,7 +118,7 @@ namespace Funky.Libs{
                 }
                 return draw;
             });
-            draw["loadTexture"] = new VarFunction(dat => {
+            draw["loadTexture"] = draw["loadImage"] = new VarFunction(dat => {
                 uint text = Gl.GenTexture();
                 Gl.BindTexture(TextureTarget.Texture2d, text);
                 Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
@@ -202,9 +202,13 @@ namespace Funky.Libs{
                 double h = (double)FunkyHelpers.ReadArgument(dat, 3, "h", 0.0d).asNumber();
 
                 Gl.Begin(PrimitiveType.Quads);
+                    Gl.TexCoord2(0, 0f);
                     Gl.Vertex2(x, y);
+                    Gl.TexCoord2(w, 0f);
                     Gl.Vertex2(x+w, y);
+                    Gl.TexCoord2(w, h);
                     Gl.Vertex2(x+w, y+h);
+                    Gl.TexCoord2(0f, h);
                     Gl.Vertex2(x, y+h);
                 Gl.End();
 
@@ -216,6 +220,7 @@ namespace Funky.Libs{
 
                 Gl.Begin(PrimitiveType.Polygon);
                     for(int i=0; dat.num_args.ContainsKey(i) && dat.num_args.ContainsKey(i+1); i+=2){
+                        Gl.TexCoord2(dat.num_args[i].asNumber(), dat.num_args[i+1].asNumber());
                         Gl.Vertex2(dat.num_args[i].asNumber(), dat.num_args[i+1].asNumber());
                     }
                 Gl.End();
@@ -324,7 +329,7 @@ namespace Funky.Libs{
 
                 return infolog.ToString();
             });
-            draw["useShaders"] = draw["useShaders"] = new VarFunction(dat => {
+            draw["useShaders"] = draw["useShader"] = new VarFunction(dat => {
                 Var shad = FunkyHelpers.ReadArgument(dat, 0, "shaders", Var.nil);
                 if(shad is VarNull)
                     return draw; // No action
