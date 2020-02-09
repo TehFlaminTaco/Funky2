@@ -47,6 +47,7 @@ namespace Funky{
             VarList nul = newMeta();
             nul["tostring"] = new VarFunction(dat => dat.num_args[0] is VarNull n ? n.id : "what? stop");
             nul["tobool"] = new VarFunction(dat => 0);
+            nul["not"] = new VarFunction(dat => 1);
             nul["eq[left=null,right=null]"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
 
             return nul;
