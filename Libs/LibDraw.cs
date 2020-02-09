@@ -137,6 +137,7 @@ namespace Funky.Libs{
                 bitmapLists[l] = map;
                 l["getWidth"] = new VarFunction(dat => map.Width);
                 l["getHeight"] = new VarFunction(dat => map.Height);
+                Gl.BindTexture(TextureTarget.Texture2d, 0);
                 //Gl.GenerateMipmap(TextureTarget.Texture2d);
                 return l;
             });
@@ -144,7 +145,6 @@ namespace Funky.Libs{
                 VarList l = dat.num_args[0].asList();
                 if(textureLists.ContainsKey(l)){
                     uint text = textureLists[l];
-                    Bitmap map = bitmapLists[l];
                     double x  = (double)FunkyHelpers.ReadArgument(dat, 1, "x", 0.0d).asNumber();
                     double y  = (double)FunkyHelpers.ReadArgument(dat, 2, "y", 0.0d).asNumber();
                     double r  = (double)FunkyHelpers.ReadArgument(dat, 3, "r", 0.0d).asNumber();
@@ -155,21 +155,24 @@ namespace Funky.Libs{
                     double kx = (double)FunkyHelpers.ReadArgument(dat, 8, "kx", 1.0d).asNumber();
                     double ky = (double)FunkyHelpers.ReadArgument(dat, 9, "ky", 1.0d).asNumber();
 
+                    int w = (int)l.Get("getWidth").Call(new CallData(l)).asNumber();
+                    int h = (int)l.Get("getHeight").Call(new CallData(l)).asNumber();
+
                     Gl.PushMatrix();
                         Gl.Translate(x, y, 0d);
                         Gl.Scale(sx, sy, 0d);
                         Gl.Rotate(r, 0.0d, 0.0d, 1.0d);
-                        Gl.Translate(-ox*map.Width, -oy*map.Height, 0d);
+                        Gl.Translate(-ox*w, -oy*h, 0d);
                         Gl.BindTexture(TextureTarget.Texture2d, text);
                         Gl.Begin(PrimitiveType.Quads);
                             Gl.TexCoord2(0f, 0f);
                             Gl.Vertex2(0d, 0d);
                             Gl.TexCoord2((float)kx, 0f);
-                            Gl.Vertex2(map.Width, 0d);
+                            Gl.Vertex2(w, 0d);
                             Gl.TexCoord2((float)kx, (float)ky);
-                            Gl.Vertex2(map.Width, map.Height);
+                            Gl.Vertex2(w, h);
                             Gl.TexCoord2(0f, (float)ky);
-                            Gl.Vertex2(0d, map.Height);
+                            Gl.Vertex2(0d, h);
                         Gl.End();
                     Gl.PopMatrix();
                     Gl.BindTexture(TextureTarget.Texture2d, 0);
@@ -303,6 +306,10 @@ namespace Funky.Libs{
                 Gl.Color4((float)foregroundColor.double_vars[0].asNumber(), (float)foregroundColor.double_vars[1].asNumber(), (float)foregroundColor.double_vars[2].asNumber(), (float)foregroundColor.double_vars[3].asNumber());
                 return foregroundColor;
             });
+            draw["clear"] = new VarFunction(dat => {
+                Gl.Clear(ClearBufferMask.ColorBufferBit);
+                return draw;
+            });
             draw["createShader"] = new VarFunction(dat => {
                 string source       = FunkyHelpers.ReadArgument(dat, 0, "source", "").asString();
                 string shadertype   = FunkyHelpers.ReadArgument(dat, 1, "type", "frag").asString();
@@ -331,8 +338,10 @@ namespace Funky.Libs{
             });
             draw["useShaders"] = draw["useShader"] = new VarFunction(dat => {
                 Var shad = FunkyHelpers.ReadArgument(dat, 0, "shaders", Var.nil);
-                if(shad is VarNull)
+                if(shad is VarNull){
+                    Gl.UseProgram(0);
                     return draw; // No action
+                }
                 VarList s = shad.asList();
                 if(programLists.ContainsKey(s)){
                     Gl.UseProgram(programLists[s]);
@@ -352,6 +361,40 @@ namespace Funky.Libs{
                 Gl.LinkProgram(prog);
 
                 return pList;
+            });
+            draw["createCanvas"] = new VarFunction(dat => {
+                int w = (int)FunkyHelpers.ReadArgument(dat, 0, "w", lastWidth).asNumber();
+                int h = (int)FunkyHelpers.ReadArgument(dat, 1, "h", lastHeight).asNumber();
+                VarList canvList = new VarList();
+
+                uint canvasTexture = Gl.GenTexture();
+                Gl.BindTexture(TextureTarget.Texture2d, canvasTexture);
+                Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, w, h, 0, OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, new IntPtr(0));
+                Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
+                Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+
+                textureLists[canvList] = canvasTexture;
+                canvList["getWidth"] = new VarFunction(dat => w);
+                canvList["getHeight"] = new VarFunction(dat => h);
+
+                uint frameBuffer = Gl.GenFramebuffer();
+                Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
+                Gl.FramebufferTexture2D(FramebufferTarget.DrawFramebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2d, canvasTexture, 0);
+                Gl.BindTexture(TextureTarget.Texture2d, 0);
+                
+                Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+                canvList["drawTo"] = new VarFunction(d => {
+                    VarFunction f = FunkyHelpers.ReadArgument(d, 0, "drawFunc", Var.nil).asFunction();
+                    Gl.PushMatrix();
+                        Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
+                        Gl.Clear(ClearBufferMask.ColorBufferBit);
+                        //Gl.Viewport(0, 0, w, h);
+                        f.Call(new CallData(canvList));
+                        Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+                    Gl.PopMatrix();
+                    return canvList;
+                });
+                return canvList;
             });
 
             return draw;
