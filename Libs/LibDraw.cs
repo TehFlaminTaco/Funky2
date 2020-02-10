@@ -12,17 +12,23 @@ using System.Linq;
 
 namespace Funky.Libs{
     public static class LibDraw{
+        #region VarList's real values
         public static Dictionary<IntPtr, NativeWindow> contextToWindow = new Dictionary<IntPtr, NativeWindow>();
         public static Dictionary<VarList, uint> textureLists = new Dictionary<VarList, uint>();
         public static Dictionary<VarList, Bitmap> bitmapLists = new Dictionary<VarList, Bitmap>();
         public static Dictionary<VarList, Font> fontLists = new Dictionary<VarList, Font>();
         public static Dictionary<VarList, uint> shaderLists = new Dictionary<VarList, uint>();
         public static Dictionary<VarList, uint> programLists = new Dictionary<VarList, uint>();
+        #endregion
 
+
+        #region Fake Variables
         public static VarList foregroundColor = new VarList();
-
         private static uint lastWidth = 0;
         private static uint lastHeight = 0;
+        private static int mouseX = 0;
+        private static int mouseY = 0;
+        #endregion
 
         private static int CurrentMouse = 0;
 
@@ -47,6 +53,8 @@ namespace Funky.Libs{
                 windowList["onMouseDown"] = new VarEvent("onMouseDown");
                 windowList["onMouseUp"] = new VarEvent("onMouseUp");
                 windowList["onMouseWheel"] = new VarEvent("onMouseWheel");
+                windowList["onMouseMove"] = new VarEvent("onMouseMove");
+                windowList["onResize"] = new VarEvent("onResize");
                 Thread t = null;
                 t = new Thread(()=>{
                     using(NativeWindowWinNTCustom nw = new NativeWindowWinNTCustom()){
@@ -78,6 +86,8 @@ namespace Funky.Libs{
                         nw.MouseDown += OnMouseDown(nw, windowList);
                         nw.MouseUp += OnMouseUp(nw, windowList);
                         nw.WorkingMouseWheel += OnMouseWheel(nw, windowList);
+                        nw.MouseMove += OnMouseMove(nw, windowList);
+                        nw.Resize += OnResize(nw, windowList);
 
                         windowList.meta = WindowMeta(nw, windowList);
 
@@ -92,8 +102,22 @@ namespace Funky.Libs{
                 t.Start();
                 return windowList;
             });
+            draw["setBlendMode"] = draw["setBlend"] = new VarFunction(dat => {
+                string mode = (string)FunkyHelpers.ReadArgument(dat, 0, "mode", "OneMinus").asString();
+                switch(mode){
+                    case "Screen":
+                        Gl.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcColor); break;
+                    case "Multiply":
+                        Gl.BlendFunc(BlendingFactor.Zero, BlendingFactor.SrcColor); break;
+                    default:
+                        Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha); break;
+                }
+                return draw;
+            });
             draw["getWidth"] = new VarFunction(dat => lastWidth);
             draw["getHeight"] = new VarFunction(dat => lastHeight);
+            draw["getMouseX"] = new VarFunction(dat => mouseX);
+            draw["getMouseY"] = new VarFunction(dat => mouseY);
             draw["loadFont"] = new VarFunction(dat => {
                 VarList l = new VarList();
                 string family = (string)FunkyHelpers.ReadArgument(dat, 0, "family", "Arial").asString();
@@ -127,7 +151,7 @@ namespace Funky.Libs{
                 BitmapData bm = null;
                 try{
                     bm = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, map.PixelFormat);
-                    Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, map.Width, map.Height, 0, OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bm.Scan0);
+                    Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, map.Width, map.Height, 0, map.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? OpenGL.PixelFormat.Bgr : OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bm.Scan0);
                 }finally{
                     if(bm != null)
                         map.UnlockBits(bm);
@@ -135,8 +159,24 @@ namespace Funky.Libs{
                 VarList l = new VarList();
                 textureLists[l] = text;
                 bitmapLists[l] = map;
-                l["getWidth"] = new VarFunction(dat => map.Width);
-                l["getHeight"] = new VarFunction(dat => map.Height);
+                bool destroyed = false;
+                l["getWidth"] = new VarFunction(dat =>{
+                    if(destroyed)return Var.nil;
+                    return map.Width;
+                });
+                l["getHeight"] = new VarFunction(dat => {
+                    if(destroyed)return Var.nil;
+                    return map.Height;
+                });
+                l["destroy"] = new VarFunction(dat =>{
+                    if(destroyed)return Var.nil;
+                    destroyed = true;
+                    Gl.DeleteTextures(text);
+                    textureLists.Remove(l);
+                    bitmapLists.Remove(l);
+                    map.Dispose();
+                    return draw;
+                });
                 Gl.BindTexture(TextureTarget.Texture2d, 0);
                 //Gl.GenerateMipmap(TextureTarget.Texture2d);
                 return l;
@@ -176,6 +216,8 @@ namespace Funky.Libs{
                         Gl.End();
                     Gl.PopMatrix();
                     Gl.BindTexture(TextureTarget.Texture2d, 0);
+                }else{
+                    return draw;
                 }
                 return draw;
             });
@@ -295,7 +337,7 @@ namespace Funky.Libs{
                     Gl.End();
                 Gl.PopMatrix();
                 Gl.BindTexture(TextureTarget.Texture2d, 0);
-
+                map.Dispose();
                 return draw;
             });
             draw["setColor"] = new VarFunction(dat => {
@@ -362,7 +404,7 @@ namespace Funky.Libs{
 
                 return pList;
             });
-            draw["createCanvas"] = new VarFunction(dat => {
+            draw["createCanvas"] = draw["newCanvas"] = new VarFunction(dat => {
                 int w = (int)FunkyHelpers.ReadArgument(dat, 0, "w", lastWidth).asNumber();
                 int h = (int)FunkyHelpers.ReadArgument(dat, 1, "h", lastHeight).asNumber();
                 VarList canvList = new VarList();
@@ -374,8 +416,15 @@ namespace Funky.Libs{
                 Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
 
                 textureLists[canvList] = canvasTexture;
-                canvList["getWidth"] = new VarFunction(dat => w);
-                canvList["getHeight"] = new VarFunction(dat => h);
+                bool destroyed = false;
+                canvList["getWidth"] = new VarFunction(dat => {
+                    if(destroyed)return Var.nil;
+                    return w;
+                });
+                canvList["getHeight"] = new VarFunction(dat => {
+                    if(destroyed)return Var.nil;
+                    return h;
+                });
 
                 uint frameBuffer = Gl.GenFramebuffer();
                 Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
@@ -384,21 +433,180 @@ namespace Funky.Libs{
                 
                 Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                 canvList["drawTo"] = new VarFunction(d => {
+                    if(destroyed)return Var.nil;
                     VarFunction f = FunkyHelpers.ReadArgument(d, 0, "drawFunc", Var.nil).asFunction();
                     Gl.PushMatrix();
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
                         Gl.Clear(ClearBufferMask.ColorBufferBit);
-                        //Gl.Viewport(0, 0, w, h);
                         f.Call(new CallData(canvList));
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                     Gl.PopMatrix();
                     return canvList;
                 });
+                canvList["destroy"] = new VarFunction(d => {
+                    if(destroyed)return Var.nil;
+                    destroyed = true;
+                    Gl.DeleteFramebuffers(frameBuffer);
+                    Gl.DeleteTextures(canvasTexture);
+
+                    textureLists.Remove(canvList);
+
+                    return draw;
+                });
                 return canvList;
             });
-
+            draw["newImageData"] = new VarFunction(dat => {
+                VarList dataList = new VarList();
+                Var filename = FunkyHelpers.ReadArgument(dat, 0, "file", Var.nil);
+                int w           = (int)FunkyHelpers.ReadArgument(dat, 0, "w", 1).asNumber();
+                int h           = (int)FunkyHelpers.ReadArgument(dat, 1, "h", 1).asNumber();
+                w = Math.Max(w, 1);
+                h = Math.Max(h, 1);
+                Bitmap map;
+                if(filename is VarString){
+                    map = new Bitmap(filename.asString());
+                }else{
+                    map = new Bitmap(w, h);
+                }
+                bool destroyed = false;
+                dataList["getWidth"] = new VarFunction(dat => map.Width);
+                dataList["getHeight"] = new VarFunction(dat => map.Height);
+                dataList["destroy"] = new VarFunction(d => {
+                    if(destroyed)return Var.nil;
+                    destroyed = true;
+                    map.Dispose();
+                    bitmapLists.Remove(dataList);
+                    return draw;
+                });
+                dataList["getPixel"] = new VarFunction(d => {
+                    if(destroyed)return Var.nil;
+                    int x           = (int)FunkyHelpers.ReadArgument(dat, 0, "x", 0).asNumber();
+                    int y           = (int)FunkyHelpers.ReadArgument(dat, 1, "y", 0).asNumber();
+                    x = (int)Math.Clamp(x, 0, map.Width);
+                    y = (int)Math.Clamp(y, 0, map.Width);
+                    int col = map.GetPixel(x, y).ToArgb();
+                    int a = (col>>3)&0xFF;
+                    int r = (col>>2)&0xFF;
+                    int g = (col>>1)&0xFF;
+                    int b = (col>>0)&0xFF;
+                    VarList oList = new VarList();
+                    oList[0] = oList["r"] = ((float)r)/255;
+                    oList[1] = oList["g"] = ((float)g)/255;
+                    oList[2] = oList["b"] = ((float)b)/255;
+                    oList[3] = oList["a"] = ((float)a)/255;
+                    return oList;
+                });
+                dataList["setPixel"] = new VarFunction(d => {
+                    if(destroyed)return Var.nil;
+                    int x           = (int)FunkyHelpers.ReadArgument(dat, 0, "x", 0).asNumber();
+                    int y           = (int)FunkyHelpers.ReadArgument(dat, 1, "y", 0).asNumber();
+                    VarList rgba    =      FunkyHelpers.ReadArgument(dat, 2, "color", Var.nil).asList();
+                    float r = rgba.string_vars.ContainsKey("r") ? (float)rgba["r"].asNumber()
+                            : rgba.double_vars.ContainsKey(0)   ? (float)rgba[ 0 ].asNumber()
+                            : 1.0f;
+                    float g = rgba.string_vars.ContainsKey("g") ? (float)rgba["g"].asNumber()
+                            : rgba.double_vars.ContainsKey(1)   ? (float)rgba[ 1 ].asNumber()
+                            : 1.0f;
+                    float b = rgba.string_vars.ContainsKey("b") ? (float)rgba["b"].asNumber()
+                            : rgba.double_vars.ContainsKey(2)   ? (float)rgba[ 2 ].asNumber()
+                            : 1.0f;
+                    float a = rgba.string_vars.ContainsKey("a") ? (float)rgba["a"].asNumber()
+                            : rgba.double_vars.ContainsKey(3)   ? (float)rgba[ 3 ].asNumber()
+                            : 1.0f;
+                    r = Math.Clamp(r, 0.0f, 1.0f);
+                    g = Math.Clamp(g, 0.0f, 1.0f);
+                    b = Math.Clamp(b, 0.0f, 1.0f);
+                    a = Math.Clamp(a, 0.0f, 1.0f);
+                    x = (int)Math.Clamp(x, 0, map.Width);
+                    y = (int)Math.Clamp(y, 0, map.Width);
+                    map.SetPixel(x, y, Color.FromArgb((int)(255*a), (int)(255*r), (int)(255*g), (int)(255*b)));
+                    return dataList;
+                });
+                dataList["mapPixels"] = new VarFunction(d => {
+                    if(destroyed)return Var.nil;
+                    VarFunction action = FunkyHelpers.ReadArgument(d, 0, "action", Var.nil).asFunction();
+                    for(int x=0; x<map.Width; x++){
+                        for(int y=0; y < map.Height; y++){
+                            int col = map.GetPixel(x, y).ToArgb();
+                            int a = (col>>3)&0xFF;
+                            int r = (col>>2)&0xFF;
+                            int g = (col>>1)&0xFF;
+                            int b = (col>>0)&0xFF;
+                            VarList cList = new VarList();
+                            cList[0] = cList["r"] = ((float)r)/255;
+                            cList[1] = cList["g"] = ((float)g)/255;
+                            cList[2] = cList["b"] = ((float)b)/255;
+                            cList[3] = cList["a"] = ((float)a)/255;
+                            CallData cd = new CallData(x, y, cList);
+                            cd.str_args["x"] = x;
+                            cd.str_args["y"] = y;
+                            cd.str_args["col"] = cList;
+                            VarList rgba = action.Call(cd).asList();
+                            float R = rgba.string_vars.ContainsKey("r") ? (float)rgba["r"].asNumber()
+                                    : rgba.double_vars.ContainsKey(0)   ? (float)rgba[ 0 ].asNumber()
+                                    : 1.0f;
+                            float G = rgba.string_vars.ContainsKey("g") ? (float)rgba["g"].asNumber()
+                                    : rgba.double_vars.ContainsKey(1)   ? (float)rgba[ 1 ].asNumber()
+                                    : 1.0f;
+                            float B = rgba.string_vars.ContainsKey("b") ? (float)rgba["b"].asNumber()
+                                    : rgba.double_vars.ContainsKey(2)   ? (float)rgba[ 2 ].asNumber()
+                                    : 1.0f;
+                            float A = rgba.string_vars.ContainsKey("a") ? (float)rgba["a"].asNumber()
+                                    : rgba.double_vars.ContainsKey(3)   ? (float)rgba[ 3 ].asNumber()
+                                    : 1.0f;
+                            R = Math.Clamp(R, 0.0f, 1.0f);
+                            G = Math.Clamp(G, 0.0f, 1.0f);
+                            B = Math.Clamp(B, 0.0f, 1.0f);
+                            A = Math.Clamp(A, 0.0f, 1.0f);
+                            map.SetPixel(x, y, Color.FromArgb((int)(255*A), (int)(255*R), (int)(255*G), (int)(255*B)));
+                        }
+                    }
+                    return dataList;
+                });
+                dataList["toImage"] = new VarFunction(d => {
+                    uint text = Gl.GenTexture();
+                    Gl.BindTexture(TextureTarget.Texture2d, text);
+                    Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
+                    Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+                    BitmapData bm = null;
+                    try{
+                        bm = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, map.PixelFormat);
+                        Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, map.Width, map.Height, 0, map.PixelFormat == System.Drawing.Imaging.PixelFormat.Format24bppRgb ? OpenGL.PixelFormat.Bgr : OpenGL.PixelFormat.Bgra, PixelType.UnsignedByte, bm.Scan0);
+                    }finally{
+                        if(bm != null)
+                            map.UnlockBits(bm);
+                    }
+                    VarList l = new VarList();
+                    textureLists[l] = text;
+                    bitmapLists[l] = map;
+                    bool destroyed = false;
+                    l["getWidth"] = new VarFunction(dat =>{
+                        if(destroyed)return Var.nil;
+                        return map.Width;
+                    });
+                    l["getHeight"] = new VarFunction(dat => {
+                        if(destroyed)return Var.nil;
+                        return map.Height;
+                    });
+                    l["destroy"] = new VarFunction(dat =>{
+                        if(destroyed)return Var.nil;
+                        destroyed = true;
+                        Gl.DeleteTextures(text);
+                        textureLists.Remove(l);
+                        bitmapLists.Remove(l);
+                        return draw;
+                    });
+                    Gl.BindTexture(TextureTarget.Texture2d, 0);
+                    //Gl.GenerateMipmap(TextureTarget.Texture2d);
+                    return l;
+                });
+                bitmapLists[dataList] = map;
+                return dataList;
+            });
             return draw;
         }
+
+        #region Window Events
         public static EventHandler<NativeWindowEventArgs> DrawWindow(NativeWindow window, VarList l){
             return (object c_Sender, NativeWindowEventArgs e)=>{
                 lastWidth = window.Width;
@@ -450,7 +658,7 @@ namespace Funky.Libs{
                         CallData cd = new CallData(button, x, y);
                         cd.str_args["button"] = button;
                         cd.str_args["x"] = x;
-                        cd.str_args["y"] = y;
+                        cd.str_args["y"] = ((int)lastHeight)-y;
                         l.Get("onMouseDown").Call(cd);
                     }
                 }    
@@ -469,7 +677,7 @@ namespace Funky.Libs{
                         CallData cd = new CallData(button, x, y);
                         cd.str_args["button"] = button;
                         cd.str_args["x"] = x;
-                        cd.str_args["y"] = y;
+                        cd.str_args["y"] = ((int)lastHeight)-y;
                         l.Get("onMouseUp").Call(cd);
                     }
                 }    
@@ -483,16 +691,42 @@ namespace Funky.Libs{
                 CallData cd = new CallData(delta, x, y);
                 cd.str_args["delta"] = delta;
                 cd.str_args["x"] = x;
-                cd.str_args["y"] = y;
+                cd.str_args["y"] = ((int)lastHeight)-y;
                 l.Get("onMouseWheel").Call(cd); 
             };
         }
+        public static EventHandler<NativeWindowMouseEventArgs> OnMouseMove(NativeWindow window, VarList l){
+            return (object c_Sender, NativeWindowMouseEventArgs e)=>{
+                var x = e.Location.X;
+                var y = e.Location.Y;
+                mouseX = x;
+                mouseY = ((int)lastHeight)-y;
+                CallData cd = new CallData(x, y);
+                cd.str_args["x"] = x;
+                cd.str_args["y"] = ((int)lastHeight)-y;
+                l.Get("onMouseMove").Call(cd); 
+            };
+        }
+
+        public static EventHandler<EventArgs> OnResize(NativeWindow window, VarList l){
+            return (object c_Sender, EventArgs e)=>{
+                int oldW = (int)lastWidth;
+                int oldH = (int)lastHeight;
+                int w = (int)(lastWidth = window.Width);
+                int h = (int)(lastHeight = window.Height);
+                CallData cd = new CallData(w,h,oldW,oldH);
+                cd.str_args["w"] = w;
+                cd.str_args["h"] = h;
+                cd.str_args["oldW"] = oldW;
+                cd.str_args["oldH"] = oldH;
+                l.Get("onResize").Call(cd); 
+            };
+        }
+        #endregion
 
         public static VarList WindowMeta(NativeWindow window, VarList l){
             VarList meta = new VarList();
             VarList metafuncs = new VarList();
-
-            meta["get"] = new VarFunction(d=>metafuncs.Get(d.num_args[1]));
 
             metafuncs["isKeyDown"] = new VarFunction(d=>{
                 if(!d.num_args.ContainsKey(0))

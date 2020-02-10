@@ -11,7 +11,12 @@ namespace Funky.Libs{
             math["tan"] = new VarFunction(dat => Math.Tan(dat.num_args[0].asNumber()));
             math["asin"] = new VarFunction(dat => Math.Asin(dat.num_args[0].asNumber()));
             math["acos"] = new VarFunction(dat => Math.Acos(dat.num_args[0].asNumber()));
-            math["atan"] = new VarFunction(dat => Math.Atan(dat.num_args[0].asNumber()));
+            math["atan"] = new VarFunction(dat => {
+                if(dat.num_args.ContainsKey(1))
+                    return Math.Atan2(dat.num_args[0].asNumber(), dat.num_args[1].asNumber());
+                else
+                    return Math.Atan(dat.num_args[0].asNumber());
+            });
             math["floor"] = new VarFunction(dat => {
                 if(dat.num_args.ContainsKey(1)){
                     double e = Math.Pow(10, dat.num_args[1].asNumber());
@@ -51,6 +56,13 @@ namespace Funky.Libs{
             math["rad"] = new VarFunction(dat => Math.PI * dat.num_args[0].asNumber() / 180.0d);
             math["sqrt"] = new VarFunction(dat => Math.Sqrt(dat.num_args[0].asNumber()));
             math["pi"] = Math.PI;
+            math["dot"] = new VarFunction(dat => {
+                float x1 = (float)FunkyHelpers.ReadArgument(dat, 0, "x1", 0).asNumber();
+                float y1 = (float)FunkyHelpers.ReadArgument(dat, 1, "y1", 0).asNumber();
+                float x2 = (float)FunkyHelpers.ReadArgument(dat, 2, "x2", 0).asNumber();
+                float y2 = (float)FunkyHelpers.ReadArgument(dat, 3, "y2", 0).asNumber();
+                return System.Numerics.Vector2.Dot(new System.Numerics.Vector2(x1, y1), new System.Numerics.Vector2(x2, y2));
+            });
             return math;
         }
     }
