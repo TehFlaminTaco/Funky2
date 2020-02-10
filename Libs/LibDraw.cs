@@ -35,6 +35,7 @@ namespace Funky.Libs{
         private static Font currentFont = new Font(new FontFamily("Arial"), 12, FontStyle.Regular, GraphicsUnit.Pixel);
         private static System.Drawing.Text.TextRenderingHint FontAA = System.Drawing.Text.TextRenderingHint.AntiAlias;
         private static uint fontTexture;
+        public static Stack<uint> frameBufferStack = new Stack<uint>();
 
         public static VarList Generate(){
             VarList draw = new VarList();
@@ -442,6 +443,7 @@ namespace Funky.Libs{
                     Gl.PushMatrix();
                         Gl.Viewport(0, 0, w, h);
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
+                        frameBufferStack.Push(frameBuffer);
                         Gl.Clear(ClearBufferMask.ColorBufferBit);
                         Gl.MatrixMode(MatrixMode.Projection);
                         Gl.PushMatrix();
@@ -453,7 +455,12 @@ namespace Funky.Libs{
                             Gl.MatrixMode(MatrixMode.Projection);
                         Gl.PopMatrix();
                         Gl.MatrixMode(MatrixMode.Modelview);
-                        Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+                        frameBufferStack.Pop();
+                        if(frameBufferStack.Count == 0)
+                            Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
+                        else
+                            Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBufferStack.Peek());
+
                         Gl.Viewport(0, 0, (int)oldWidth, (int)oldHeight);
                     Gl.PopMatrix();
                     lastWidth = oldWidth;
