@@ -8,9 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="NAudio" Version="1.10.0" />
     <PackageReference Include="OpenGL.Net" Version="1.0.304" />
     <PackageReference Include="OpenGL.Net.CoreUI" Version="1.0.304" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Windows.Extensions" />
   </ItemGroup>
 
 </Project>
