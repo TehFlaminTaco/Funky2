@@ -434,6 +434,9 @@ namespace Funky.Libs{
                 Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                 canvList["drawTo"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
+                    uint oldWidth = lastWidth, oldHeight = lastHeight;
+                    lastWidth = (uint)w;
+                    lastHeight = (uint)h;
                     VarFunction f = FunkyHelpers.ReadArgument(d, 0, "drawFunc", Var.nil).asFunction();
                     Gl.PushMatrix();
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
@@ -441,6 +444,8 @@ namespace Funky.Libs{
                         f.Call(new CallData(canvList));
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                     Gl.PopMatrix();
+                    lastWidth = oldWidth;
+                    lastHeight = oldHeight;
                     return canvList;
                 });
                 canvList["destroy"] = new VarFunction(d => {
