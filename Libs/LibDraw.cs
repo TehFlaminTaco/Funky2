@@ -441,6 +441,11 @@ namespace Funky.Libs{
                     Gl.PushMatrix();
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
                         Gl.Clear(ClearBufferMask.ColorBufferBit);
+                        Gl.MatrixMode(MatrixMode.Projection);
+                        Gl.LoadIdentity();
+                        Gl.Ortho(0.0, w, h, 0.0, 0.0, 1.0);
+                        Gl.MatrixMode(MatrixMode.Modelview);
+                        Gl.LoadIdentity();
                         f.Call(new CallData(canvList));
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, 0);
                     Gl.PopMatrix();
