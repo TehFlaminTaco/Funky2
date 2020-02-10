@@ -28,8 +28,8 @@ namespace Funky.Libs{
                 soundList["onFinished"] = new VarEvent("onFinished");
                 soundList["play"] = new VarFunction(d=>{
                     if(destroyed) return Var.nil;
-                    waveOutDevice.Play();
                     audioFileReader.Position = 0;
+                    waveOutDevice.Play();
                     return soundList;
                 });
                 soundList["stop"] = new VarFunction(d=>{
