@@ -79,9 +79,9 @@ namespace Funky.Tokens{
         override public Var Get(Scope scope){
             if(curry){
                 return new VarFunction(dat => {
-                    Var frm = indexed.Parse(scope);
+                    Var frm = indexed.TryParse(scope);
                     
-                    Var oldFunc = frm?.Get(index.Parse(scope));
+                    Var oldFunc = frm?.Get(index.TryParse(scope));
 
                     CallData newCD = new CallData();
                     newCD.num_args = new Dictionary<double, Var>();
@@ -99,11 +99,11 @@ namespace Funky.Tokens{
                     return oldFunc.Call(newCD);
                 });
             }else
-                return indexed.Parse(scope)?.Get(index.Parse(scope));
+                return indexed.TryParse(scope)?.Get(index.TryParse(scope));
         }
 
         override public Var Set(Scope scope, Var value){
-            return indexed.Parse(scope)?.Set(index.Parse(scope), value);
+            return indexed.TryParse(scope)?.Set(index.TryParse(scope), value);
         }
     }
 

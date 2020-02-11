@@ -19,7 +19,7 @@ namespace Funky.Tokens{
                 if(scope.escape.Count > 0){
                     return scope.escape.Peek().value;
                 }
-                ret = expressions[i].Parse(newScope);
+                ret = expressions[i].TryParse(newScope);
             }
             return ret;
         }

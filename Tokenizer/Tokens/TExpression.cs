@@ -3,12 +3,16 @@ using Funky.Tokens.Literal;
 namespace Funky.Tokens{
     abstract class TExpression : Token{
         new public static TExpression Claim(StringClaimer claimer){
+            int claimStart = claimer.currentPoint();
             TExpression preClaimed = pre_claim(claimer);
             if(preClaimed == null)
                 return null;
+            preClaimed.SetDebugInfo(claimer, claimStart);
             TExpression next_claim;
-            while((next_claim = post_claim(claimer, preClaimed))!=null)
+            while((next_claim = post_claim(claimer, preClaimed))!=null){
                 preClaimed = next_claim;
+                preClaimed.SetDebugInfo(claimer, claimStart);
+            }
             return preClaimed;
         }
 
@@ -41,5 +45,14 @@ namespace Funky.Tokens{
         }
 
         public abstract Var Parse(Scope scope); // Although Expression requires a Parse function, it fails to implement it, because it shouldn't be possible to have a raw "TExpression" token.
+
+        public Var TryParse(Scope scope){
+            try{
+                return Parse(scope);
+            }catch(System.Exception e){
+                ShowError(e);
+            }
+            return Var.nil;
+        }
     }
 }

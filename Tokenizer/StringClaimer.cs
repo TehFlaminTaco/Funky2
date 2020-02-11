@@ -52,6 +52,24 @@ namespace Funky{
             return c;
         }
 
+        public int currentPoint(){
+            if(wsignored)
+                offset += whitespace.Match(to_claim.Substring(offset)).Length;
+            return offset;
+        }
+
+        public string getTextFrom(int oldPoint){
+            return to_claim.Substring(oldPoint, offset - oldPoint);
+        }
+
+        public int getLine(int point){
+            return to_claim.Substring(0, point).Split('\n').Length;
+        }
+        public int getChar(int point){
+            string[] lines = to_claim.Substring(0, point).Split('\n');
+            return lines[lines.Length - 1].Length;
+        }
+
         public bool Revert(Claim claim){
             Stack<ClaimLoc> storeStack = new Stack<ClaimLoc>(prev_claims);
             while(prev_claims.Count > 0){

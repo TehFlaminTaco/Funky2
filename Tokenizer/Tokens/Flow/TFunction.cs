@@ -120,7 +120,7 @@ namespace Funky.Tokens.Flow{
                 for(int i=0; i < args.Count; i++){
                     index = args[i].AppendToScope(index, func.scope, dat, subscope);
                 }
-                Var o = body.Parse(subscope);
+                Var o = body.TryParse(subscope);
                 if(subscope.escape.Count>0){
                     Escaper esc = subscope.escape.Peek();
                     if(esc.method == Escape.RETURN){
@@ -231,7 +231,7 @@ namespace Funky.Tokens.Flow{
                 if(defValue == null)
                     var.Set(scopetarget, Var.undefined);
                 else
-                    var.Set(scopetarget, defValue.Parse(scopetarget));
+                    var.Set(scopetarget, defValue.TryParse(scopetarget));
             }
             return ++index;
         }

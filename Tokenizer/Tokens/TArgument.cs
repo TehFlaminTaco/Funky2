@@ -16,7 +16,7 @@ namespace Funky.Tokens{
     class TArgExpression : TArgument{
         TExpression heldExp;
         override public int AppendArguments(VarList argumentList, int index, Scope scope){
-            argumentList.double_vars[index] = heldExp.Parse(scope);
+            argumentList.double_vars[index] = heldExp.TryParse(scope);
             return index+1;
         }
 
@@ -36,7 +36,7 @@ namespace Funky.Tokens{
 
 
         override public int AppendArguments(VarList argumentList, int index, Scope scope){
-            Var v = heldExp.Parse(scope);
+            Var v = heldExp.TryParse(scope);
             if(v is VarList list){
                 int max = -1;
                 for(int i=0; list.double_vars.ContainsKey(i); i++){
@@ -88,9 +88,9 @@ namespace Funky.Tokens{
 
         override public int AppendArguments(VarList argumentList, int index, Scope scope){
             if(literalVar!=null){
-                argumentList.Set(literalVar.Parse(scope), value.Parse(scope));
+                argumentList.Set(literalVar.TryParse(scope), value.TryParse(scope));
             }else{
-                argumentList.Set(textVar.name, value.Parse(scope));
+                argumentList.Set(textVar.name, value.TryParse(scope));
             }
             return index;
         }

@@ -78,7 +78,7 @@ namespace Funky.Tokens.Literal{
             for(int i=0; i < dats.Count; i++){
                 sb.Append(chunks[i]);
                 if(dats[i] != null){
-                    sb.Append(dats[i].Parse(scope).asString());
+                    sb.Append(dats[i].TryParse(scope).asString());
                 }
             }
             return sb.ToString();

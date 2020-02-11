@@ -33,7 +33,7 @@ namespace Funky.Tokens.Flow{
         }
 
         override public Var Parse(Scope scope){
-            VarEvent hookTo = evnt.Parse(scope).asEvent();
+            VarEvent hookTo = evnt.TryParse(scope).asEvent();
             
             hookTo.Hook(dat => {
                 Scope newScope = new Scope();
@@ -46,7 +46,7 @@ namespace Funky.Tokens.Flow{
                     newScope.variables.string_vars[kv.Key] = kv.Value;
                 foreach(var kv in dat.var_args)
                     newScope.variables.other_vars[kv.Key] = kv.Value;
-                return block.Parse(newScope);
+                return block.TryParse(newScope);
             });
             return hookTo;
         }

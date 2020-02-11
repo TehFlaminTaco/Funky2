@@ -59,7 +59,7 @@ namespace Funky.Libs{
                 Thread t = null;
                 t = new Thread(()=>{
                     using(NativeWindowWinNTCustom nw = new NativeWindowWinNTCustom()){
-                        nw.ContextCreated += (object s, NativeWindowEventArgs e)=>{windowList.Get("onLoad").Call(new CallData(windowList));};
+                        nw.ContextCreated += (object s, NativeWindowEventArgs e)=>{windowList.Get("onLoad").TryCall(new CallData(windowList));};
                         
                         string title = FunkyHelpers.ReadArgument(dat, 0, "title", "Funky2").asString();
                         uint width   = (uint)FunkyHelpers.ReadArgument(dat, 1, "width", 640).asNumber();
@@ -196,8 +196,8 @@ namespace Funky.Libs{
                     double kx = (double)FunkyHelpers.ReadArgument(dat, 8, "kx", 1.0d).asNumber();
                     double ky = (double)FunkyHelpers.ReadArgument(dat, 9, "ky", 1.0d).asNumber();
 
-                    int w = (int)l.Get("getWidth").Call(new CallData(l)).asNumber();
-                    int h = (int)l.Get("getHeight").Call(new CallData(l)).asNumber();
+                    int w = (int)l.Get("getWidth").TryCall(new CallData(l)).asNumber();
+                    int h = (int)l.Get("getHeight").TryCall(new CallData(l)).asNumber();
 
                     Gl.PushMatrix();
                         Gl.Translate(x, y, 0d);
@@ -451,7 +451,7 @@ namespace Funky.Libs{
                             Gl.Ortho(0.0, w, 0.0, h, 0.0, 1.0);
                             Gl.MatrixMode(MatrixMode.Modelview);
                             Gl.LoadIdentity();
-                            f.Call(new CallData(canvList));
+                            f.TryCall(new CallData(canvList));
                             Gl.MatrixMode(MatrixMode.Projection);
                         Gl.PopMatrix();
                         Gl.MatrixMode(MatrixMode.Modelview);
@@ -565,7 +565,7 @@ namespace Funky.Libs{
                             cd.str_args["x"] = x;
                             cd.str_args["y"] = y;
                             cd.str_args["col"] = cList;
-                            VarList rgba = action.Call(cd).asList();
+                            VarList rgba = action.TryCall(cd).asList();
                             float R = rgba.string_vars.ContainsKey("r") ? (float)rgba["r"].asNumber()
                                     : rgba.double_vars.ContainsKey(0)   ? (float)rgba[ 0 ].asNumber()
                                     : 1.0f;
@@ -645,7 +645,7 @@ namespace Funky.Libs{
                 Gl.MatrixMode(MatrixMode.Modelview);
                 Gl.LoadIdentity();
 
-                l.Get("onDraw").Call(new CallData(l));
+                l.Get("onDraw").TryCall(new CallData(l));
             };
         }
 
@@ -656,7 +656,7 @@ namespace Funky.Libs{
                 CallData cd = new CallData(keyCode, keyName);
                 cd.str_args["code"] = keyCode;
                 cd.str_args["key"] = keyName;
-                l.Get("onKeyDown").Call(cd);
+                l.Get("onKeyDown").TryCall(cd);
             };
         }
         public static EventHandler<NativeWindowKeyEventArgs> OnKeyUp(NativeWindow window, VarList l){
@@ -666,7 +666,7 @@ namespace Funky.Libs{
                 CallData cd = new CallData(keyCode, keyName);
                 cd.str_args["code"] = keyCode;
                 cd.str_args["key"] = keyName;
-                l.Get("onKeyUp").Call(cd);
+                l.Get("onKeyUp").TryCall(cd);
             };
         }
         public static EventHandler<NativeWindowMouseEventArgs> OnMouseDown(NativeWindow window, VarList l){
@@ -683,7 +683,7 @@ namespace Funky.Libs{
                         cd.str_args["button"] = button;
                         cd.str_args["x"] = x;
                         cd.str_args["y"] = ((int)lastHeight)-y;
-                        l.Get("onMouseDown").Call(cd);
+                        l.Get("onMouseDown").TryCall(cd);
                     }
                 }    
             };
@@ -702,7 +702,7 @@ namespace Funky.Libs{
                         cd.str_args["button"] = button;
                         cd.str_args["x"] = x;
                         cd.str_args["y"] = ((int)lastHeight)-y;
-                        l.Get("onMouseUp").Call(cd);
+                        l.Get("onMouseUp").TryCall(cd);
                     }
                 }    
             };
@@ -716,7 +716,7 @@ namespace Funky.Libs{
                 cd.str_args["delta"] = delta;
                 cd.str_args["x"] = x;
                 cd.str_args["y"] = ((int)lastHeight)-y;
-                l.Get("onMouseWheel").Call(cd); 
+                l.Get("onMouseWheel").TryCall(cd); 
             };
         }
         public static EventHandler<NativeWindowMouseEventArgs> OnMouseMove(NativeWindow window, VarList l){
@@ -728,7 +728,7 @@ namespace Funky.Libs{
                 CallData cd = new CallData(x, y);
                 cd.str_args["x"] = x;
                 cd.str_args["y"] = ((int)lastHeight)-y;
-                l.Get("onMouseMove").Call(cd); 
+                l.Get("onMouseMove").TryCall(cd); 
             };
         }
 
@@ -743,7 +743,7 @@ namespace Funky.Libs{
                 cd.str_args["h"] = h;
                 cd.str_args["oldW"] = oldW;
                 cd.str_args["oldH"] = oldH;
-                l.Get("onResize").Call(cd); 
+                l.Get("onResize").TryCall(cd); 
             };
         }
         #endregion

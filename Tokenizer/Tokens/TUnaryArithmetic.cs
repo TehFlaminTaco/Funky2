@@ -26,7 +26,7 @@ namespace Funky.Tokens{
         }
 
         override public Var Parse(Scope scope){
-            return op.Parse(arg.Parse(scope));
+            return op.Parse(arg.TryParse(scope));
         }
     }
 }

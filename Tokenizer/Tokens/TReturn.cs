@@ -26,7 +26,7 @@ namespace Funky.Tokens{
             return null;
         }
         override public Var Parse(Scope scope){
-            Var o = exp?.Parse(scope) ?? Var.nil;
+            Var o = exp?.TryParse(scope) ?? Var.nil;
             scope.escape.Push(new Escaper(escType, o));
             return o;
         }

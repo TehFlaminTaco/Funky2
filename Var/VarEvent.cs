@@ -38,5 +38,14 @@ namespace Funky{
             }
             return lastRet;
         }
+
+        public override Var TryCall(CallData callData){
+            try{
+                return Call(callData);
+            }catch(System.Exception e){
+                System.Console.Error.WriteLine($"ERROR:\nin event {name} {e.Message}");
+            }
+            return Var.nil;
+        }
     }
 }
