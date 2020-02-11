@@ -70,14 +70,14 @@ namespace Funky.Tokens{
         override public Var Parse(Scope scope){
             VarList argList = new VarList();
             if(special_call != null){
-                argList.double_vars[0] = special_call.Parse(scope);
+                argList.double_vars[0] = special_call.TryParse(scope);
             }else{
                 int index = 0;
                 for(int i=0; i < arguments.Count; i++){
                     index = arguments[i].AppendArguments(argList, index, scope);
                 }
             }
-            Var callVar = caller.Parse(scope).asFunction();
+            Var callVar = caller.TryParse(scope).asFunction();
             CallData callData = new CallData();
             callData.num_args = argList.double_vars;
             callData.str_args = argList.string_vars;

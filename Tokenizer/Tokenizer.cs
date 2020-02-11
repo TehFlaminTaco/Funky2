@@ -53,7 +53,7 @@ namespace Funky{
             Scope scope = new Scope(scopeList);
             Var[] results = new Var[expressions.Count];
             for(int i=0; i < expressions.Count; i++){
-                results[i] = expressions[i].Parse(scope);
+                results[i] = expressions[i].TryParse(scope);
             }
             return;
         }

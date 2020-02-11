@@ -32,7 +32,7 @@ namespace Funky.Tokens.Flow{
         }
 
         override public Var Parse(Scope scope){
-            VarList lList = list.Parse(scope).asList();
+            VarList lList = list.TryParse(scope).asList();
             VarList scopeList = new VarList();
             scopeList.meta = new VarList();
             scopeList.meta["get"] = new VarFunction(dat => {
@@ -58,7 +58,7 @@ namespace Funky.Tokens.Flow{
 
             Scope subScope = new Scope(scopeList);
             subScope.escape = scope.escape;
-            return block.Parse(subScope);
+            return block.TryParse(subScope);
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Funky.Tokens{
             if(expr != null){
                 VarFunction func = null;
                 func = new VarFunction(dat => {
-                    return expr.Parse(func.scope);
+                    return expr.TryParse(func.scope);
                 });
                 func.scope = scope;
                 func.FunctionText = raw;

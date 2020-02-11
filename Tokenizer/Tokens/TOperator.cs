@@ -57,20 +57,20 @@ namespace Funky.Tokens{
         public Var Parse(Scope scope, TExpression left, TExpression right){
             Var l = Var.nil;
             if(op.name == "and"){
-                l = left.Parse(scope);
+                l = left.TryParse(scope);
                 if(!l.asBool()){
                     return l;
                 }
-                return right.Parse(scope);
+                return right.TryParse(scope);
             }
             if(op.name == "or"){
-                l = left.Parse(scope);
+                l = left.TryParse(scope);
                 if(l.asBool()){
                     return l;
                 }
-                return right.Parse(scope);
+                return right.TryParse(scope);
             }
-            return Parse(left.Parse(scope), right.Parse(scope));
+            return Parse(left.TryParse(scope), right.TryParse(scope));
         }
 
         public Var Parse(Var left, Var right){

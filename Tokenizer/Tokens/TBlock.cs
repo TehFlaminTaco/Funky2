@@ -19,7 +19,7 @@ namespace Funky.Tokens{
                 if(scope.escape.Count > 0){
                     return scope.escape.Peek().value;
                 }
-                ret = expressions[i].Parse(newScope);
+                ret = expressions[i].TryParse(newScope);
             }
             return ret;
         }
@@ -32,6 +32,10 @@ namespace Funky.Tokens{
             c.Pass();
             TBlock newBlock = new TBlock();
             TExpression nExp;
+            if((c = claimer.Claim(RIGHT_BRACKET)).success){
+                c.Pass();
+                return newBlock;
+            }
             while((nExp = TExpression.Claim(claimer)) != null){
                 newBlock.expressions.Add(nExp);
                 claimer.Claim(SEMI_COLON);

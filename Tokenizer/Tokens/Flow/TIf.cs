@@ -48,8 +48,8 @@ namespace Funky.Tokens.Flow{
         }
 
         override public Var Parse(Scope scope){
-            Var should = condition.Parse(scope);
-            return (should.asBool()?action.Parse(scope):otherwise?.Parse(scope))??Var.nil;
+            Var should = condition.TryParse(scope);
+            return (should.asBool()?action.TryParse(scope):otherwise?.TryParse(scope))??Var.nil;
         }
     }
 }

@@ -67,7 +67,7 @@ namespace Funky.Tokens{
                 Var val = op.Parse(scope, var, value);
                 return var.Set(scope, val);
             }else
-                return var.Set(scope, value.Parse(scope));
+                return var.Set(scope, value.TryParse(scope));
         }
     }
 }

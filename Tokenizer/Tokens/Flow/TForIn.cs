@@ -52,7 +52,7 @@ namespace Funky.Tokens.Flow{
         }
 
         override public Var Parse(Scope scope){
-            Var iterVar = iter.Parse(scope);
+            Var iterVar = iter.TryParse(scope);
 
             Var ret = Var.nil;
 
@@ -60,27 +60,27 @@ namespace Funky.Tokens.Flow{
                 VarList vl = iterVar.asList();
                 foreach(KeyValuePair<double, Var> kv in vl.double_vars){
                     inVar.Set(scope, kv.Key);
-                    ret = body.Parse(scope);
+                    ret = body.TryParse(scope);
                 }
                 foreach(KeyValuePair<string, Var> kv in vl.string_vars){
                     inVar.Set(scope, kv.Key);
-                    ret = body.Parse(scope);
+                    ret = body.TryParse(scope);
                 }
                 foreach(KeyValuePair<Var, Var> kv in vl.other_vars){
                     inVar.Set(scope, kv.Key);
-                    ret = body.Parse(scope);
+                    ret = body.TryParse(scope);
                 }
             }else if(iterVar is VarString){
                 string vs = iterVar.asString().data;
                 for(int i=0; i < vs.Length; i++){
                     inVar.Set(scope, ""+vs[i]);
-                    ret = body.Parse(scope);
+                    ret = body.TryParse(scope);
                 }
             }else if(iterVar is VarNumber){
                 int vi = (int)iterVar.asNumber().value;
                 for(int i=0; i < vi; i++){
                     inVar.Set(scope, vi);
-                    ret = body.Parse(scope);
+                    ret = body.TryParse(scope);
                 }
             }else if(iterVar is VarFunction){
                 VarFunction func = (VarFunction)iterVar;
@@ -91,7 +91,7 @@ namespace Funky.Tokens.Flow{
                 cd.var_args = new Dictionary<Var,    Var>();
                 while (!((fr = func.Call(cd)) is VarNull)){
                     inVar.Set(scope, fr);
-                    ret = body.Parse(scope);
+                    ret = body.TryParse(scope);
                 }
             }
 

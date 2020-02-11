@@ -23,7 +23,7 @@ namespace Funky.Tokens{
         }
 
         override public Var Parse(Scope scope){
-            return realExpression.Parse(scope);
+            return realExpression.TryParse(scope);
         }
     }
 }

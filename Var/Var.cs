@@ -16,6 +16,15 @@ namespace Funky{
             return this;
         }
 
+        public virtual Var TryCall(CallData callData){
+            try{
+                return Call(callData);
+            }catch(System.Exception e){
+                System.Console.Error.WriteLine($"ERROR:\n{e.Message}");
+            }
+            return Var.nil;
+        }
+
         public virtual Var Get(Var key){
             Var callFunc = Meta.Get(this, "get", $"key({key.type})");
             if(!(callFunc is VarNull))

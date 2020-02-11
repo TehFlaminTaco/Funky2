@@ -59,7 +59,11 @@ class Globals{
                 globals["string"] = LibString.Generate();
                 globals["list"] = LibList.Generate();
                 globals["io"] = LibIO.Generate();
+                globals["os"] = LibOS.Generate();
                 globals["event"] = LibEvent.Generate();
+                if (System.Environment.OSVersion.VersionString.IndexOf("Windows")>=0)
+                    globals["draw"] = LibDraw.Generate(); // Draw is only supported on windows for now.
+                globals["sound"] = LibSound.Generate();
 
                 globals["_G"] = globals;
             }
