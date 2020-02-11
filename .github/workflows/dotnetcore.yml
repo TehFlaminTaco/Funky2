@@ -14,4 +14,8 @@ jobs:
       with:
         dotnet-version: 2.2.108
     - name: Build with dotnet
-      run: dotnet build -r win-x64
+      run: dotnet publish -r win-x64  
+    - uses: actions/upload-artifact@v1
+      with:
+        name: Funky2.exe
+        path: bin/Debug/netcoreapp3.0/win-x64/publish/Funky2.exe
