@@ -1,6 +1,7 @@
 
 using System.Collections.Generic;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Funky.Tokens{
     abstract class Token{
@@ -13,9 +14,10 @@ namespace Funky.Tokens{
             return null;
         }
 
+        private static Regex endWhitespace = new Regex(@"\s*$");
         public void SetDebugInfo(StringClaimer claimer, int startPos){
             offset = startPos;
-            raw = claimer.getTextFrom(startPos);
+            raw = endWhitespace.Replace(claimer.getTextFrom(startPos), "");
             ownerClaimer = claimer;
         }
 
