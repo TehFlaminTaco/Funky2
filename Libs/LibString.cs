@@ -10,17 +10,17 @@ namespace Funky.Libs{
             VarList str = new VarList();
 
             str["sub"] = new VarFunction(dat => {
-                VarString s = dat.num_args[0].asString();
-                VarNumber a = dat.num_args[1].asNumber();
-                if(dat.num_args.ContainsKey(2)){
-                    return s.data.Substring((int) a, (int) dat.num_args[2].asNumber());
+                VarString s = dat.Get(0).Required().GetString();
+                VarNumber a = dat.Get(1).Required().GetNumber();
+                if(dat._num_args.ContainsKey(2)){
+                    return s.data.Substring((int) a, (int) dat.Get(2).Required().GetNumber());
                 }else{
                     return s.data.Substring((int) a);
                 }
             });
             str["match"] = new VarFunction(dat => {
-                string haystack = dat.num_args[0].asString();
-                string needle = dat.num_args[1].asString();
+                string haystack = dat.Get(0).Required().GetString();
+                string needle = dat.Get(1).Required().GetString();
                 Regex matcher = new Regex(needle);
                 Match m = matcher.Match(haystack);
                 if(m.Success){
@@ -36,8 +36,8 @@ namespace Funky.Libs{
                 return Var.nil;
             });
             str["gmatch"] = new VarFunction(dat => {
-                string haystack = dat.num_args[0].asString();
-                string needle = dat.num_args[1].asString();
+                string haystack = dat.Get(0).Required().GetString();
+                string needle = dat.Get(1).Required().GetString();
                 Regex matcher = new Regex(needle);
                 MatchCollection M = matcher.Matches(haystack);
                 int i = 0;
@@ -58,9 +58,9 @@ namespace Funky.Libs{
             });
             string groupFinder = @"^(?:(?<!\\)(?:\\\\)*\(.*?){3}((?:.|\\\)|\\\\)*?)\)";
             str["gsub"] = new VarFunction(dat => {
-                string haystack = dat.num_args[0].asString();
-                string needle = dat.num_args[1].asString();
-                Var replacement = dat.num_args[2];
+                string haystack = dat.Get(0).Required().GetString();
+                string needle = dat.Get(1).Required().GetString();
+                Var replacement = dat.Get(2).Required().Get();
                 Regex matcher = new Regex(needle);
                 
                 if(replacement is VarFunction){
@@ -72,19 +72,16 @@ namespace Funky.Libs{
                         result.Append(haystack.Substring(lastPoint, m.Index - lastPoint));
                         lastPoint = m.Index + m.Length;
                         CallData cd = new CallData();
-                        cd.num_args = new Dictionary<double, Var>();
-                        cd.str_args = new Dictionary<string, Var>();
-                        cd.var_args = new Dictionary<Var,    Var>();
                         if(m.Groups.Count > 1)
                             for(int c = 1; c < m.Groups.Count; c++){
                                 string groupText = Regex.Match(needle, Regex.Replace(groupFinder, "3", ""+c)).Groups[1].Value;
                                 if(groupText.Length == 0)
-                                    cd.str_args[m.Groups[c].Name] = cd.num_args[c-1] = m.Groups[c].Index;
+                                    cd._str_args[m.Groups[c].Name] = cd._num_args[c-1] = m.Groups[c].Index;
                                 else
-                                    cd.str_args[m.Groups[c].Name] = cd.num_args[c-1] = m.Groups[c].Value;
+                                    cd._str_args[m.Groups[c].Name] = cd._num_args[c-1] = m.Groups[c].Value;
                             }
                         else
-                            cd.num_args[0] = m.Groups[0].Value;
+                            cd._num_args[0] = m.Groups[0].Value;
                         result.Append(replacement.Call(cd).asString().data);
                     }
                     result.Append(haystack.Substring(lastPoint));
@@ -93,10 +90,10 @@ namespace Funky.Libs{
                     return matcher.Replace(haystack, replacement.asString());
                 }
             });
-            str["upper"] = new VarFunction(dat => dat.num_args[0].asString().data.ToUpper());
-            str["lower"] = new VarFunction(dat => dat.num_args[0].asString().data.ToLower());
+            str["upper"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.ToUpper());
+            str["lower"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.ToLower());
             str["reverse"] = new VarFunction(dat => {
-                char[] arr = dat.num_args[0].asString().data.ToCharArray();
+                char[] arr = dat.Get(0).Required().GetString().data.ToCharArray();
                 Array.Reverse(arr);
                 return new String(arr);
             });

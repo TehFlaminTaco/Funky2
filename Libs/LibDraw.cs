@@ -61,9 +61,9 @@ namespace Funky.Libs{
                     using(NativeWindowWinNTCustom nw = new NativeWindowWinNTCustom()){
                         nw.ContextCreated += (object s, NativeWindowEventArgs e)=>{windowList.Get("onLoad").TryCall(new CallData(windowList));};
                         
-                        string title = FunkyHelpers.ReadArgument(dat, 0, "title", "Funky2").asString();
-                        uint width   = (uint)FunkyHelpers.ReadArgument(dat, 1, "width", 640).asNumber();
-                        uint height  = (uint)FunkyHelpers.ReadArgument(dat, 2, "height", 480).asNumber();
+                        string title = dat.Get(0).Or("title").Otherwise("Funky2").GetString();
+                        uint width   = (uint)dat.Get(1).Or("width").Otherwise(640).GetNumber();
+                        uint height  = (uint)dat.Get(2).Or("height").Otherwise(480).GetNumber();
 
                         lastWidth = width;
                         lastHeight = height;
@@ -104,7 +104,7 @@ namespace Funky.Libs{
                 return windowList;
             });
             draw["setBlendMode"] = draw["setBlend"] = new VarFunction(dat => {
-                string mode = (string)FunkyHelpers.ReadArgument(dat, 0, "mode", "OneMinus").asString();
+                string mode = (string)dat.Get(0).Or("mode").Otherwise("OneMinus").GetString();
                 switch(mode){
                     case "Screen":
                         Gl.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcColor); break;
@@ -121,10 +121,10 @@ namespace Funky.Libs{
             draw["getMouseY"] = new VarFunction(dat => mouseY);
             draw["loadFont"] = new VarFunction(dat => {
                 VarList l = new VarList();
-                string family = (string)FunkyHelpers.ReadArgument(dat, 0, "family", "Arial").asString();
-                int size      = (int)FunkyHelpers.ReadArgument(dat, 1, "size", 12f).asNumber();
-                int AA        = (int)FunkyHelpers.ReadArgument(dat, 2, "AA", 1f).asNumber();
-                string style  = FunkyHelpers.ReadArgument(dat, 3, "style", "Regular").asString();
+                string family = (string)dat.Get(0).Or("family").Otherwise("Arial").GetString();
+                int size      = (int)dat.Get(1).Or("size").Otherwise(12f).GetNumber();
+                int AA        = (int)dat.Get(2).Or("AA").Otherwise(1f).GetNumber();
+                string style  = dat.Get(3).Or("style").Otherwise("Regular").GetString();
                 FontStyle st =  FontStyle.Regular;
                 FontStyle.TryParse(style, true, out st);
                 Font f = new Font(new FontFamily(family), size, st, GraphicsUnit.Pixel);
@@ -133,7 +133,7 @@ namespace Funky.Libs{
                 return l;
             });
             draw["setFont"] = new VarFunction(dat => {
-                Var font = FunkyHelpers.ReadArgument(dat, 0, "font", Var.nil);
+                Var font = dat.Get(0).Or("font").Otherwise(Var.nil).Get();
                 if(font is VarNull)
                     return draw; // No action
                 VarList f = font.asList();
@@ -148,7 +148,7 @@ namespace Funky.Libs{
                 Gl.BindTexture(TextureTarget.Texture2d, text);
                 Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
                 Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
-                Bitmap map = new Bitmap(dat.num_args[0].asString());
+                Bitmap map = new Bitmap(dat.Get(0).Required().GetString());
                 BitmapData bm = null;
                 try{
                     bm = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, map.PixelFormat);
@@ -183,18 +183,18 @@ namespace Funky.Libs{
                 return l;
             });
             draw["texturedRect"] = draw["image"] = new VarFunction(dat => {
-                VarList l = dat.num_args[0].asList();
+                VarList l = dat.Get(0).Or("tex").Required().GetList();
                 if(textureLists.ContainsKey(l)){
                     uint text = textureLists[l];
-                    double x  = (double)FunkyHelpers.ReadArgument(dat, 1, "x", 0.0d).asNumber();
-                    double y  = (double)FunkyHelpers.ReadArgument(dat, 2, "y", 0.0d).asNumber();
-                    double r  = (double)FunkyHelpers.ReadArgument(dat, 3, "r", 0.0d).asNumber();
-                    double sx = (double)FunkyHelpers.ReadArgument(dat, 4, "sx", 1.0d).asNumber();
-                    double sy = (double)FunkyHelpers.ReadArgument(dat, 5, "sy", 1.0d).asNumber();
-                    double ox = (double)FunkyHelpers.ReadArgument(dat, 6, "ox", 0.0d).asNumber();
-                    double oy = (double)FunkyHelpers.ReadArgument(dat, 7, "oy", 0.0d).asNumber();
-                    double kx = (double)FunkyHelpers.ReadArgument(dat, 8, "kx", 1.0d).asNumber();
-                    double ky = (double)FunkyHelpers.ReadArgument(dat, 9, "ky", 1.0d).asNumber();
+                    double x  = (double)dat.Get(1).Or("x").Otherwise(0.0d).GetNumber();
+                    double y  = (double)dat.Get(2).Or("y").Otherwise(0.0d).GetNumber();
+                    double r  = (double)dat.Get(3).Or("r").Otherwise(0.0d).GetNumber();
+                    double sx = (double)dat.Get(4).Or("sx").Otherwise(1.0d).GetNumber();
+                    double sy = (double)dat.Get(5).Or("sy").Otherwise(1.0d).GetNumber();
+                    double ox = (double)dat.Get(6).Or("ox").Otherwise(0.0d).GetNumber();
+                    double oy = (double)dat.Get(7).Or("oy").Otherwise(0.0d).GetNumber();
+                    double kx = (double)dat.Get(8).Or("kx").Otherwise(1.0d).GetNumber();
+                    double ky = (double)dat.Get(9).Or("ky").Otherwise(1.0d).GetNumber();
 
                     int w = (int)l.Get("getWidth").TryCall(new CallData(l)).asNumber();
                     int h = (int)l.Get("getHeight").TryCall(new CallData(l)).asNumber();
@@ -225,27 +225,27 @@ namespace Funky.Libs{
             draw["push"] = new VarFunction(dat => {Gl.PushMatrix(); return draw;});
             draw["pop"] = new VarFunction(dat => {Gl.PopMatrix(); return draw;});
             draw["translate"] = new VarFunction(dat => {
-                double x = (double)FunkyHelpers.ReadArgument(dat, 0, "x", 0.0d).asNumber();
-                double y = (double)FunkyHelpers.ReadArgument(dat, 1, "y", 0.0d).asNumber();
+                double x = (double)dat.Get(0).Or("x").Otherwise(0.0d).GetNumber();
+                double y = (double)dat.Get(1).Or("y").Otherwise(0.0d).GetNumber();
                 Gl.Translate(x, y, 0.0d);
                 return draw;
             });
             draw["rotate"] = new VarFunction(dat => {
-                double r = (double)FunkyHelpers.ReadArgument(dat, 0, "r", 0.0d).asNumber();
+                double r = (double)dat.Get(0).Or("r").Otherwise(0.0d).GetNumber();
                 Gl.Rotate(r, 0.0d, 0.0d, 1.0d);
                 return draw;
             });
             draw["scale"] = new VarFunction(dat => {
-                double x = (double)FunkyHelpers.ReadArgument(dat, 0, "x", 0.0d).asNumber();
-                double y = (double)FunkyHelpers.ReadArgument(dat, 1, "y", 0.0d).asNumber();
+                double x = (double)dat.Get(0).Or("x").Otherwise(0.0d).GetNumber();
+                double y = (double)dat.Get(1).Or("y").Otherwise(0.0d).GetNumber();
                 Gl.Scale(x, y, 0.0d);
                 return draw;
             });
             draw["rect"] = draw["rectangle"] = draw["box"] = new VarFunction(dat => {
-                double x = (double)FunkyHelpers.ReadArgument(dat, 0, "x", 0.0d).asNumber();
-                double y = (double)FunkyHelpers.ReadArgument(dat, 1, "y", 0.0d).asNumber();
-                double w = (double)FunkyHelpers.ReadArgument(dat, 2, "w", 0.0d).asNumber();
-                double h = (double)FunkyHelpers.ReadArgument(dat, 3, "h", 0.0d).asNumber();
+                double x = (double)dat.Get(0).Or("x").Otherwise(0.0d).GetNumber();
+                double y = (double)dat.Get(1).Or("y").Otherwise(0.0d).GetNumber();
+                double w = (double)dat.Get(2).Or("w").Otherwise(0.0d).GetNumber();
+                double h = (double)dat.Get(3).Or("h").Otherwise(0.0d).GetNumber();
 
                 Gl.Begin(PrimitiveType.Quads);
                     Gl.TexCoord2(0, 0f);
@@ -262,25 +262,25 @@ namespace Funky.Libs{
             });
             draw["poly"] = draw["polygon"] = new VarFunction(dat => {
                 // Ensure 6 arguments.
-                for(int i=0; i < 6; i++)if(!dat.num_args.ContainsKey(i))return Var.nil;
+                for(int i=0; i < 6; i++)if(!dat._num_args.ContainsKey(i))return Var.nil;
 
                 Gl.Begin(PrimitiveType.Polygon);
-                    for(int i=0; dat.num_args.ContainsKey(i) && dat.num_args.ContainsKey(i+1); i+=2){
-                        Gl.TexCoord2(dat.num_args[i].asNumber(), dat.num_args[i+1].asNumber());
-                        Gl.Vertex2(dat.num_args[i].asNumber(), dat.num_args[i+1].asNumber());
+                    for(int i=0; dat._num_args.ContainsKey(i) && dat._num_args.ContainsKey(i+1); i+=2){
+                        Gl.TexCoord2(dat._num_args[i].asNumber(), dat._num_args[i+1].asNumber());
+                        Gl.Vertex2(dat._num_args[i].asNumber(), dat._num_args[i+1].asNumber());
                     }
                 Gl.End();
 
                 return draw;
             });
             draw["text"] = draw["print"] = new VarFunction(dat => {
-                string showText = (string)FunkyHelpers.ReadArgument(dat, 0, "text", "").asString();
-                float x         = (float)FunkyHelpers.ReadArgument(dat, 1, "x", 0f).asNumber();
-                float y         = (float)FunkyHelpers.ReadArgument(dat, 2, "y", 0f).asNumber();
-                int ha          = (int)FunkyHelpers.ReadArgument(dat, 3, "ha", -1f).asNumber();
-                int va          = (int)FunkyHelpers.ReadArgument(dat, 4, "va", -1f).asNumber();
-                float ox        = (float)FunkyHelpers.ReadArgument(dat, 5, "ox", 0f).asNumber();
-                float oy        = (float)FunkyHelpers.ReadArgument(dat, 6, "oy", 0f).asNumber();
+                string showText = (string)dat.Get(0).Or("text").Otherwise("").GetString();
+                float x         = (float)dat.Get(1).Or("x").Otherwise(0f).GetNumber();
+                float y         = (float)dat.Get(2).Or("y").Otherwise(0f).GetNumber();
+                int ha          = (int)dat.Get(3).Or("ha").Otherwise(-1f).GetNumber();
+                int va          = (int)dat.Get(4).Or("va").Otherwise(-1f).GetNumber();
+                float ox        = (float)dat.Get(5).Or("ox").Otherwise(0f).GetNumber();
+                float oy        = (float)dat.Get(6).Or("oy").Otherwise(0f).GetNumber();
 
                 ha = (int)Math.Clamp(ha, -1, 1);
                 va = (int)Math.Clamp(va, -1, 1);
@@ -342,10 +342,10 @@ namespace Funky.Libs{
                 return draw;
             });
             draw["setColor"] = new VarFunction(dat => {
-                foregroundColor.double_vars[0] = (float)FunkyHelpers.ReadArgument(dat, 0, "r", 0.0f).asNumber();
-                foregroundColor.double_vars[1] = (float)FunkyHelpers.ReadArgument(dat, 1, "g", 0.0f).asNumber();
-                foregroundColor.double_vars[2] = (float)FunkyHelpers.ReadArgument(dat, 2, "b", 0.0f).asNumber();
-                foregroundColor.double_vars[3] = (float)FunkyHelpers.ReadArgument(dat, 3, "a", 1.0f).asNumber();
+                foregroundColor.double_vars[0] = (float)dat.Get(0).Or("r").Otherwise(0.0f).GetNumber();
+                foregroundColor.double_vars[1] = (float)dat.Get(1).Or("g").Otherwise(0.0f).GetNumber();
+                foregroundColor.double_vars[2] = (float)dat.Get(2).Or("b").Otherwise(0.0f).GetNumber();
+                foregroundColor.double_vars[3] = (float)dat.Get(3).Or("a").Otherwise(1.0f).GetNumber();
                 Gl.Color4((float)foregroundColor.double_vars[0].asNumber(), (float)foregroundColor.double_vars[1].asNumber(), (float)foregroundColor.double_vars[2].asNumber(), (float)foregroundColor.double_vars[3].asNumber());
                 return foregroundColor;
             });
@@ -354,8 +354,8 @@ namespace Funky.Libs{
                 return draw;
             });
             draw["createShader"] = new VarFunction(dat => {
-                string source       = FunkyHelpers.ReadArgument(dat, 0, "source", "").asString();
-                string shadertype   = FunkyHelpers.ReadArgument(dat, 1, "type", "frag").asString();
+                string source       = dat.Get(0).Or("source").Otherwise("").GetString();
+                string shadertype   = dat.Get(1).Or("type").Otherwise("frag").GetString();
                 if(source == "")
                     return Var.nil; // No source??!?!?
                 ShaderType typ = shadertype.ToLower().Substring(0, 4) == "frag" ? ShaderType.FragmentShader : ShaderType.VertexShader;
@@ -380,7 +380,7 @@ namespace Funky.Libs{
                 return infolog.ToString();
             });
             draw["useShaders"] = draw["useShader"] = new VarFunction(dat => {
-                Var shad = FunkyHelpers.ReadArgument(dat, 0, "shaders", Var.nil);
+                Var shad = dat.Get(0).Or("shaders").Otherwise(Var.nil).Get();
                 if(shad is VarNull){
                     Gl.UseProgram(0);
                     return draw; // No action
@@ -396,8 +396,8 @@ namespace Funky.Libs{
                 VarList pList = new VarList();
                 programLists[pList] = prog;
 
-                for(int i=0; dat.num_args.ContainsKey(i); i++){
-                    VarList l = dat.num_args[i].asList();
+                for(int i=0; dat._num_args.ContainsKey(i); i++){
+                    VarList l = dat._num_args[i].asList();
                     if(shaderLists.ContainsKey(l))
                         Gl.AttachShader(prog, shaderLists[l]);
                 }
@@ -406,8 +406,8 @@ namespace Funky.Libs{
                 return pList;
             });
             draw["createCanvas"] = draw["newCanvas"] = new VarFunction(dat => {
-                int w = (int)FunkyHelpers.ReadArgument(dat, 0, "w", lastWidth).asNumber();
-                int h = (int)FunkyHelpers.ReadArgument(dat, 1, "h", lastHeight).asNumber();
+                int w = (int)dat.Get(0).Or("w").Otherwise(lastWidth).GetNumber();
+                int h = (int)dat.Get(1).Or("h").Otherwise(lastHeight).GetNumber();
                 VarList canvList = new VarList();
 
                 uint canvasTexture = Gl.GenTexture();
@@ -439,7 +439,7 @@ namespace Funky.Libs{
                     uint oldHeight = lastHeight;
                     lastWidth = (uint)w;
                     lastHeight = (uint)h;
-                    VarFunction f = FunkyHelpers.ReadArgument(d, 0, "drawFunc", Var.nil).asFunction();
+                    VarFunction f = d.Get(0).Or("drawFunc").Otherwise(Var.nil).GetFunction();
                     Gl.PushMatrix();
                         Gl.Viewport(0, 0, w, h);
                         Gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, frameBuffer);
@@ -481,9 +481,9 @@ namespace Funky.Libs{
             });
             draw["newImageData"] = new VarFunction(dat => {
                 VarList dataList = new VarList();
-                Var filename = FunkyHelpers.ReadArgument(dat, 0, "file", Var.nil);
-                int w           = (int)FunkyHelpers.ReadArgument(dat, 0, "w", 1).asNumber();
-                int h           = (int)FunkyHelpers.ReadArgument(dat, 1, "h", 1).asNumber();
+                Var filename = dat.Get(0).Or("file").Otherwise(Var.nil).Get();
+                int w           = (int)dat.Get(0).Or("w").Otherwise(1).GetNumber();
+                int h           = (int)dat.Get(1).Or("h").Otherwise(1).GetNumber();
                 w = Math.Max(w, 1);
                 h = Math.Max(h, 1);
                 Bitmap map;
@@ -504,8 +504,8 @@ namespace Funky.Libs{
                 });
                 dataList["getPixel"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
-                    int x           = (int)FunkyHelpers.ReadArgument(dat, 0, "x", 0).asNumber();
-                    int y           = (int)FunkyHelpers.ReadArgument(dat, 1, "y", 0).asNumber();
+                    int x           = (int)dat.Get(0).Or("x").Otherwise(0).GetNumber();
+                    int y           = (int)dat.Get(1).Or("y").Otherwise(0).GetNumber();
                     x = (int)Math.Clamp(x, 0, map.Width);
                     y = (int)Math.Clamp(y, 0, map.Width);
                     int col = map.GetPixel(x, y).ToArgb();
@@ -522,9 +522,9 @@ namespace Funky.Libs{
                 });
                 dataList["setPixel"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
-                    int x           = (int)FunkyHelpers.ReadArgument(dat, 0, "x", 0).asNumber();
-                    int y           = (int)FunkyHelpers.ReadArgument(dat, 1, "y", 0).asNumber();
-                    VarList rgba    =      FunkyHelpers.ReadArgument(dat, 2, "color", Var.nil).asList();
+                    int x           = (int)dat.Get(0).Or("x").Otherwise(0).GetNumber();
+                    int y           = (int)dat.Get(1).Or("y").Otherwise(0).GetNumber();
+                    VarList rgba    =      dat.Get(2).Or("color").Otherwise(Var.nil).GetList();
                     float r = rgba.string_vars.ContainsKey("r") ? (float)rgba["r"].asNumber()
                             : rgba.double_vars.ContainsKey(0)   ? (float)rgba[ 0 ].asNumber()
                             : 1.0f;
@@ -548,7 +548,7 @@ namespace Funky.Libs{
                 });
                 dataList["mapPixels"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
-                    VarFunction action = FunkyHelpers.ReadArgument(d, 0, "action", Var.nil).asFunction();
+                    VarFunction action = d.Get(0).Or("action").Otherwise(Var.nil).GetFunction();
                     for(int x=0; x<map.Width; x++){
                         for(int y=0; y < map.Height; y++){
                             int col = map.GetPixel(x, y).ToArgb();
@@ -562,9 +562,9 @@ namespace Funky.Libs{
                             cList[2] = cList["b"] = ((float)b)/255;
                             cList[3] = cList["a"] = ((float)a)/255;
                             CallData cd = new CallData(x, y, cList);
-                            cd.str_args["x"] = x;
-                            cd.str_args["y"] = y;
-                            cd.str_args["col"] = cList;
+                            cd._str_args["x"] = x;
+                            cd._str_args["y"] = y;
+                            cd._str_args["col"] = cList;
                             VarList rgba = action.TryCall(cd).asList();
                             float R = rgba.string_vars.ContainsKey("r") ? (float)rgba["r"].asNumber()
                                     : rgba.double_vars.ContainsKey(0)   ? (float)rgba[ 0 ].asNumber()
@@ -654,8 +654,8 @@ namespace Funky.Libs{
                 int keyCode = (int)e.Key;
                 string keyName = CodeToKey(e.Key);
                 CallData cd = new CallData(keyCode, keyName);
-                cd.str_args["code"] = keyCode;
-                cd.str_args["key"] = keyName;
+                cd._str_args["code"] = keyCode;
+                cd._str_args["key"] = keyName;
                 l.Get("onKeyDown").TryCall(cd);
             };
         }
@@ -664,8 +664,8 @@ namespace Funky.Libs{
                 int keyCode = (int)e.Key;
                 string keyName = CodeToKey(e.Key);
                 CallData cd = new CallData(keyCode, keyName);
-                cd.str_args["code"] = keyCode;
-                cd.str_args["key"] = keyName;
+                cd._str_args["code"] = keyCode;
+                cd._str_args["key"] = keyName;
                 l.Get("onKeyUp").TryCall(cd);
             };
         }
@@ -680,9 +680,9 @@ namespace Funky.Libs{
                         var x = e.Location.X;
                         var y = e.Location.Y;
                         CallData cd = new CallData(button, x, y);
-                        cd.str_args["button"] = button;
-                        cd.str_args["x"] = x;
-                        cd.str_args["y"] = ((int)lastHeight)-y;
+                        cd._str_args["button"] = button;
+                        cd._str_args["x"] = x;
+                        cd._str_args["y"] = ((int)lastHeight)-y;
                         l.Get("onMouseDown").TryCall(cd);
                     }
                 }    
@@ -699,9 +699,9 @@ namespace Funky.Libs{
                         var x = e.Location.X;
                         var y = e.Location.Y;
                         CallData cd = new CallData(button, x, y);
-                        cd.str_args["button"] = button;
-                        cd.str_args["x"] = x;
-                        cd.str_args["y"] = ((int)lastHeight)-y;
+                        cd._str_args["button"] = button;
+                        cd._str_args["x"] = x;
+                        cd._str_args["y"] = ((int)lastHeight)-y;
                         l.Get("onMouseUp").TryCall(cd);
                     }
                 }    
@@ -713,9 +713,9 @@ namespace Funky.Libs{
                 var x = e.Location.X;
                 var y = e.Location.Y;
                 CallData cd = new CallData(delta, x, y);
-                cd.str_args["delta"] = delta;
-                cd.str_args["x"] = x;
-                cd.str_args["y"] = ((int)lastHeight)-y;
+                cd._str_args["delta"] = delta;
+                cd._str_args["x"] = x;
+                cd._str_args["y"] = ((int)lastHeight)-y;
                 l.Get("onMouseWheel").TryCall(cd); 
             };
         }
@@ -726,8 +726,8 @@ namespace Funky.Libs{
                 mouseX = x;
                 mouseY = ((int)lastHeight)-y;
                 CallData cd = new CallData(x, y);
-                cd.str_args["x"] = x;
-                cd.str_args["y"] = ((int)lastHeight)-y;
+                cd._str_args["x"] = x;
+                cd._str_args["y"] = ((int)lastHeight)-y;
                 l.Get("onMouseMove").TryCall(cd); 
             };
         }
@@ -739,10 +739,10 @@ namespace Funky.Libs{
                 int w = (int)(lastWidth = window.Width);
                 int h = (int)(lastHeight = window.Height);
                 CallData cd = new CallData(w,h,oldW,oldH);
-                cd.str_args["w"] = w;
-                cd.str_args["h"] = h;
-                cd.str_args["oldW"] = oldW;
-                cd.str_args["oldH"] = oldH;
+                cd._str_args["w"] = w;
+                cd._str_args["h"] = h;
+                cd._str_args["oldW"] = oldW;
+                cd._str_args["oldH"] = oldH;
                 l.Get("onResize").TryCall(cd); 
             };
         }
@@ -753,9 +753,7 @@ namespace Funky.Libs{
             VarList metafuncs = new VarList();
 
             metafuncs["isKeyDown"] = new VarFunction(d=>{
-                if(!d.num_args.ContainsKey(0))
-                    return Var.nil;
-                Var key = d.num_args[0];
+                Var key = d.Get(0).Required().Get();
 
                 if(key is VarString)
                     return window.IsKeyPressed(KeyToCode(key.asString()))?1:0;
@@ -765,7 +763,7 @@ namespace Funky.Libs{
             });
 
             metafuncs["setTitle"] = new VarFunction(d=>{
-                Var a = FunkyHelpers.ReadArgument(d, 0, "title", Var.nil);
+                Var a = d.Get(0).Or("title").Otherwise(Var.nil).Get();
                 if(a != Var.nil)
                     FunkyHelpers.SetWindowTextW(window.Handle, a.asString());
                 return a;

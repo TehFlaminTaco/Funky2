@@ -36,24 +36,24 @@ namespace Funky.Tokens.Flow{
             VarList scopeList = new VarList();
             scopeList.meta = new VarList();
             scopeList.meta["get"] = new VarFunction(dat => {
-                Var resVar = lList.Get(dat.num_args[1]);
+                Var resVar = lList.Get(dat._num_args[1]);
                 if(resVar is VarNull)
-                    resVar = scope.variables.Get(dat.num_args[1]);
+                    resVar = scope.variables.Get(dat._num_args[1]);
                 return resVar;
             });
             scopeList.meta["set"] = new VarFunction(dat => {
-                Var resVar = lList.Get(dat.num_args[1]);
+                Var resVar = lList.Get(dat._num_args[1]);
                 if(resVar is VarNull){
-                    resVar = scope.variables.Get(dat.num_args[1]);
+                    resVar = scope.variables.Get(dat._num_args[1]);
                     if(resVar is VarNull){
-                        lList.Set(dat.num_args[1], dat.num_args[2]);
+                        lList.Set(dat._num_args[1], dat._num_args[2]);
                     }else{
-                        scope.variables.Set(dat.num_args[1], dat.num_args[2]);
+                        scope.variables.Set(dat._num_args[1], dat._num_args[2]);
                     }
                 }else{
-                    lList.Set(dat.num_args[1], dat.num_args[2]);
+                    lList.Set(dat._num_args[1], dat._num_args[2]);
                 }
-                return dat.num_args[2];
+                return dat._num_args[2];
             });
 
             Scope subScope = new Scope(scopeList);

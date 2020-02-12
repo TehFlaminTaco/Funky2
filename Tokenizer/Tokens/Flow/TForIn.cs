@@ -86,9 +86,6 @@ namespace Funky.Tokens.Flow{
                 VarFunction func = (VarFunction)iterVar;
                 Var fr;
                 CallData cd = new CallData();
-                cd.num_args = new Dictionary<double, Var>();
-                cd.str_args = new Dictionary<string, Var>();
-                cd.var_args = new Dictionary<Var,    Var>();
                 while (!((fr = func.Call(cd)) is VarNull)){
                     inVar.Set(scope, fr);
                     ret = body.TryParse(scope);

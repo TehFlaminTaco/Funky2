@@ -32,23 +32,23 @@ namespace Funky{
 
         private static VarList _Base(){
             VarList bas = newMeta();
-            bas["concat"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
-            bas["eq"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
-            bas["ne"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 0 : 1);
+            bas["concat"] = new VarFunction(dat => new VarString(dat.Get(0).Required().GetString().data + dat.Get(1).Required().GetString().data));
+            bas["eq"] = new VarFunction(dat => dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0);
+            bas["ne"] = new VarFunction(dat => dat.Get(0).Get() == dat.Get(1).Get() ? 0 : 1);
 
-            bas["unp"] = new VarFunction(dat => dat.num_args[0].asNumber());
-            bas["unm"] = new VarFunction(dat => -dat.num_args[0].asNumber().value);
-            bas["not"] = new VarFunction(dat => dat.num_args[0].asBool() ? 0 : 1);
+            bas["unp"] = new VarFunction(dat => dat.Get(0).Required().GetNumber());
+            bas["unm"] = new VarFunction(dat => -dat.Get(0).Required().GetNumber().value);
+            bas["not"] = new VarFunction(dat => dat.Get(0).Required().Get().asBool() ? 0 : 1);
             bas["len"] = new VarFunction(dat => 0);
             return bas;
         }
 
         private static VarList _Null(){
             VarList nul = newMeta();
-            nul["tostring"] = new VarFunction(dat => dat.num_args[0] is VarNull n ? n.id : "what? stop");
+            nul["tostring"] = new VarFunction(dat => dat._num_args[0] is VarNull n ? n.id : "what? stop");
             nul["tobool"] = new VarFunction(dat => 0);
             nul["not"] = new VarFunction(dat => 1);
-            nul["eq[left=null,right=null]"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
+            nul["eq[left=null,right=null]"] = new VarFunction(dat => dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0);
 
             return nul;
         }
@@ -57,8 +57,8 @@ namespace Funky{
             VarList str = newMeta();
 
             str["get"] = new VarFunction(dat => {
-                VarString s = dat.num_args[0].asString();
-                Var n = dat.num_args[1];
+                VarString s = dat.Get(0).Required().GetString();
+                Var n = dat.Get(1).Required().Get();
                 if (n is VarNumber){
                     return (VarString)(""+s.data[(int)(Math.Abs(n.asNumber().value)%s.data.Length)]);
                 }else{
@@ -66,23 +66,23 @@ namespace Funky{
                 }
             });
 
-            str["tobool"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);
-            str["len"] = new VarFunction(dat => dat.num_args[0].asString().data.Length);
+            str["tobool"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.Length);
+            str["len"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.Length);
 
-            str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == -1 ? 1 : 0);
-            str["le[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) <= 0 ? 1 : 0);
-            str["gt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) == 1 ? 1 : 0);
-            str["ge[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data.CompareTo(dat.num_args[1].asString().data) >= 0 ? 1 : 0);
-            str["eq[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data == dat.num_args[1].asString().data ? 1 : 0);
-            str["ne[side=left,left=string,right=string]"] = new VarFunction(dat => dat.num_args[0].asString().data != dat.num_args[1].asString().data ? 1 : 0);
+            str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.CompareTo(dat.Get(1).Required().GetString().data) == -1 ? 1 : 0);
+            str["le[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.CompareTo(dat.Get(1).Required().GetString().data) <= 0 ? 1 : 0);
+            str["gt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.CompareTo(dat.Get(1).Required().GetString().data) == 1 ? 1 : 0);
+            str["ge[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.CompareTo(dat.Get(1).Required().GetString().data) >= 0 ? 1 : 0);
+            str["eq[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data == dat.Get(1).Required().GetString().data ? 1 : 0);
+            str["ne[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data != dat.Get(1).Required().GetString().data ? 1 : 0);
             str["eq"] = new VarFunction(dat => 0);
             str["ne"] = new VarFunction(dat => 1);
 
-            str["add"] = new VarFunction(dat => new VarString(dat.num_args[0].asString().data + dat.num_args[1].asString().data));
+            str["add"] = new VarFunction(dat => new VarString(dat.Get(0).Required().GetString().data + dat.Get(1).Required().GetString().data));
             str["mult[side=left,left=string,right=number]"] = new VarFunction(dat => {
-                double repeatAmt = dat.num_args[1].asNumber().value;
+                double repeatAmt = dat.Get(1).Required().GetNumber().value;
                 string builtString = "";
-                string baseString = dat.num_args[0].asString().data;
+                string baseString = dat.Get(0).Required().GetString().data;
                 bool doFlip = false;
                 if(repeatAmt < 0d){
                     repeatAmt = -repeatAmt;
@@ -102,9 +102,9 @@ namespace Funky{
                 return new VarString(builtString);
             });
             str["mult[side=right,left=number,right=string]"] = new VarFunction(dat => {
-                double repeatAmt = dat.num_args[0].asNumber().value;
+                double repeatAmt = dat.Get(0).Required().GetNumber().value;
                 string builtString = "";
-                string baseString = dat.num_args[1].asString().data;
+                string baseString = dat.Get(1).Required().GetString().data;
                 bool doFlip = false;
                 if(repeatAmt < 0d){
                     repeatAmt = -repeatAmt;
@@ -131,10 +131,10 @@ namespace Funky{
             VarList fnc = newMeta();
 
             fnc["tobool"] = new VarFunction(dat => new VarNumber(1));
-            fnc["tostring"] = new VarFunction(dat => dat.num_args[0].asFunction().FunctionText);
+            fnc["tostring"] = new VarFunction(dat => dat.Get(0).Required().GetFunction().FunctionText);
 
-            fnc["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
-            fnc["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));
+            fnc["eq"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().Get() == dat.Get(1).Get() ? 1 : 0));
+            fnc["ne"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().Get() == dat.Get(1).Get() ? 0 : 1));
 
             return fnc;
         }
@@ -144,7 +144,7 @@ namespace Funky{
 
             lst["tobool"] = new VarFunction(dat => new VarNumber(1));
             lst["tostring"] = new VarFunction(dat => {
-                VarList l = dat.num_args[0].asList();
+                VarList l = dat.Get(0).Required().GetList();
                 StringBuilder sb = new StringBuilder();
                 string joiner = "";
                 sb.Append("[");
@@ -185,17 +185,17 @@ namespace Funky{
                 return new VarString(sb.ToString());
             });
             lst["len"] = new VarFunction(dat => {
-                VarList l = dat.num_args[0].asList();
+                VarList l = dat.Get(0).Required().GetList();
                 int i=0;
                 while(l.double_vars.ContainsKey(i) && !(l.double_vars[i] is VarNull))
                     i++;
                 return i;
             });
 
-            lst["eq"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 1 : 0));
-            lst["ne"] = new VarFunction(dat => new VarNumber(dat.num_args[0] == dat.num_args[1] ? 0 : 1));
+            lst["eq"] = new VarFunction(dat => new VarNumber(dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0));
+            lst["ne"] = new VarFunction(dat => new VarNumber(dat.Get(0).Get() == dat.Get(1).Get() ? 0 : 1));
 
-            lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.num_args[1]));
+            lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.Get(1).Required().Get()));
 
             return lst;
         }
@@ -203,33 +203,33 @@ namespace Funky{
         private static VarList _Number(){
             VarList num = newMeta();
 
-            num["tobool"] = new VarFunction(dat => dat.num_args[0]);
+            num["tobool"] = new VarFunction(dat => dat.Get(0).Required().GetNumber());
 
-            num["add[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber() + dat.num_args[1].asNumber()));
-            num["sub[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber() - dat.num_args[1].asNumber()));
-            num["mult[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber() * dat.num_args[1].asNumber()));
-            num["div[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber() / dat.num_args[1].asNumber()));
-            num["intdiv[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)(dat.num_args[0].asNumber() / dat.num_args[1].asNumber())));
-            num["pow[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(Math.Pow(dat.num_args[0].asNumber(), dat.num_args[1].asNumber())));
-            num["mod[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber() % dat.num_args[1].asNumber()));
-            num["concat[side=left]"] = new VarFunction(dat => new VarString(dat.num_args[0].asString() + dat.num_args[1].asString()));
-            num["bitor[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.num_args[0].asNumber().value | (int)dat.num_args[1].asNumber().value));
-            num["bitand[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.num_args[0].asNumber().value & (int)dat.num_args[1].asNumber().value));
-            num["bitxor[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.num_args[0].asNumber().value ^ (int)dat.num_args[1].asNumber().value));
-            num["bitshiftl[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.num_args[0].asNumber().value << (int)dat.num_args[1].asNumber().value));
-            num["bitshiftr[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.num_args[0].asNumber().value >> (int)dat.num_args[1].asNumber().value));
-            num["lt[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber().value < dat.num_args[1].asNumber().value ? 1 : 0));
-            num["le[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber().value <= dat.num_args[1].asNumber().value ? 1 : 0));
-            num["gt[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber().value > dat.num_args[1].asNumber().value ? 1 : 0));
-            num["ge[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber().value >= dat.num_args[1].asNumber().value ? 1 : 0));
-            num["eq[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber().value == dat.num_args[1].asNumber().value ? 1 : 0));
-            num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.num_args[0].asNumber().value != dat.num_args[1].asNumber().value ? 1 : 0));
+            num["add[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber() + dat.Get(1).Required().GetNumber()));
+            num["sub[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber() - dat.Get(1).Required().GetNumber()));
+            num["mult[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber() * dat.Get(1).Required().GetNumber()));
+            num["div[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber() / dat.Get(1).Required().GetNumber()));
+            num["intdiv[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)(dat.Get(0).Required().GetNumber() / dat.Get(1).Required().GetNumber())));
+            num["pow[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(Math.Pow(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber())));
+            num["mod[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber() % dat.Get(1).Required().GetNumber()));
+            num["concat[side=left]"] = new VarFunction(dat => new VarString(dat.Get(0).Required().GetString() + dat.Get(1).Required().GetString()));
+            num["bitor[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.Get(0).Required().GetNumber().value | (int)dat.Get(1).Required().GetNumber().value));
+            num["bitand[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.Get(0).Required().GetNumber().value & (int)dat.Get(1).Required().GetNumber().value));
+            num["bitxor[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.Get(0).Required().GetNumber().value ^ (int)dat.Get(1).Required().GetNumber().value));
+            num["bitshiftl[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.Get(0).Required().GetNumber().value << (int)dat.Get(1).Required().GetNumber().value));
+            num["bitshiftr[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber((int)dat.Get(0).Required().GetNumber().value >> (int)dat.Get(1).Required().GetNumber().value));
+            num["lt[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value < dat.Get(1).Required().GetNumber().value ? 1 : 0));
+            num["le[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value <= dat.Get(1).Required().GetNumber().value ? 1 : 0));
+            num["gt[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value > dat.Get(1).Required().GetNumber().value ? 1 : 0));
+            num["ge[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value >= dat.Get(1).Required().GetNumber().value ? 1 : 0));
+            num["eq[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value == dat.Get(1).Required().GetNumber().value ? 1 : 0));
+            num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value != dat.Get(1).Required().GetNumber().value ? 1 : 0));
             num["eq"] = new VarFunction(dat => new VarNumber(0));
             num["ne"] = new VarFunction(dat => new VarNumber(1));
 
 
             num["tostring"] = new VarFunction(dat => {
-                return new VarString((dat.num_args[0] as VarNumber).value.ToString());
+                return new VarString(dat.Get(0).Required().GetNumber().value.ToString());
             });
 
             return num;
@@ -237,10 +237,10 @@ namespace Funky{
 
         private static VarList _Event(){
             VarList evt = newMeta();
-            evt["tostring"] = new VarFunction(dat => $"Event({dat.num_args[0].asEvent().name})");
+            evt["tostring"] = new VarFunction(dat => $"Event({dat.Get(0).Required().GetEvent().name})");
             evt["tobool"] = new VarFunction(dat => 1);
-            evt["eq[left=null,right=null]"] = new VarFunction(dat => dat.num_args[0] == dat.num_args[1] ? 1 : 0);
-            evt["get"] = new VarFunction(dat => Globals.get()["event"].Get(dat.num_args[1]));
+            evt["eq[left=null,right=null]"] = new VarFunction(dat => dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0);
+            evt["get"] = new VarFunction(dat => Globals.get()["event"].Get(dat.Get(1).Required().Get()));
 
             return evt;
         }

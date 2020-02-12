@@ -15,7 +15,7 @@ namespace Funky.Libs{
             sound["loadSound"] = new VarFunction(dat => {
                 VarList soundList = new VarList();
                 IWavePlayer waveOutDevice = new WaveOutEvent();
-                AudioFileReader audioFileReader = new AudioFileReader(dat.num_args[0].asString());
+                AudioFileReader audioFileReader = new AudioFileReader(dat.Get(0).Required().GetString());
                 waveOutDevice.Init(audioFileReader);
                 soundLists[soundList] = waveOutDevice;
                 bool destroyed = false;
@@ -39,7 +39,7 @@ namespace Funky.Libs{
                 });
                 soundList["setVolume"] = new VarFunction(d=>{
                     if(destroyed) return Var.nil;
-                    waveOutDevice.Volume = (float)FunkyHelpers.ReadArgument(d, 0, "volume", 1.0f).asNumber();
+                    waveOutDevice.Volume = (float)d.Get(0).Or("volume").Otherwise(1.0f).GetNumber();
                     return soundList;
                 });
                 soundList["getVolume"] = new VarFunction(d=>{

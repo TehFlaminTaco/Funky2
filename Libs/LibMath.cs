@@ -6,61 +6,61 @@ namespace Funky.Libs{
         public static VarList Generate(){
             VarList math = new VarList();
 
-            math["sin"] = new VarFunction(dat => Math.Sin(dat.num_args[0].asNumber()));
-            math["cos"] = new VarFunction(dat => Math.Cos(dat.num_args[0].asNumber()));
-            math["tan"] = new VarFunction(dat => Math.Tan(dat.num_args[0].asNumber()));
-            math["asin"] = new VarFunction(dat => Math.Asin(dat.num_args[0].asNumber()));
-            math["acos"] = new VarFunction(dat => Math.Acos(dat.num_args[0].asNumber()));
+            math["sin"] = new VarFunction(dat => Math.Sin(dat.Get(0).Required().GetNumber()));
+            math["cos"] = new VarFunction(dat => Math.Cos(dat.Get(0).Required().GetNumber()));
+            math["tan"] = new VarFunction(dat => Math.Tan(dat.Get(0).Required().GetNumber()));
+            math["asin"] = new VarFunction(dat => Math.Asin(dat.Get(0).Required().GetNumber()));
+            math["acos"] = new VarFunction(dat => Math.Acos(dat.Get(0).Required().GetNumber()));
             math["atan"] = new VarFunction(dat => {
-                if(dat.num_args.ContainsKey(1))
-                    return Math.Atan2(dat.num_args[0].asNumber(), dat.num_args[1].asNumber());
+                if(dat._num_args.ContainsKey(1))
+                    return Math.Atan2(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber());
                 else
-                    return Math.Atan(dat.num_args[0].asNumber());
+                    return Math.Atan(dat.Get(0).Required().GetNumber());
             });
             math["floor"] = new VarFunction(dat => {
-                if(dat.num_args.ContainsKey(1)){
-                    double e = Math.Pow(10, dat.num_args[1].asNumber());
-                    return Math.Floor(dat.num_args[0].asNumber()*e)/e;
+                if(dat._num_args.ContainsKey(1)){
+                    double e = Math.Pow(10, dat.Get(1).Required().GetNumber());
+                    return Math.Floor(dat.Get(0).Required().GetNumber()*e)/e;
                 }else
-                    return Math.Floor(dat.num_args[0].asNumber());
+                    return Math.Floor(dat.Get(0).Required().GetNumber());
             });
             math["ceil"] = new VarFunction(dat => {
-                if(dat.num_args.ContainsKey(1)){
-                    double e = Math.Pow(10, dat.num_args[1].asNumber());
-                    return Math.Ceiling(dat.num_args[0].asNumber()*e)/e;
+                if(dat._num_args.ContainsKey(1)){
+                    double e = Math.Pow(10, dat.Get(1).Required().GetNumber());
+                    return Math.Ceiling(dat.Get(0).Required().GetNumber()*e)/e;
                 }else
-                    return Math.Ceiling(dat.num_args[0].asNumber());
+                    return Math.Ceiling(dat.Get(0).Required().GetNumber());
             });
             math["round"] = new VarFunction(dat => {
-                if(dat.num_args.ContainsKey(1)){
-                    double e = Math.Pow(10, dat.num_args[1].asNumber());
-                    return Math.Floor(0.5d+dat.num_args[0].asNumber()*e)/e;
+                if(dat._num_args.ContainsKey(1)){
+                    double e = Math.Pow(10, dat.Get(1).Required().GetNumber());
+                    return Math.Floor(0.5d+dat.Get(0).Required().GetNumber()*e)/e;
                 }else
-                    return Math.Floor(0.5d+dat.num_args[0].asNumber());
+                    return Math.Floor(0.5d+dat.Get(0).Required().GetNumber());
             });
-            math["min"] = new VarFunction(dat => Math.Min(dat.num_args[0].asNumber(), dat.num_args[1].asNumber()));
-            math["max"] = new VarFunction(dat => Math.Max(dat.num_args[0].asNumber(), dat.num_args[1].asNumber()));
-            math["clamp"] = new VarFunction(dat => Math.Clamp(dat.num_args[0].asNumber(), dat.num_args[1].asNumber(), dat.num_args[2].asNumber()));
+            math["min"] = new VarFunction(dat => Math.Min(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber()));
+            math["max"] = new VarFunction(dat => Math.Max(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber()));
+            math["clamp"] = new VarFunction(dat => Math.Clamp(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber(), dat.Get(2).Required().GetNumber()));
             Random rng = new Random();
             math["random"] = new VarFunction(dat => {
-                if(dat.num_args.ContainsKey(1)){
-                    return rng.Next((int)dat.num_args[0].asNumber(), (int)dat.num_args[1].asNumber());
-                }else if(dat.num_args.ContainsKey(0)){
-                    return rng.Next((int)dat.num_args[0].asNumber());
+                if(dat._num_args.ContainsKey(1)){
+                    return rng.Next((int)dat.Get(0).Required().GetNumber(), (int)dat.Get(1).Required().GetNumber());
+                }else if(dat._num_args.ContainsKey(0)){
+                    return rng.Next((int)dat.Get(0).Required().GetNumber());
                 }else{
                     return rng.NextDouble();
                 }
             });
-            math["abs"] = new VarFunction(dat => Math.Abs(dat.num_args[0].asNumber()));
-            math["deg"] = new VarFunction(dat => dat.num_args[0].asNumber() * (180.0d / Math.PI));
-            math["rad"] = new VarFunction(dat => Math.PI * dat.num_args[0].asNumber() / 180.0d);
-            math["sqrt"] = new VarFunction(dat => Math.Sqrt(dat.num_args[0].asNumber()));
+            math["abs"] = new VarFunction(dat => Math.Abs(dat.Get(0).Required().GetNumber()));
+            math["deg"] = new VarFunction(dat => dat.Get(0).Required().GetNumber() * (180.0d / Math.PI));
+            math["rad"] = new VarFunction(dat => Math.PI * dat.Get(0).Required().GetNumber() / 180.0d);
+            math["sqrt"] = new VarFunction(dat => Math.Sqrt(dat.Get(0).Required().GetNumber()));
             math["pi"] = Math.PI;
             math["dot"] = new VarFunction(dat => {
-                float x1 = (float)FunkyHelpers.ReadArgument(dat, 0, "x1", 0).asNumber();
-                float y1 = (float)FunkyHelpers.ReadArgument(dat, 1, "y1", 0).asNumber();
-                float x2 = (float)FunkyHelpers.ReadArgument(dat, 2, "x2", 0).asNumber();
-                float y2 = (float)FunkyHelpers.ReadArgument(dat, 3, "y2", 0).asNumber();
+                float x1 = (float)dat.Get(0).Or("x1").Otherwise(0).GetNumber();
+                float y1 = (float)dat.Get(1).Or("y1").Otherwise(0).GetNumber();
+                float x2 = (float)dat.Get(2).Or("x2").Otherwise(0).GetNumber();
+                float y2 = (float)dat.Get(3).Or("y2").Otherwise(0).GetNumber();
                 return System.Numerics.Vector2.Dot(new System.Numerics.Vector2(x1, y1), new System.Numerics.Vector2(x2, y2));
             });
             return math;

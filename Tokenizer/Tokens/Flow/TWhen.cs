@@ -40,11 +40,11 @@ namespace Funky.Tokens.Flow{
                 newScope.variables = new VarList();
                 newScope.variables.parent = scope.variables;
                 newScope.escape = new Stack<Escaper>();
-                foreach(var kv in dat.num_args)
+                foreach(var kv in dat._num_args)
                     newScope.variables.double_vars[kv.Key] = kv.Value;
-                foreach(var kv in dat.str_args)
+                foreach(var kv in dat._str_args)
                     newScope.variables.string_vars[kv.Key] = kv.Value;
-                foreach(var kv in dat.var_args)
+                foreach(var kv in dat._var_args)
                     newScope.variables.other_vars[kv.Key] = kv.Value;
                 return block.TryParse(newScope);
             });

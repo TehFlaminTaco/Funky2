@@ -79,9 +79,9 @@ namespace Funky.Tokens{
             }
             Var callVar = caller.TryParse(scope).asFunction();
             CallData callData = new CallData();
-            callData.num_args = argList.double_vars;
-            callData.str_args = argList.string_vars;
-            callData.var_args = argList.other_vars;
+            callData._num_args = argList.double_vars;
+            callData._str_args = argList.string_vars;
+            callData._var_args = argList.other_vars;
             return callVar.Call(callData);
         }
 
