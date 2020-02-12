@@ -84,17 +84,17 @@ namespace Funky.Tokens{
                     Var oldFunc = frm?.Get(index.TryParse(scope));
 
                     CallData newCD = new CallData();
-                    newCD.num_args = new Dictionary<double, Var>();
-                    newCD.str_args = new Dictionary<string, Var>();
-                    newCD.var_args = new Dictionary<Var,    Var>();
+                    newCD._num_args = new Dictionary<double, Var>();
+                    newCD._str_args = new Dictionary<string, Var>();
+                    newCD._var_args = new Dictionary<Var,    Var>();
 
-                    foreach(KeyValuePair<string, Var> kv in dat.str_args)
-                        newCD.str_args[kv.Key] = kv.Value;
-                    foreach(KeyValuePair<Var, Var> kv in dat.var_args)
-                        newCD.var_args[kv.Key] = kv.Value;
-                    foreach(KeyValuePair<double, Var> kv in dat.num_args)
-                        newCD.num_args[kv.Key+1] = kv.Value;
-                    newCD.num_args[0d] = frm;
+                    foreach(KeyValuePair<string, Var> kv in dat._str_args)
+                        newCD._str_args[kv.Key] = kv.Value;
+                    foreach(KeyValuePair<Var, Var> kv in dat._var_args)
+                        newCD._var_args[kv.Key] = kv.Value;
+                    foreach(KeyValuePair<double, Var> kv in dat._num_args)
+                        newCD._num_args[kv.Key+1] = kv.Value;
+                    newCD._num_args[0d] = frm;
 
                     return oldFunc.Call(newCD);
                 });

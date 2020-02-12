@@ -14,9 +14,9 @@ class Globals{
                 globals["print"] = new VarFunction(dat => {
                     StringBuilder sb = new StringBuilder();
                     string chunker = "";
-                    for(int i=0; dat.num_args.ContainsKey(i); i++){
+                    for(int i=0; dat._num_args.ContainsKey(i); i++){
                         sb.Append(chunker);
-                        sb.Append(dat.num_args[i].asString());
+                        sb.Append(dat._num_args[i].asString());
                         chunker = "\t";
                     }
                     string outStr = sb.ToString();
@@ -25,8 +25,8 @@ class Globals{
                 });
                 globals["write"] = new VarFunction(dat => {
                     StringBuilder sb = new StringBuilder();
-                    for(int i=0; dat.num_args.ContainsKey(i); i++){
-                        sb.Append(dat.num_args[i].asString());
+                    for(int i=0; dat._num_args.ContainsKey(i); i++){
+                        sb.Append(dat._num_args[i].asString());
                     }
                     string outStr = sb.ToString();
                     Console.Write(outStr);
@@ -34,21 +34,22 @@ class Globals{
                 });
                 globals["list"] = new VarFunction(dat => {
                     VarList l = new VarList();
-                    l.double_vars = dat.num_args;
-                    l.string_vars = dat.str_args;
-                    l.other_vars = dat.var_args;
+                    l.double_vars = dat._num_args;
+                    l.string_vars = dat._str_args;
+                    l.other_vars = dat._var_args;
                     return l;
                 });
                 
                 globals["setscope"] = new VarFunction(dat => {
-                    VarFunction fnc = dat.num_args[0].asFunction();
+                    VarFunction fnc = dat.Get(0).Or("function").As(ArgType.Function).Required().GetFunction();
+                    VarList scope = dat.Get(1).Or("scope").As(ArgType.List).Required().GetList();
                     if(fnc.scope.escape != null){
-                        fnc.scope.variables = dat.num_args[1].asList();
+                        fnc.scope.variables = scope.asList();
                     }
                     return fnc;
                 });
                 globals["getscope"] = new VarFunction(dat => {
-                    VarFunction fnc = dat.num_args[0].asFunction();
+                    VarFunction fnc = dat.Get(0).Or("function").As(ArgType.Function).Required().GetFunction();
                     if(fnc.scope.escape != null){
                         return fnc.scope.variables;
                     }

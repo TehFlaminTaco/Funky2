@@ -21,37 +21,33 @@ namespace Funky.Libs{
             VarList list = new VarList();
 
             list["setmeta"] = new VarFunction(dat => {
-                dat.num_args[0].meta = dat.num_args[1]?.asList();
-                return dat.num_args[0];
+                dat.Get(0).Required().Get().meta = dat.Get(1).Required().Get()?.asList();
+                return dat.Get(0).Required().Get();
             });
-            list["getmeta"] = new VarFunction(dat => (Var)dat.num_args[0].meta??Var.nil);
+            list["getmeta"] = new VarFunction(dat => (Var)dat.Get(0).Required().Get().meta??Var.nil);
             list["rawget"] = new VarFunction(dat => {
-                VarList l = dat.num_args[0].asList();
-                return l.ThisGet(dat.num_args[1]);
+                VarList l = dat.Get(0).Required().GetList();
+                return l.ThisGet(dat.Get(1).Required().Get());
             });
             list["rawset"] = new VarFunction(dat => {
-                VarList l = dat.num_args[0].asList();
-                return l.ThisSet(dat.num_args[1], dat.num_args[2]);
+                VarList l = dat.Get(0).Required().GetList();
+                return l.ThisSet(dat.Get(1).Required().Get(), dat.Get(2).Required().Get());
             });
             list["apply"] = new VarFunction(dat => {
-                VarList lst = dat.num_args[0].asList();
-                VarFunction fnc = dat.num_args[1].asFunction();
+                VarList lst = dat.Get(0).Required().GetList();
+                VarFunction fnc = dat.Get(1).Required().GetFunction();
                 CallData cd = new CallData();
-                cd.num_args = new Dictionary<double, Var>();
-                cd.str_args = new Dictionary<string, Var>();
-                cd.var_args = new Dictionary<Var,    Var>();
-
                 foreach(var kv in lst.double_vars)
-                    cd.num_args[kv.Key] = kv.Value;
+                    cd._num_args[kv.Key] = kv.Value;
                 foreach(var kv in lst.string_vars)
-                    cd.str_args[kv.Key] = kv.Value;
+                    cd._str_args[kv.Key] = kv.Value;
                 foreach(var kv in lst.other_vars)
-                    cd.var_args[kv.Key] = kv.Value;
+                    cd._var_args[kv.Key] = kv.Value;
                 
                 return fnc.Call(cd);
             });
             list["reverse"] = new VarFunction(dat => {
-                VarList vl = dat.num_args[0].asList();
+                VarList vl = dat.Get(0).Required().GetList();
                 VarList nList = duplicateList(vl);
                 int l = 0;
                 while(vl.double_vars.ContainsKey(l) && !(vl.double_vars[l] is VarNull))
@@ -61,11 +57,11 @@ namespace Funky.Libs{
                 return nList;
             });
             list["enqueue"] = list["push"] = list["insert"] = new VarFunction(dat => {
-                VarList vl = dat.num_args[0].asList();
-                Var index = dat.num_args[1];
+                VarList vl = dat.Get(0).Required().GetList();
+                Var index = dat.Get(1).Required().Get();
                 Var value;
-                if(dat.num_args.ContainsKey(2)){
-                    value = dat.num_args[2];
+                if(dat._num_args.ContainsKey(2)){
+                    value = dat.Get(2).Required().Get();
                     index = (int)Math.Max(index.asNumber().value, 0d);
                 }else{
                     value = index;
@@ -80,10 +76,10 @@ namespace Funky.Libs{
                 return vl;
             });
             list["pop"] = list["remove"] = new VarFunction(dat => {
-                VarList vl = dat.num_args[0].asList();
+                VarList vl = dat.Get(0).Required().GetList();
                 Var index = 0;
-                if(dat.num_args.ContainsKey(1)){
-                    index = (int)Math.Max(dat.num_args[1].asNumber().value, 0d);
+                if(dat._num_args.ContainsKey(1)){
+                    index = (int)Math.Max(dat.Get(1).Required().GetNumber().value, 0d);
                 }
                 Var ret = vl.double_vars.ContainsKey((int)index.asNumber().value) ? vl.double_vars[(int)index.asNumber().value] : Var.nil;
                 for(int i=(int)index.asNumber().value; vl.double_vars.ContainsKey(i); i++){
@@ -95,10 +91,10 @@ namespace Funky.Libs{
                 return ret;
             });
             list["dequeue"] = new VarFunction(dat => {
-                VarList vl = dat.num_args[0].asList();
+                VarList vl = dat.Get(0).Required().GetList();
                 Var index = 0;
-                if(dat.num_args.ContainsKey(1)){
-                    index = (int)Math.Max(dat.num_args[1].asNumber().value, 0d);
+                if(dat._num_args.ContainsKey(1)){
+                    index = (int)Math.Max(dat.Get(1).Required().GetNumber().value, 0d);
                 }else{
                     for(int l=0;vl.double_vars.ContainsKey(l);l++)
                         index = l;

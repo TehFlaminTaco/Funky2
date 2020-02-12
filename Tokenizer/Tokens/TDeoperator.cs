@@ -9,7 +9,9 @@ namespace Funky.Tokens{
         override public Var Parse(Scope scope){
             if(operand != null){
                 VarFunction func = new VarFunction(dat => {
-                    return operand.Parse(dat.num_args[0], dat.num_args[1]);
+                    Var left = dat.Get(0).Required().Get();
+                    Var right = dat.Get(1).Required().Get();
+                    return operand.Parse(left, right);
                 });
                 func.FunctionText = raw;
                 return func;

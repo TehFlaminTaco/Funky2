@@ -9,10 +9,10 @@ namespace Funky.Libs{
         public static VarList Generate(){
             VarList evnt = new VarList();
 
-            evnt["hook"] = new VarFunction(dat => dat.num_args[0].asEvent().Hook(dat.num_args[1]));
-            evnt["unhook"] = new VarFunction(dat => dat.num_args[0].asEvent().Unhook(dat.num_args[1]));
-            evnt["call"] = new VarFunction(dat => dat.num_args[0].Call(dat));
-            evnt["new"] = new VarFunction(dat => new VarEvent(dat.num_args[0].asString()));
+            evnt["hook"] = new VarFunction(dat => dat.Get(0).Required().GetEvent().Hook(dat.Get(1).Required().Get()));
+            evnt["unhook"] = new VarFunction(dat => dat.Get(0).Required().GetEvent().Unhook(dat.Get(1).Required().Get()));
+            evnt["call"] = new VarFunction(dat => dat.Get(0).Required().Get().Call(dat));
+            evnt["new"] = new VarFunction(dat => new VarEvent(dat.Get(0).Required().GetString()));
 
             return evnt;
         }

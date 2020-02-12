@@ -177,16 +177,16 @@ namespace Funky.Tokens.Flow{
                 var.Set(scopetarget, Var.undefined);
             }*/
 
-            foreach(var kv in callData.str_args){
+            foreach(var kv in callData._str_args){
                 vl.string_vars[kv.Key] = kv.Value;
             }
-            foreach(var kv in callData.var_args){
+            foreach(var kv in callData._var_args){
                 vl.other_vars[kv.Key] = kv.Value;
             }
 
             int i = 0;
-            while(callData.num_args.ContainsKey(index+i)){
-                vl.double_vars[i] = callData.num_args[index+i];
+            while(callData._num_args.ContainsKey(index+i)){
+                vl.double_vars[i] = callData._num_args[index+i];
                 i++;
             }
 
@@ -223,10 +223,10 @@ namespace Funky.Tokens.Flow{
         }
 
         override public int AppendToScope(int index, Scope called, CallData callData, Scope scopetarget){
-            if(callData.str_args.ContainsKey(var.name))
-                var.Set(scopetarget, callData.str_args[var.name]);
-            else if(callData.num_args.ContainsKey(index)){
-                var.Set(scopetarget, callData.num_args[index]);
+            if(callData._str_args.ContainsKey(var.name))
+                var.Set(scopetarget, callData._str_args[var.name]);
+            else if(callData._num_args.ContainsKey(index)){
+                var.Set(scopetarget, callData._num_args[index]);
             }else{
                 if(defValue == null)
                     var.Set(scopetarget, Var.undefined);

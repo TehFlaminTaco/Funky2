@@ -2,17 +2,6 @@ using System;
 using System.Runtime.InteropServices;
 namespace Funky{
     public static class FunkyHelpers{
-        public static Var ReadArgument(CallData cd, int index, string name, Var def = null, Exception onfail = null){
-            if(cd.str_args.ContainsKey(name))
-                return cd.str_args[name];
-            else if (cd.num_args.ContainsKey(index))
-                return cd.num_args[index];
-            else if (onfail != null)
-                throw onfail;
-            else if (def != null)
-                return def;
-            return Var.nil;
-        }
 
         [DllImport("user32.dll")]
         public static extern bool SetWindowTextW(IntPtr hWnd, string text);
