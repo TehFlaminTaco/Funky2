@@ -12,8 +12,8 @@ namespace Funky
                 ? (File.Exists("main.fnk")?File.ReadAllText("main.fnk"):@"print('Please specify a file.')")
                 : File.ReadAllText(file);
             Meta.GetMeta();
-            TProgram prog = TProgram.Claim(new StringClaimer(code));
             try{
+                TProgram prog = TProgram.Claim(new StringClaimer(code));
                 prog.Parse();
             }catch(System.Exception e){
                 System.Console.Error.WriteLine($"ERROR:\n{e.Message}");

@@ -36,6 +36,7 @@ namespace Funky{
     class TProgram : Token{
         List<TExpression> expressions = new List<TExpression>();
         static Regex SEMI_COLON = new Regex(@";");
+        private static Regex CLEAN_ERROR = new Regex(@"\n(\n|\r|.)*");
         new public static TProgram Claim(StringClaimer claimer){
             TProgram prog = new TProgram();
 
@@ -43,6 +44,11 @@ namespace Funky{
             while((e = TExpression.Claim(claimer))!=null){
                 claimer.Claim(SEMI_COLON);
                 prog.expressions.Add(e);
+            }
+
+            if(claimer.bestReach < claimer.to_claim.Length){
+                string errorString = CLEAN_ERROR.Replace(claimer.to_claim.Substring(claimer.bestReach), "...");
+                throw new FunkyException($"Unexpected symbol at {claimer.getLine(claimer.bestReach)}:{claimer.getChar(claimer.bestReach)} \"{errorString}\"");
             }
             return prog;
         }

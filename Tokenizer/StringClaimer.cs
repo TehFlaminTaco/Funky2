@@ -5,13 +5,14 @@ using System;
 namespace Funky{
 
     class StringClaimer{
-        string to_claim;
+        public string to_claim;
         Stack<ClaimLoc> prev_claims = new Stack<ClaimLoc>();
 
         static Regex whitespace = new Regex(@"^(\$\*([^*]|\*[^$])*\*\$|\$[^*\r\n].*|\s)*");
 
         public bool wsignored = true;
         int offset = 0;
+        public int bestReach = 0;
         public StringClaimer(string text){
             to_claim = text;
         }
@@ -39,6 +40,7 @@ namespace Funky{
             Claim newClaim = new Claim(method, string_match, this);
             prev_claims.Push(new ClaimLoc(newClaim, offset));
             offset += string_match.Length;
+            bestReach = Math.Max(bestReach, offset+whitespace.Match(to_claim.Substring(offset)).Length);
             return newClaim;
         }
 
