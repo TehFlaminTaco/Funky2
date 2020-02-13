@@ -39,7 +39,10 @@ class Globals{
                     l.other_vars = dat._var_args;
                     return l;
                 });
-                
+                globals["error"] = new VarFunction(dat => {
+                    throw new FunkyException(dat.Get(0).Or("message").Otherwise("").GetString());
+                });
+
                 globals["setscope"] = new VarFunction(dat => {
                     VarFunction fnc = dat.Get(0).Or("function").As(ArgType.Function).Required().GetFunction();
                     VarList scope = dat.Get(1).Or("scope").As(ArgType.List).Required().GetList();
@@ -55,6 +58,7 @@ class Globals{
                     }
                     return Var.nil;
                 });
+
 
                 globals["math"] = LibMath.Generate();
                 globals["string"] = LibString.Generate();
