@@ -15,7 +15,7 @@ namespace Funky.Libs{
             sound["loadSound"] = new VarFunction(dat => {
                 VarList soundList = new VarList();
                 IWavePlayer waveOutDevice = new WaveOutEvent();
-                AudioFileReader audioFileReader = new AudioFileReader(dat.Get(0).Required().GetString());
+                AudioFileReader audioFileReader = new AudioFileReader(new FunkyFile(dat.Get(0).Required().GetString(), "sounds", ".wav", ".mp3").realPath);
                 waveOutDevice.Init(audioFileReader);
                 soundLists[soundList] = waveOutDevice;
                 bool destroyed = false;

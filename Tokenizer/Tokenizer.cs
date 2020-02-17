@@ -53,15 +53,16 @@ namespace Funky{
             return prog;
         }
 
-        public void Parse(){
+        public Var Parse(){
             VarList scopeList = new VarList();
             scopeList.parent = Globals.get();
             Scope scope = new Scope(scopeList);
             Var[] results = new Var[expressions.Count];
+            Var lastRes = Var.nil;
             for(int i=0; i < expressions.Count; i++){
-                results[i] = expressions[i].TryParse(scope);
+                lastRes = results[i] = expressions[i].TryParse(scope);
             }
-            return;
+            return lastRes;
         }
     }
 }

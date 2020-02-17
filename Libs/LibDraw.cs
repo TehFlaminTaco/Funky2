@@ -148,7 +148,7 @@ namespace Funky.Libs{
                 Gl.BindTexture(TextureTarget.Texture2d, text);
                 Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
                 Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
-                Bitmap map = new Bitmap(dat.Get(0).Required().GetString());
+                Bitmap map = new Bitmap(new FunkyFile(dat.Get(0).Required().GetString(), "images", ".png", ".jpg", ".bmp").realPath);
                 BitmapData bm = null;
                 try{
                     bm = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, map.PixelFormat);

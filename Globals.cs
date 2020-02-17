@@ -59,6 +59,16 @@ class Globals{
                     return Var.nil;
                 });
 
+                globals["require"] = new VarFunction(dat => {
+                    string fileName = dat.Get(0).Or("file").As(ArgType.String).Required().GetString();
+                    var file = new FunkyFile(fileName, "funky", ".fnk");
+                    if(!file.Exists()){
+                        throw new FunkyException("File not found.");
+                    }else{
+                        TProgram prog = TProgram.Claim(new StringClaimer(file.ReadAllText(), file.shortName));
+                        return prog.Parse();
+                    }
+                });
 
                 globals["math"] = LibMath.Generate();
                 globals["string"] = LibString.Generate();

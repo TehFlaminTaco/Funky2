@@ -27,7 +27,7 @@ namespace Funky.Tokens{
             }
             //System.Console.Error.WriteLine($"Error at point {ownerClaimer.getLine(offset)}:{ownerClaimer.getChar(offset)} \"{raw}\"\n{e.Message}");
             // This should theoretically climb UP the call stack with the error untill something (Or nothing) catches it.
-            throw new System.Exception($"at position {ownerClaimer.getLine(offset)}:{ownerClaimer.getChar(offset)} \"{raw.Split('\n')[0] + (raw.IndexOf("\n")>-1?"...":"")}\"\n{e.Message}");
+            throw new System.Exception($"at {ownerClaimer.runnerFile}:{ownerClaimer.getLine(offset)}:{ownerClaimer.getChar(offset)} \"{raw.Split('\n')[0] + (raw.IndexOf("\n")>-1?"...":"")}\"\n{e.Message}");
         }
     }
 }

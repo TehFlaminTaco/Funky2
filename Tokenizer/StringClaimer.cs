@@ -13,8 +13,11 @@ namespace Funky{
         public bool wsignored = true;
         int offset = 0;
         public int bestReach = 0;
-        public StringClaimer(string text){
+
+        public string runnerFile = "";
+        public StringClaimer(string text, string file){
             to_claim = text;
+            runnerFile = file;
         }
 
         public int Location(){
