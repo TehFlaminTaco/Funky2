@@ -44,7 +44,7 @@ namespace Funky.Tokens{
                     max = i;
                 }
                 foreach(KeyValuePair<double, Var> kv in list.double_vars){
-                    if(kv.Key%1 == 0.0d && kv.Key >= 0 && kv.Key < max)
+                    if(kv.Key%1 == 0.0d && kv.Key >= 0 && kv.Key <= max)
                         continue;
                     argumentList.double_vars[kv.Key] = kv.Value;
                 }
