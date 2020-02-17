@@ -97,6 +97,18 @@ namespace Funky.Libs{
                 Array.Reverse(arr);
                 return new String(arr);
             });
+            str["load"] = new VarFunction(dat => {
+                string text = dat.Get(0).Or("code").Required().GetString();
+                TProgram prog = TProgram.Claim(new StringClaimer(text, "<run>"));
+                return new VarFunction(d => {
+                    return prog.Parse();
+                });
+            });
+            str["run"] = new VarFunction(dat => {
+                string text = dat.Get(0).Or("code").Required().GetString();
+                TProgram prog = TProgram.Claim(new StringClaimer(text, "<run>"));
+                return prog.Parse();
+            });
             return str;
         }
     }
