@@ -4,31 +4,43 @@ using System.IO;
 using System.Collections.Generic;
 
 namespace Funky{
-    public class FunkyFile{
+    public abstract class FunkyFS{
         public string realPath = null;
 
         public string shortName { get { return Path.GetFileName(realPath); } set {} }
 
-        public string[] searchLocations = {"./", Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)};
+        public static string[] searchLocations = {"./", Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)};
+        
+        public FunkyFS(){}
 
-        public FunkyFile(string name){
+        public FunkyFS(string name){
             foreach(String location in searchLocations){
                 string cur = Path.Combine(location, name);
-                if(File.Exists(cur)){
+                if(CheckFile(cur)){
                     realPath = cur;
                     break;
                 }
             }
         }
 
-        public FunkyFile(string name, string specialFolder, params string[] guessExtensions){
+        public bool Exists(){
+            return realPath != null;
+        }
+
+        public abstract bool CheckFile(string path);
+    }
+
+    public class FunkyFile : FunkyFS{
+        public FunkyFile(string name) : base(name){}
+
+        public FunkyFile(string name, string specialFolder, params string[] guessExtensions) : base(){
             string[] withSpecial = new string[]{"", specialFolder};
             IEnumerable<string> gE = guessExtensions.Prepend("");
             foreach(String location in searchLocations){
                 foreach(String special in withSpecial){
                     foreach(String ext in gE){
                         string cur = Path.Combine(location, special, name) + ext;
-                        if(File.Exists(cur)){
+                        if(CheckFile(cur)){
                             realPath = cur;
                             return;
                         }
@@ -37,14 +49,21 @@ namespace Funky{
             }
         }
 
+        public override bool CheckFile(string path){
+            return File.Exists(path);
+        }
+
         public string ReadAllText(){
             if(realPath == null)
                 throw new FileNotFoundException();
             return File.ReadAllText(realPath);
         }
+    }
 
-        public bool Exists(){
-            return realPath != null;
+    public class FunkyFolder : FunkyFS {
+        public FunkyFolder(string name) : base(name){}
+        public override bool CheckFile(string path){
+            return Directory.Exists(path);
         }
     }
 }
