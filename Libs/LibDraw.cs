@@ -688,7 +688,7 @@ namespace Funky.Libs{
                         string button = Enum.GetName(typeof(MouseButton), i);
                         var x = e.Location.X;
                         var y = e.Location.Y;
-                        CallData cd = new CallData(button, x, y);
+                        CallData cd = new CallData(button, x, ((int)lastHeight)-y);
                         cd._str_args["button"] = button;
                         cd._str_args["x"] = x;
                         cd._str_args["y"] = ((int)lastHeight)-y;
@@ -707,7 +707,7 @@ namespace Funky.Libs{
                         string button = Enum.GetName(typeof(MouseButton), i);
                         var x = e.Location.X;
                         var y = e.Location.Y;
-                        CallData cd = new CallData(button, x, y);
+                        CallData cd = new CallData(button, x, ((int)lastHeight)-y);
                         cd._str_args["button"] = button;
                         cd._str_args["x"] = x;
                         cd._str_args["y"] = ((int)lastHeight)-y;
@@ -721,7 +721,7 @@ namespace Funky.Libs{
                 int delta = e.WheelTicks;
                 var x = e.Location.X;
                 var y = e.Location.Y;
-                CallData cd = new CallData(delta, x, y);
+                CallData cd = new CallData(delta, x, ((int)lastHeight)-y);
                 cd._str_args["delta"] = delta;
                 cd._str_args["x"] = x;
                 cd._str_args["y"] = ((int)lastHeight)-y;
@@ -734,7 +734,7 @@ namespace Funky.Libs{
                 var y = e.Location.Y;
                 mouseX = x;
                 mouseY = ((int)lastHeight)-y;
-                CallData cd = new CallData(x, y);
+                CallData cd = new CallData(x, ((int)lastHeight)-y);
                 cd._str_args["x"] = x;
                 cd._str_args["y"] = ((int)lastHeight)-y;
                 l.Get("onMouseMove").TryCall(cd); 
