@@ -341,6 +341,15 @@ namespace Funky.Libs{
                 map.Dispose();
                 return draw;
             });
+            draw["textSize"] = new VarFunction(dat => {
+                var textToMeasure = dat.Get(0).Or("text").GetString();
+                SizeF textSize = Graphics.FromImage(new Bitmap(1,1)).MeasureString(textToMeasure, currentFont);
+                VarList outData = new VarList();
+                outData["width"] = textSize.Width;
+                outData["height"] = textSize.Height;
+                outData["text"] = textToMeasure;
+                return outData;
+            });
             draw["setColor"] = new VarFunction(dat => {
                 foregroundColor.double_vars[0] = (float)dat.Get(0).Or("r").Otherwise(0.0f).GetNumber();
                 foregroundColor.double_vars[1] = (float)dat.Get(1).Or("g").Otherwise(0.0f).GetNumber();

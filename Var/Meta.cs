@@ -67,6 +67,11 @@ namespace Funky{
             });
 
             str["tobool"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.Length);
+            str["tonumber"] = new VarFunction(dat => {
+                double d = 0;
+                Double.TryParse(dat.Get(0).Required().GetString().data, out d);
+                return d;
+            });
             str["len"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.Length);
 
             str["lt[side=left,left=string,right=string]"] = new VarFunction(dat => dat.Get(0).Required().GetString().data.CompareTo(dat.Get(1).Required().GetString().data) == -1 ? 1 : 0);

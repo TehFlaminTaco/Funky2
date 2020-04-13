@@ -70,6 +70,8 @@ class Globals{
                     }
                 });
 
+                globals["tonumber"] = new VarFunction(dat => dat.Get(0).Required().Get().asNumber());
+
                 globals["math"] = LibMath.Generate();
                 globals["string"] = LibString.Generate();
                 globals["list"] = LibList.Generate();
