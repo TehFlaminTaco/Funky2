@@ -106,8 +106,7 @@ namespace Funky.Libs{
             });
             str["run"] = new VarFunction(dat => {
                 string text = dat.Get(0).Or("code").Required().GetString();
-                TProgram prog = TProgram.Claim(new StringClaimer(text, "<run>"));
-                return prog.Parse();
+                return Executor.ExecuteProgram(text, "<run>");
             });
             return str;
         }

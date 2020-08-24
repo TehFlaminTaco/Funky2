@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System;
 using Funky.Libs;
+using Funky.Tokens;
 
 namespace Funky{
 class Globals{
@@ -65,8 +66,7 @@ class Globals{
                     if(!file.Exists()){
                         throw new FunkyException("File not found.");
                     }else{
-                        TProgram prog = TProgram.Claim(new StringClaimer(file.ReadAllText(), file.shortName));
-                        return prog.Parse();
+                        return Executor.ExecuteProgram(file.ReadAllText(), file.shortName);
                     }
                 });
 

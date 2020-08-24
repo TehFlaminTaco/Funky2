@@ -1,8 +1,10 @@
 ﻿using System.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
+using Funky.Tokens;
 namespace Funky
 {
-    static class Executer
+    public static class Executor
     {
         static void Main(string[] args)
         {
@@ -14,11 +16,30 @@ namespace Funky
             var fileName = file is null ? "main.fnk" : new FunkyFile(file, "funky", ".fnk").shortName;
             Meta.GetMeta();
             try{
-                TProgram prog = TProgram.Claim(new StringClaimer(code, fileName));
-                prog.Parse();
+                ExecuteProgram(code, fileName);
             }catch(System.Exception e){
                 System.Console.Error.WriteLine($"ERROR:\n{e.Message}");
             }
+        }
+
+        public static Regex CLEAN_ERROR = new Regex(@"\n(\n|\r|.)*");
+        public static Regex SEMI_COLON = new Regex(@";");
+        public static Var ExecuteProgram(string code, string fileName){
+            TExpression e;
+            Var last = Var.nil;
+            VarList scopeList = new VarList();
+            scopeList.parent = Globals.get();
+            Scope scope = new Scope(scopeList);
+            StringClaimer claimer = new StringClaimer(code, fileName);
+            while((e=TExpression.Claim(claimer))!=null){
+                claimer.Claim(SEMI_COLON);
+                last = e.Parse(scope);
+            }
+            if(claimer.bestReach < claimer.to_claim.Length){
+                string errorString = CLEAN_ERROR.Replace(claimer.to_claim.Substring(claimer.bestReach), "...");
+                throw new FunkyException($"Unexpected symbol at {claimer.getLine(claimer.bestReach)}:{claimer.getChar(claimer.bestReach)} \"{errorString}\"");
+            }
+            return last;
         }
     }
 }
