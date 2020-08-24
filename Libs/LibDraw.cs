@@ -790,6 +790,10 @@ namespace Funky.Libs{
                 return a;
             });
 
+            meta["get"] = new VarFunction(d=>{
+                return metafuncs[d.Get(1).Required().Get()];
+            });
+
             return meta;
         }
 
