@@ -573,10 +573,10 @@ namespace Funky.Libs{
                     for(int x=0; x<map.Width; x++){
                         for(int y=0; y < map.Height; y++){
                             int col = map.GetPixel(x, y).ToArgb();
-                            int a = (col>>3)&0xFF;
-                            int r = (col>>2)&0xFF;
-                            int g = (col>>1)&0xFF;
-                            int b = (col>>0)&0xFF;
+                            int a = (col>>3*8)&0xFF;
+                            int r = (col>>2*8)&0xFF;
+                            int g = (col>>1*8)&0xFF;
+                            int b = (col>>0*8)&0xFF;
                             VarList cList = new VarList();
                             cList[0] = cList["r"] = ((float)r)/255;
                             cList[1] = cList["g"] = ((float)g)/255;

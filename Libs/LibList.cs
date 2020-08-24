@@ -108,6 +108,57 @@ namespace Funky.Libs{
                 }
                 return ret;
             });
+            Random rng = new Random();
+            list["sort"] = new VarFunction(dat => {
+                VarList sortable = dat.Get(0).Required().GetList();
+                Var method = dat.Get(1).Required().Get();
+                int length = 0;
+                while(sortable.double_vars.ContainsKey(length))length++;
+                if(length <= 1){ // A list of length 1 or less is always sorted.
+                        return sortable;
+                }
+                int pivot = rng.Next()%length;
+                Var pivotVal = sortable.double_vars[pivot];
+                VarList leftList = new VarList();
+                VarList rightList = new VarList();
+                int leftListLen = 0;
+                int rightListLen = 0;
+                bool allEqual = true;
+                for(int i=0; i < length; i++){
+                    if(i==pivot)
+                        continue;
+                    Var curVal = sortable.double_vars[i];
+                    if(method.Call(new CallData(curVal, pivotVal)).asBool()){
+                        leftList.double_vars[leftListLen++] = curVal;
+                        allEqual = false;
+                    }else{
+                        if(allEqual && method.Call(new CallData(pivotVal, curVal)).asBool()){
+                            allEqual = false;
+                        }
+                        rightList.double_vars[rightListLen++] = curVal;
+                    }
+                }
+                if(allEqual)
+                    return rightList;
+                leftList = list["sort"].Call(new CallData(leftList, method)).asList();
+                rightList = list["sort"].Call(new CallData(rightList, method)).asList();
+
+                // Needed incase we get given a bad list.
+                leftListLen = 0;
+                rightListLen = 0;
+                if(leftList!=null)while(leftList.double_vars.ContainsKey(leftListLen))leftListLen++;
+                if(rightList!=null)while(rightList.double_vars.ContainsKey(rightListLen))rightListLen++;
+
+                VarList outList = new VarList();
+                for(int i=0; i<leftListLen; i++){
+                    outList.double_vars[i] = leftList.double_vars[i];
+                }
+                outList.double_vars[leftListLen] = pivotVal;
+                for(int i=0; i<rightListLen; i++){
+                    outList.double_vars[leftListLen+i+1]=rightList.double_vars[i];
+                }
+                return outList;
+            });
             return list;
         }
     }
