@@ -123,9 +123,7 @@ namespace Funky.Tokens.Flow{
                 Var o = body.TryParse(subscope);
                 if(subscope.escape.Count>0){
                     Escaper esc = subscope.escape.Peek();
-                    if(esc.method == Escape.RETURN){
-                        subscope.escape.Pop();
-                    }
+                    subscope.escape.Clear();
                     return esc.value;
                 }
                 return o;
