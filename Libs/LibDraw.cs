@@ -570,8 +570,8 @@ namespace Funky.Libs{
                 dataList["mapPixels"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
                     VarFunction action = d.Get(0).Or("action").Otherwise(Var.nil).GetFunction();
-                    for(int x=0; x<map.Width; x++){
-                        for(int y=0; y < map.Height; y++){
+                    for(int y=0; y<map.Height; y++){
+                        for(int x=0; x < map.Width; x++){
                             int col = map.GetPixel(x, y).ToArgb();
                             int a = (col>>3*8)&0xFF;
                             int r = (col>>2*8)&0xFF;
