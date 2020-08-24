@@ -45,15 +45,11 @@ namespace Funky{
             return other_vars.ContainsKey(key) ? other_vars[key] : Var.nil;
         }
 
-        public override Var Set(Var key, Var value){
-            return ThisSet(key, value); // Not sure if I need this..?
-        }
-
-        public Var ThisSet(Var key, Var val){
+        public override Var Set(Var key, Var val){
             Var metaFunc = Meta.Get(this, "set", $"key({key.type})", $"value({val.type})");
 
             if(!(metaFunc is VarNull))
-                return metaFunc.Call(new CallData(this, (VarString)key, val));
+                return metaFunc.Call(new CallData(this, key, val));
             
             bool assignHere = false;
             if(writeParent == null)
@@ -73,6 +69,16 @@ namespace Funky{
                 return other_vars[key] = val;
             }else
                 return writeParent.Set(key, val);
+        }
+
+        public Var ThisSet(Var key, Var val){
+            if(key is VarNumber n){
+                return double_vars[n] = val;
+            }
+            if(key is VarString s){
+                return string_vars[s] = val;
+            }
+            return other_vars[key] = val;
         }
     }
 }
