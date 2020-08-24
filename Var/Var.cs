@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 namespace Funky{
     public class Var{
         public string type;
@@ -13,6 +14,30 @@ namespace Funky{
         public Var(){type = this.GetType().Name.Substring(3).ToLower();}
 
         public virtual Var Call(CallData callData){
+            List<Var> numberArguments = new List<Var>();
+            for(int i=0; callData._num_args.ContainsKey(i); i++){
+                numberArguments.Add(callData._num_args[i]);
+            }
+            string[] options = new string[numberArguments.Count];
+            for(int i=0; i < options.Length; i++){
+                options[i] = $"{i}({numberArguments[i].type})";
+            }
+            Var callFunc = Meta.Get(this, "call", options);
+            if(!(callFunc is VarNull)){
+                var newCD = new CallData();
+                Dictionary<double, Var> newNumArguments = new Dictionary<double, Var>();
+                foreach(var kv in callData._num_args)
+                    newNumArguments[kv.Key] = kv.Value;
+                newNumArguments[0] = this;
+                for(int i=0; i < numberArguments.Count; i++)
+                    newNumArguments[i+1] = numberArguments[i];
+
+                newCD._num_args = newNumArguments;
+                newCD._str_args = callData._str_args.ToDictionary(e => e.Key, e => e.Value);
+                newCD._str_args["this"] = this;
+                newCD._var_args = callData._var_args.ToDictionary(e => e.Key, e => e.Value);
+                return callFunc.Call(newCD);
+            }
             return this;
         }
 

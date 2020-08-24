@@ -42,6 +42,11 @@ namespace Funky.Libs{
             math["max"] = new VarFunction(dat => Math.Max(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber()));
             math["clamp"] = new VarFunction(dat => Math.Clamp(dat.Get(0).Required().GetNumber(), dat.Get(1).Required().GetNumber(), dat.Get(2).Required().GetNumber()));
             Random rng = new Random();
+            /*/
+                float [0, 1) 
+                int [0, a)
+                int [a, b)
+            /*/
             math["random"] = new VarFunction(dat => {
                 if(dat._num_args.ContainsKey(1)){
                     return rng.Next((int)dat.Get(0).Required().GetNumber(), (int)dat.Get(1).Required().GetNumber());

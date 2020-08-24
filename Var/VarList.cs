@@ -25,7 +25,12 @@ namespace Funky{
         public override Var Get(Var key){
             Var t = ThisGet(key);
             if(t == Var.nil){
-                return readParent != null ? readParent.Get(key) : base.Get(key);
+                if (readParent != null){
+                    Var parVal = readParent.Get(key);
+                    if(!(parVal is VarNull))
+                        return parVal;
+                }
+                return base.Get(key);
             }
             return t;
         }

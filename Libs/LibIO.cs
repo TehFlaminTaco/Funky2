@@ -90,7 +90,7 @@ namespace Funky.Libs{
 
                 return file;
             });
-
+            io["stdin"] = new VarList();
             return io;
         }
     }

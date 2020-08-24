@@ -342,7 +342,7 @@ namespace Funky.Libs{
                 return draw;
             });
             draw["textSize"] = new VarFunction(dat => {
-                var textToMeasure = dat.Get(0).Or("text").GetString();
+                var textToMeasure = dat.Get(0).Or("text").Required().GetString();
                 SizeF textSize = Graphics.FromImage(new Bitmap(1,1)).MeasureString(textToMeasure, currentFont);
                 VarList outData = new VarList();
                 outData["width"] = textSize.Width;
@@ -414,6 +414,18 @@ namespace Funky.Libs{
 
                 return pList;
             });
+            /*draw["sendToProgram"] = new VarFunction(dat => {
+                var program = dat.Get(0).Or("program").Required().GetList();
+                var name = dat.Get(1).Or("name").Required().GetString();
+                var value = dat.Get(2).Or("value").Otherwise(Var.nil).Get();
+
+                if(!programLists.ContainsKey(program)){
+                    return Var.nil;
+                }
+                uint programID = programLists[program];
+                int uniformLocation = Gl.GetUniformLocation(programID, name);
+                Gl.Uniform1(uniformLocation, value.asNumber());
+            });*/
             draw["createCanvas"] = draw["newCanvas"] = new VarFunction(dat => {
                 int w = (int)dat.Get(0).Or("w").Otherwise(lastWidth).GetNumber();
                 int h = (int)dat.Get(1).Or("h").Otherwise(lastHeight).GetNumber();
@@ -513,15 +525,15 @@ namespace Funky.Libs{
                 });
                 dataList["getPixel"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
-                    int x           = (int)dat.Get(0).Or("x").Otherwise(0).GetNumber();
-                    int y           = (int)dat.Get(1).Or("y").Otherwise(0).GetNumber();
+                    int x           = (int)d.Get(0).Or("x").Otherwise(0).GetNumber();
+                    int y           = (int)d.Get(1).Or("y").Otherwise(0).GetNumber();
                     x = (int)Math.Clamp(x, 0, map.Width);
                     y = (int)Math.Clamp(y, 0, map.Width);
                     int col = map.GetPixel(x, y).ToArgb();
-                    int a = (col>>3)&0xFF;
-                    int r = (col>>2)&0xFF;
-                    int g = (col>>1)&0xFF;
-                    int b = (col>>0)&0xFF;
+                    int a = (col>>3*8)&0xFF;
+                    int r = (col>>2*8)&0xFF;
+                    int g = (col>>1*8)&0xFF;
+                    int b = (col>>0*8)&0xFF;
                     VarList oList = new VarList();
                     oList[0] = oList["r"] = ((float)r)/255;
                     oList[1] = oList["g"] = ((float)g)/255;
@@ -531,9 +543,9 @@ namespace Funky.Libs{
                 });
                 dataList["setPixel"] = new VarFunction(d => {
                     if(destroyed)return Var.nil;
-                    int x           = (int)dat.Get(0).Or("x").Otherwise(0).GetNumber();
-                    int y           = (int)dat.Get(1).Or("y").Otherwise(0).GetNumber();
-                    VarList rgba    =      dat.Get(2).Or("color").Otherwise(Var.nil).GetList();
+                    int x           = (int)d.Get(0).Or("x").Otherwise(0).GetNumber();
+                    int y           = (int)d.Get(1).Or("y").Otherwise(0).GetNumber();
+                    VarList rgba    =      d.Get(2).Or("color").Otherwise(Var.nil).GetList();
                     float r = rgba.string_vars.ContainsKey("r") ? (float)rgba["r"].asNumber()
                             : rgba.double_vars.ContainsKey(0)   ? (float)rgba[ 0 ].asNumber()
                             : 1.0f;
