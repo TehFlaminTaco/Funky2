@@ -121,25 +121,29 @@ namespace Funky.Libs{
                 Var pivotVal = sortable.double_vars[pivot];
                 VarList leftList = new VarList();
                 VarList rightList = new VarList();
+                VarList pivotList = new VarList();
+                pivotList[0] = pivotVal;
                 int leftListLen = 0;
                 int rightListLen = 0;
+                int pivotListLen = 1;
                 bool allEqual = true;
                 for(int i=0; i < length; i++){
                     if(i==pivot)
                         continue;
                     Var curVal = sortable.double_vars[i];
-                    if(method.Call(new CallData(curVal, pivotVal)).asBool()){
+                    int sign = Math.Sign(method.Call(new CallData(curVal, pivotVal)).asNumber());
+                    if(sign<0){
                         leftList.double_vars[leftListLen++] = curVal;
                         allEqual = false;
-                    }else{
-                        if(allEqual && method.Call(new CallData(pivotVal, curVal)).asBool()){
-                            allEqual = false;
-                        }
+                    }else if(sign>0){
                         rightList.double_vars[rightListLen++] = curVal;
+                        allEqual = false;
+                    }else{
+                        pivotList[pivotListLen++] = curVal;
                     }
                 }
                 if(allEqual)
-                    return rightList;
+                    return pivotList;
                 leftList = list["sort"].Call(new CallData(leftList, method)).asList();
                 rightList = list["sort"].Call(new CallData(rightList, method)).asList();
 
@@ -153,9 +157,11 @@ namespace Funky.Libs{
                 for(int i=0; i<leftListLen; i++){
                     outList.double_vars[i] = leftList.double_vars[i];
                 }
-                outList.double_vars[leftListLen] = pivotVal;
+                for(int i=0; i<pivotListLen; i++){
+                    outList.double_vars[leftListLen+i] = pivotList.double_vars[i];
+                }
                 for(int i=0; i<rightListLen; i++){
-                    outList.double_vars[leftListLen+i+1]=rightList.double_vars[i];
+                    outList.double_vars[leftListLen+pivotListLen+i]=rightList.double_vars[i];
                 }
                 return outList;
             });
