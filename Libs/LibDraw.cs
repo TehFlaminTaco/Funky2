@@ -509,7 +509,7 @@ namespace Funky.Libs{
                 h = Math.Max(h, 1);
                 Bitmap map;
                 if(filename is VarString){
-                    map = new Bitmap(filename.asString());
+                    map = new Bitmap(new FunkyFile(filename.asString(), "images", ".png", ".jpg", ".bmp").realPath);
                 }else{
                     map = new Bitmap(w, h);
                 }
@@ -644,6 +644,12 @@ namespace Funky.Libs{
                     Gl.BindTexture(TextureTarget.Texture2d, 0);
                     //Gl.GenerateMipmap(TextureTarget.Texture2d);
                     return l;
+                });
+                dataList["export"] = new VarFunction(d => {
+                    string filename = d.Get(0).Or("file").Or("filename").Required().GetString();
+                    FunkyFile f = new FunkyFile(filename, "images", ".png", ".jpg", ".bmp");
+                    map.Save(f.realPath??filename);
+                    return filename;
                 });
                 bitmapLists[dataList] = map;
                 return dataList;
