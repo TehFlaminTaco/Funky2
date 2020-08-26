@@ -200,7 +200,7 @@ namespace Funky{
             lst["eq"] = new VarFunction(dat => new VarNumber(dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0));
             lst["ne"] = new VarFunction(dat => new VarNumber(dat.Get(0).Get() == dat.Get(1).Get() ? 0 : 1));
 
-            lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.Get(1).Required().Get()));
+            //lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.Get(1).Required().Get()));
 
             return lst;
         }

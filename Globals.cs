@@ -33,13 +33,6 @@ class Globals{
                     Console.Write(outStr);
                     return outStr;
                 });
-                globals["list"] = new VarFunction(dat => {
-                    VarList l = new VarList();
-                    l.double_vars = dat._num_args;
-                    l.string_vars = dat._str_args;
-                    l.other_vars = dat._var_args;
-                    return l;
-                });
                 globals["error"] = new VarFunction(dat => {
                     throw new FunkyException(dat.Get(0).Or("message").Otherwise("").GetString());
                 });
