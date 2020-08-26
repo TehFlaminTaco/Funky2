@@ -24,7 +24,22 @@ namespace Funky.Libs{
                 dat.Get(0).Required().Get().meta = dat.Get(1).Required().Get()?.asList();
                 return dat.Get(0).Required().Get();
             });
-            list["getmeta"] = new VarFunction(dat => (Var)dat.Get(0).Required().Get().meta??Var.nil);
+            list["getmeta"] = new VarFunction(dat => {
+                Var val = dat.Get(0).Otherwise(Var.nil).Get();
+                VarList var_meta;
+                if(val.meta != null){
+                    var_meta = val.meta;
+                }else{
+                    VarList meta = Meta.GetMeta();
+                    if(meta == null)
+                        return Var.nil;
+                    if(!meta.string_vars.ContainsKey(val.type)){
+                        return Var.nil;
+                    }
+                    var_meta = (VarList)meta.string_vars[val.type];
+                }
+                return var_meta;
+            });
             list["rawget"] = new VarFunction(dat => {
                 VarList l = dat.Get(0).Required().GetList();
                 return l.ThisGet(dat.Get(1).Required().Get());
