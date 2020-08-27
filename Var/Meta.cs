@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System;
+using System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Funky{
     class Meta{
@@ -264,20 +266,16 @@ namespace Funky{
             return sb.ToString();
         }
 
-        private static bool Flop(bool[] list){
-            return Flop(list, 0);
-        }
-        private static bool Flop(bool[] list, int pos){
-            if(list[pos] == true){
-                list[pos] = false;
-                return false;
+        public static VarList GetMetaTable(Var val){
+            if(val.meta != null){
+                return val.meta;
             }else{
-                list[pos] = true;
-                if(pos + 1 < list.Length){
-                    return Flop(list, pos + 1);
-                }else{
-                    return true;
+                if(meta == null)
+                    return null;
+                if(!meta.string_vars.ContainsKey(val.type)){
+                    return null;
                 }
+                return (VarList)meta.string_vars[val.type];
             }
         }
 
@@ -301,34 +299,42 @@ namespace Funky{
             return lMeta;
         }
 
-        public static Var Get(Var val, string name, params string[] options){
-            VarList var_meta;
-            if(val.meta != null){
-                var_meta = val.meta;
-            }else{
-                if(meta == null)
-                    return Var.nil;
-                if(!meta.string_vars.ContainsKey(val.type)){
-                    return Var.nil;
-                }
-                var_meta = (VarList)meta.string_vars[val.type];
-            }
-            bool[] opUse = new bool[options.Length];
-            for(int i=0; i < opUse.Length; i++){
-                opUse[i] = true;
-            }
 
-            while(opUse.Length > 0){
-                string check_name = $"{name}[{MakeOptions(options, opUse)}]";
-                if(var_meta.string_vars.ContainsKey(check_name))
-                    return var_meta.string_vars[check_name];
-                
-                if(Flop(opUse))
-                    break;
+        private static Regex keyMatcher = new Regex(",?(\\w+=\\w+)");
+        public static Var Get(Var val, string name, params string[] options){
+            StringBuilder nameChunk = new StringBuilder();
+            nameChunk.Append(name);
+            nameChunk.Append('[');
+            string metaMatch = nameChunk.ToString();
+
+            VarList var_meta = GetMetaTable(val);
+            if(var_meta == null)
+                return Var.nil;
+            int longestMatch = 0;
+            Var longestFunc = Var.nil;
+            foreach(var metaFunction in var_meta.string_vars){
+                string key = metaFunction.Key;
+                if(key == name && longestMatch == 0){
+                    longestMatch = 1;
+                    longestFunc = metaFunction.Value;
+                }
+                if(key.StartsWith(metaMatch)){
+                    var subkeys = keyMatcher.Matches(key.Substring(metaMatch.Length));
+                    if(subkeys.Count <= longestMatch)
+                        continue;
+                    bool validFunc = true;
+                    foreach(Match match in subkeys){
+                        if(!options.Contains(match.Groups[1].Value)){
+                            validFunc = false; break;
+                        }
+                    }
+                    if(!validFunc)
+                        continue;
+                    longestMatch = subkeys.Count;
+                    longestFunc = metaFunction.Value;
+                }
             }
-            if(var_meta.string_vars.ContainsKey(name))
-                return var_meta.string_vars[name];
-            return Var.nil;
+            return longestFunc;
         }
     }
 }
