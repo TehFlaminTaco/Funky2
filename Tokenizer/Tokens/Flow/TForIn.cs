@@ -61,26 +61,56 @@ namespace Funky.Tokens.Flow{
                 foreach(KeyValuePair<double, Var> kv in vl.double_vars){
                     inVar.Set(scope, kv.Key);
                     ret = body.TryParse(scope);
+                    if(scope.escape.Count > 0){
+                        Escaper esc = scope.escape.Peek();
+                        if(esc.method == Escape.BREAK)
+                            scope.escape.Pop();
+                        return esc.value;
+                    }
                 }
                 foreach(KeyValuePair<string, Var> kv in vl.string_vars){
                     inVar.Set(scope, kv.Key);
                     ret = body.TryParse(scope);
+                    if(scope.escape.Count > 0){
+                        Escaper esc = scope.escape.Peek();
+                        if(esc.method == Escape.BREAK)
+                            scope.escape.Pop();
+                        return esc.value;
+                    }
                 }
                 foreach(KeyValuePair<Var, Var> kv in vl.other_vars){
                     inVar.Set(scope, kv.Key);
                     ret = body.TryParse(scope);
+                    if(scope.escape.Count > 0){
+                        Escaper esc = scope.escape.Peek();
+                        if(esc.method == Escape.BREAK)
+                            scope.escape.Pop();
+                        return esc.value;
+                    }
                 }
             }else if(iterVar is VarString){
                 string vs = iterVar.asString().data;
                 for(int i=0; i < vs.Length; i++){
                     inVar.Set(scope, ""+vs[i]);
                     ret = body.TryParse(scope);
+                    if(scope.escape.Count > 0){
+                        Escaper esc = scope.escape.Peek();
+                        if(esc.method == Escape.BREAK)
+                            scope.escape.Pop();
+                        return esc.value;
+                    }
                 }
             }else if(iterVar is VarNumber){
                 int vi = (int)iterVar.asNumber().value;
                 for(int i=0; i < vi; i++){
                     inVar.Set(scope, vi);
                     ret = body.TryParse(scope);
+                    if(scope.escape.Count > 0){
+                        Escaper esc = scope.escape.Peek();
+                        if(esc.method == Escape.BREAK)
+                            scope.escape.Pop();
+                        return esc.value;
+                    }
                 }
             }else if(iterVar is VarFunction){
                 VarFunction func = (VarFunction)iterVar;
@@ -89,6 +119,12 @@ namespace Funky.Tokens.Flow{
                 while (!((fr = func.Call(cd)) is VarNull)){
                     inVar.Set(scope, fr);
                     ret = body.TryParse(scope);
+                    if(scope.escape.Count > 0){
+                        Escaper esc = scope.escape.Peek();
+                        if(esc.method == Escape.BREAK)
+                            scope.escape.Pop();
+                        return esc.value;
+                    }
                 }
             }
 
