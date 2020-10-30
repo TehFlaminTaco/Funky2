@@ -253,7 +253,7 @@ namespace Funky.Libs{
             });
             draw["scale"] = new VarFunction(dat => {
                 double x = (double)dat.Get(0).Or("x").Otherwise(0.0d).GetNumber();
-                double y = (double)dat.Get(1).Or("y").Otherwise(0.0d).GetNumber();
+                double y = (double)dat.Get(1).Or("y").Otherwise(x).GetNumber();
                 Gl.Scale(x, y, 0.0d);
                 return draw;
             });
@@ -379,7 +379,7 @@ namespace Funky.Libs{
                 return draw;
             });
             draw["createShader"] = new VarFunction(dat => {
-                string source       = dat.Get(0).Or("source").Otherwise("").GetString();
+                string source       = dat.Get(0).Or("source").Required().GetString();
                 string shadertype   = dat.Get(1).Or("type").Otherwise("frag").GetString();
                 if(source == "")
                     return Var.nil; // No source??!?!?
@@ -402,7 +402,7 @@ namespace Funky.Libs{
                 Gl.GetShaderInfoLog(shader, logMaxLength, out infologLength, infolog);
                 Gl.DeleteShader(shader);
 
-                return infolog.ToString();
+                throw new FunkyException(infolog.ToString()??"Unknown exception in shader.");
             });
             draw["useShaders"] = draw["useShader"] = new VarFunction(dat => {
                 Var shad = dat.Get(0).Or("shaders").Otherwise(Var.nil).Get();
@@ -430,18 +430,44 @@ namespace Funky.Libs{
 
                 return pList;
             });
-            /*draw["sendToProgram"] = new VarFunction(dat => {
+            draw["sendToProgram"] = new VarFunction(dat => {
                 var program = dat.Get(0).Or("program").Required().GetList();
                 var name = dat.Get(1).Or("name").Required().GetString();
-                var value = dat.Get(2).Or("value").Otherwise(Var.nil).Get();
+                var value1 = dat.Get(2).Or("value").Otherwise(Var.nil).Get();
+                var value2 = dat.Get(3).Or("value").Otherwise(Var.nil).Get();
+                var value3 = dat.Get(4).Or("value").Otherwise(Var.nil).Get();
+                var value4 = dat.Get(5).Or("value").Otherwise(Var.nil).Get();
 
                 if(!programLists.ContainsKey(program)){
-                    return Var.nil;
+                    throw new FunkyException("Expected valid shader program.");
                 }
                 uint programID = programLists[program];
                 int uniformLocation = Gl.GetUniformLocation(programID, name);
-                Gl.Uniform1(uniformLocation, value.asNumber());
-            });*/
+                if(value4 is VarNumber && value3 is VarNumber && value2 is VarNumber && value1 is VarNumber){
+                    Gl.Uniform4(uniformLocation,
+                        (float)value1.asNumber(),
+                        (float)value2.asNumber(),
+                        (float)value3.asNumber(),
+                        (float)value4.asNumber()
+                    );
+                }else if(value3 is VarNumber && value2 is VarNumber && value1 is VarNumber){
+                    Gl.Uniform3(uniformLocation,
+                        (float)value1.asNumber(),
+                        (float)value2.asNumber(),
+                        (float)value3.asNumber()
+                    );
+                }else if(value2 is VarNumber && value1 is VarNumber){
+                    Gl.Uniform2(uniformLocation,
+                        (float)value1.asNumber(),
+                        (float)value2.asNumber()
+                    );
+                }else if(value1 is VarNumber){
+                    Gl.Uniform1(uniformLocation,
+                        (float)value1.asNumber()
+                    );
+                }
+                return value1;
+            });
             draw["createCanvas"] = draw["newCanvas"] = new VarFunction(dat => {
                 int w = (int)dat.Get(0).Or("w").Otherwise(lastWidth).GetNumber();
                 int h = (int)dat.Get(1).Or("h").Otherwise(lastHeight).GetNumber();
