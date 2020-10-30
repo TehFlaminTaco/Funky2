@@ -14,6 +14,7 @@ namespace Funky.Tokens{
             Scope newScope = new Scope();
             newScope.variables = new VarList();
             newScope.variables.parent = scope.variables;
+            newScope.variables.meta = new VarList();
             newScope.escape = scope.escape;
             for(int i=0; i < expressions.Count; i++){
                 if(scope.escape.Count > 0){

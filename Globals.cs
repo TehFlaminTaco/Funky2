@@ -11,7 +11,7 @@ class Globals{
         public static VarList get(){
             if(globals == null){
                 globals = new VarList();
-
+                globals.meta = new VarList();
                 globals["print"] = new VarFunction(dat => {
                     StringBuilder sb = new StringBuilder();
                     string chunker = "";

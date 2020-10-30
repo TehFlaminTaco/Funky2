@@ -114,6 +114,7 @@ namespace Funky.Tokens.Flow{
             func = new VarFunction(dat => {
                 VarList scopeList = new VarList();
                 scopeList.parent = func.scope.variables;
+                scopeList.meta = new VarList();
                 Scope subscope = new Scope(scopeList);
                 subscope.escape = func.scope.escape;
                 int index = 0;

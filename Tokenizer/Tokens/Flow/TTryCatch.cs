@@ -52,6 +52,7 @@ namespace Funky.Tokens{
                     Scope subscope = new Scope();
                     subscope.escape = scope.escape;
                     subscope.variables = new VarList();
+                    subscope.variables.meta = new VarList();
                     subscope.variables.parent = scope.variables;
                     if(catchTarget != null){
                         catchTarget.isLocal = true;

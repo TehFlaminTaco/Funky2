@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+
 namespace Funky{
     public class Var{
         public string type;
@@ -88,7 +90,11 @@ namespace Funky{
                 }
                 return outp as VarString;
             }
-            return new VarString("");
+            var fancyType = new StringBuilder();
+            fancyType.Append('[');
+            fancyType.Append(type);
+            fancyType.Append(']');
+            return new VarString(fancyType.ToString());
         }
         public virtual VarNumber asNumber(){
             Var callFunc = Meta.Get(this, "tonumber");

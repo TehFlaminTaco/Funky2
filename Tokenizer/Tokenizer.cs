@@ -56,6 +56,7 @@ namespace Funky{
         public Var Parse(){
             VarList scopeList = new VarList();
             scopeList.parent = Globals.get();
+            scopeList.meta = new VarList();
             Scope scope = new Scope(scopeList);
             Var[] results = new Var[expressions.Count];
             Var lastRes = Var.nil;

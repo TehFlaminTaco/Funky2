@@ -202,7 +202,7 @@ namespace Funky{
             lst["eq"] = new VarFunction(dat => new VarNumber(dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0));
             lst["ne"] = new VarFunction(dat => new VarNumber(dat.Get(0).Get() == dat.Get(1).Get() ? 0 : 1));
 
-            //lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.Get(1).Required().Get()));
+            lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.Get(1).Required().Get()));
 
             return lst;
         }
@@ -233,6 +233,8 @@ namespace Funky{
             num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value != dat.Get(1).Required().GetNumber().value ? 1 : 0));
             num["eq"] = new VarFunction(dat => new VarNumber(0));
             num["ne"] = new VarFunction(dat => new VarNumber(1));
+            num["unm"] = new VarFunction(dat => -dat.Get(0).Required().GetNumber().value);
+            num["unp"] = new VarFunction(dat => dat.Get(0).Required().Get());
 
 
             num["tostring"] = new VarFunction(dat => {

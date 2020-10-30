@@ -39,6 +39,7 @@ namespace Funky.Tokens.Flow{
                 Scope newScope = new Scope();
                 newScope.variables = new VarList();
                 newScope.variables.parent = scope.variables;
+                newScope.variables.meta = new VarList();
                 newScope.escape = new Stack<Escaper>();
                 foreach(var kv in dat._num_args)
                     newScope.variables.double_vars[kv.Key] = kv.Value;

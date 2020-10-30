@@ -32,6 +32,7 @@ namespace Funky
             Var last = Var.nil;
             VarList scopeList = new VarList();
             scopeList.parent = Globals.get();
+            scopeList.meta = new VarList();
             if(cmdArgs!=null)
                 scopeList.string_vars["arg"] = cmdArgs;
             Scope scope = new Scope(scopeList);
