@@ -28,6 +28,7 @@ namespace Funky.Libs{
         private static uint lastHeight = 0;
         private static int mouseX = 0;
         private static int mouseY = 0;
+        private static bool mouseInWindow = false;
         #endregion
 
         private static int CurrentMouse = 0;
@@ -36,7 +37,6 @@ namespace Funky.Libs{
         private static System.Drawing.Text.TextRenderingHint FontAA = System.Drawing.Text.TextRenderingHint.AntiAlias;
         private static uint fontTexture;
         public static Stack<uint> frameBufferStack = new Stack<uint>();
-
         public static VarList Generate(){
             VarList draw = new VarList();
 
@@ -55,16 +55,20 @@ namespace Funky.Libs{
                 windowList["onMouseUp"] = new VarEvent("onMouseUp");
                 windowList["onMouseWheel"] = new VarEvent("onMouseWheel");
                 windowList["onMouseMove"] = new VarEvent("onMouseMove");
+                windowList["onMouseEnter"] = new VarEvent("onMouseEnter");
+                windowList["onMouseLeave"] = new VarEvent("onMouseLeave");
                 windowList["onResize"] = new VarEvent("onResize");
                 Thread t = null;
                 t = new Thread(()=>{
                     using(NativeWindowWinNTCustom nw = new NativeWindowWinNTCustom()){
-                        nw.ContextCreated += (object s, NativeWindowEventArgs e)=>{windowList.Get("onLoad").TryCall(new CallData(windowList));};
+                        nw.ContextCreated += (object s, NativeWindowEventArgs e)=>{
+                            windowList.Get("onLoad").TryCall(new CallData(windowList));
+                        };
                         
                         string title = dat.Get(0).Or("title").Otherwise("Funky2").GetString();
                         uint width   = (uint)dat.Get(1).Or("width").Otherwise(640).GetNumber();
                         uint height  = (uint)dat.Get(2).Or("height").Otherwise(480).GetNumber();
-
+                        
                         lastWidth = width;
                         lastHeight = height;
 
@@ -88,16 +92,16 @@ namespace Funky.Libs{
                         nw.MouseUp += OnMouseUp(nw, windowList);
                         nw.WorkingMouseWheel += OnMouseWheel(nw, windowList);
                         nw.MouseMove += OnMouseMove(nw, windowList);
+                        nw.MouseEnter += OnMouseEnter(nw, windowList);
+                        nw.MouseLeave += OnMouseLeave(nw, windowList);
                         nw.Resize += OnResize(nw, windowList);
-
                         windowList.meta = WindowMeta(nw, windowList);
 
                         nw.ContextDestroying += (object s, NativeWindowEventArgs e)=>{
                             FunkyHelpers.EndTask(nw.Handle, false, true);
                         };
                         nw.Show();
-                        nw.Run();
-                        
+                        nw.Run();  
                     }
                 });
                 t.Start();
@@ -119,6 +123,18 @@ namespace Funky.Libs{
             draw["getHeight"] = new VarFunction(dat => lastHeight);
             draw["getMouseX"] = new VarFunction(dat => mouseX);
             draw["getMouseY"] = new VarFunction(dat => mouseY);
+            draw["setCursor"] = new VarFunction(dat => {
+                string cursorName = (string)dat.Get(0).Or("cursor").Required().GetString();
+                try{
+                    CursorShape shape = Enum.Parse<CursorShape>(cursorName, true);
+                    if(!mouseInWindow) // Still check the argument, but don't draw if not in game window.
+                        return Var.nil;
+                    FunkyHelpers.SetCursor(Cursors.Get(shape));
+                }catch(ArgumentException){
+                    throw new FunkyException($"Invalid Cursor Type {cursorName}");
+                }
+                return Var.nil;
+            });
             draw["loadFont"] = new VarFunction(dat => {
                 VarList l = new VarList();
                 string family = (string)dat.Get(0).Or("family").Otherwise("Arial").GetString();
@@ -756,6 +772,26 @@ namespace Funky.Libs{
                 cd._str_args["x"] = x;
                 cd._str_args["y"] = ((int)lastHeight)-y;
                 l.Get("onMouseMove").TryCall(cd); 
+            };
+        }
+        public static EventHandler<NativeWindowMouseEventArgs> OnMouseEnter(NativeWindow window, VarList l){
+            return (object c_Sender, NativeWindowMouseEventArgs e)=>{
+                mouseInWindow = true;
+                var x = e.Location.X;
+                var y = e.Location.Y;
+                mouseX = x;
+                mouseY = ((int)lastHeight)-y;
+                CallData cd = new CallData(x, ((int)lastHeight)-y);
+                cd._str_args["x"] = x;
+                cd._str_args["y"] = ((int)lastHeight)-y;
+                l.Get("onMouseEnter").TryCall(cd); 
+            };
+        }
+        public static EventHandler<NativeWindowEventArgs> OnMouseLeave(NativeWindow window, VarList l){
+            return (object c_Sender, NativeWindowEventArgs e)=>{
+                mouseInWindow = false;
+                CallData cd = new CallData();
+                l.Get("onMouseLeave").TryCall(cd); 
             };
         }
 
