@@ -443,6 +443,15 @@ namespace Funky.Libs{
                 }
                 uint programID = programLists[program];
                 int uniformLocation = Gl.GetUniformLocation(programID, name);
+                if(value1 is VarList l){
+                    List<float> vals = new List<float>();
+                    for(int i=0; l.double_vars.ContainsKey(i); i++){
+                        if(l.double_vars[i] is VarNumber n){
+                            vals.Add((float)n);
+                        }
+                    }
+                    Gl.Uniform1(uniformLocation, vals.ToArray());
+                }
                 if(value4 is VarNumber && value3 is VarNumber && value2 is VarNumber && value1 is VarNumber){
                     Gl.Uniform4(uniformLocation,
                         (float)value1.asNumber(),
