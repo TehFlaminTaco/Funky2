@@ -289,6 +289,37 @@ namespace Funky.Libs{
 
                 return draw;
             });
+            draw["line"] = draw["lines"] = new VarFunction(dat => {
+                // Ensure 4 arguments.
+                for(int i=0; i < 4; i++)if(!dat._num_args.ContainsKey(i))return Var.nil;
+
+                Gl.Begin(PrimitiveType.Lines);
+                    for(int i=0; dat._num_args.ContainsKey(i) && dat._num_args.ContainsKey(i+1); i+=2){
+                        Gl.TexCoord2(dat._num_args[i].asNumber(), dat._num_args[i+1].asNumber());
+                        Gl.Vertex2(dat._num_args[i].asNumber(), dat._num_args[i+1].asNumber());
+                    }
+                Gl.End();
+
+                return draw;
+            });
+            draw["linesLoop"] = new VarFunction(dat => {
+                // Ensure 4 arguments.
+                for(int i=0; i < 4; i++)if(!dat._num_args.ContainsKey(i))return Var.nil;
+
+                Gl.Begin(PrimitiveType.LineLoop);
+                    for(int i=0; dat._num_args.ContainsKey(i) && dat._num_args.ContainsKey(i+1); i+=2){
+                        Gl.TexCoord2(dat._num_args[i].asNumber(), dat._num_args[i+1].asNumber());
+                        Gl.Vertex2(dat._num_args[i].asNumber(), dat._num_args[i+1].asNumber());
+                    }
+                Gl.End();
+
+                return draw;
+            });
+            draw["lineSize"] = draw["setLineSize"] = new VarFunction(dat => {
+                float size = (float)dat.Get(0).Or("size").Required().GetNumber();
+                Gl.LineWidth(size);
+                return draw;
+            });
             draw["text"] = draw["print"] = new VarFunction(dat => {
                 string showText = (string)dat.Get(0).Or("text").Otherwise("").GetString();
                 float x         = (float)dat.Get(1).Or("x").Otherwise(0f).GetNumber();
@@ -325,10 +356,12 @@ namespace Funky.Libs{
                         g.DrawString(showText, currentFont, solidBrush, drawPos, alignSettings);
                     }
                 }
-                uint text =  fontTexture;
+                uint text = fontTexture;
                 Gl.BindTexture(TextureTarget.Texture2d, text);
-                //Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
-                //Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+                if(FontAA!=System.Drawing.Text.TextRenderingHint.AntiAlias){
+                    Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
+                    Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+                }
                 BitmapData bm = null;
                 try{
                     bm = map.LockBits(new Rectangle(0, 0, map.Width, map.Height), ImageLockMode.ReadOnly, map.PixelFormat);
@@ -337,7 +370,9 @@ namespace Funky.Libs{
                     if(bm != null)
                         map.UnlockBits(bm);
                 }
-                Gl.GenerateMipmap(TextureTarget.Texture2d);
+                if(FontAA==System.Drawing.Text.TextRenderingHint.AntiAlias){
+                    Gl.GenerateMipmap(TextureTarget.Texture2d);
+                }
                 Gl.PushMatrix();
                     Gl.Translate(x, y, 0d);
                     Gl.Translate(-ox*map.Width, -oy*map.Height, 0d);
