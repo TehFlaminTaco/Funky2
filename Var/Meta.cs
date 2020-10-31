@@ -28,7 +28,6 @@ namespace Funky{
 
         private static VarList newMeta(){
             VarList l = new VarList();
-            l.readParent = meta["base"] as VarList;
             return l;
         }
 
@@ -46,7 +45,7 @@ namespace Funky{
         }
 
         private static VarList _Null(){
-            VarList nul = newMeta();
+            VarList nul = _Base();
             nul["tostring"] = new VarFunction(dat => dat._num_args[0] is VarNull n ? n.id : "what? stop");
             nul["tobool"] = new VarFunction(dat => 0);
             nul["not"] = new VarFunction(dat => 1);
@@ -56,7 +55,7 @@ namespace Funky{
         }
 
         private static VarList _String(){
-            VarList str = newMeta();
+            VarList str = _Base();
 
             str["get"] = new VarFunction(dat => {
                 VarString s = dat.Get(0).Required().GetString();
@@ -135,7 +134,7 @@ namespace Funky{
         }
 
         private static VarList _Function(){
-            VarList fnc = newMeta();
+            VarList fnc = _Base();
 
             fnc["tobool"] = new VarFunction(dat => new VarNumber(1));
             fnc["tostring"] = new VarFunction(dat => dat.Get(0).Required().GetFunction().FunctionText);
@@ -147,7 +146,7 @@ namespace Funky{
         }
 
         private static VarList _List(){
-            VarList lst = newMeta();
+            VarList lst = _Base();
 
             lst["tobool"] = new VarFunction(dat => new VarNumber(1));
             lst["tostring"] = new VarFunction(dat => {
@@ -208,7 +207,7 @@ namespace Funky{
         }
 
         private static VarList _Number(){
-            VarList num = newMeta();
+            VarList num = _Base();
 
             num["tobool"] = new VarFunction(dat => dat.Get(0).Required().GetNumber());
 
@@ -233,8 +232,6 @@ namespace Funky{
             num["ne[side=left,left=number,right=number]"] = new VarFunction(dat => new VarNumber(dat.Get(0).Required().GetNumber().value != dat.Get(1).Required().GetNumber().value ? 1 : 0));
             num["eq"] = new VarFunction(dat => new VarNumber(0));
             num["ne"] = new VarFunction(dat => new VarNumber(1));
-            num["unm"] = new VarFunction(dat => -dat.Get(0).Required().GetNumber().value);
-            num["unp"] = new VarFunction(dat => dat.Get(0).Required().Get());
 
 
             num["tostring"] = new VarFunction(dat => {
@@ -245,7 +242,7 @@ namespace Funky{
         }
 
         private static VarList _Event(){
-            VarList evt = newMeta();
+            VarList evt = _Base();
             evt["tostring"] = new VarFunction(dat => $"Event({dat.Get(0).Required().GetEvent().name})");
             evt["tobool"] = new VarFunction(dat => 1);
             evt["eq[left=null,right=null]"] = new VarFunction(dat => dat.Get(0).Get() == dat.Get(1).Get() ? 1 : 0);
