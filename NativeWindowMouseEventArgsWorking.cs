@@ -20,6 +20,7 @@
 // SOFTWARE.
 
 using System;
+using static OpenGL.CoreUI.NativeWindowWinNTCustom;
 
 namespace OpenGL.CoreUI
 {
@@ -63,6 +64,7 @@ namespace OpenGL.CoreUI
 
 		#endregion
 	}
+
 	/// <summary>
 	/// Arguments for <see cref="NativeWindow"/> mouse events.
 	/// </summary>
@@ -136,6 +138,43 @@ namespace OpenGL.CoreUI
 		/// user; a negative value indicates that the wheel was rotated backward, toward the user.
 		/// </summary>
 		public readonly short WheelTicks;
+
+		#endregion
+	}
+
+	public sealed class NativeWindowVirtualKeyArgs : NativeWindowEventArgsWorking
+	{
+		#region Constructors
+
+		/// <summary>
+		/// Construct a NativeWindowVirtualKeyArgs.
+		/// </summary>
+		/// <param name="deviceContext">
+		/// The <see cref="DeviceContext"/> used for the underlying <see cref="NativeWindow"/>.
+		/// </param>
+		/// <param name="renderContext">
+		/// The OpenGL context used for rendering.
+		/// </param>
+		/// <param name="location">
+		/// The <see cref="Point"/> representing the position relative to the event.
+		/// </param>
+		/// <param name="buttons">
+		/// The <see cref="MouseButton"/> pressed at the time of the event.
+		/// </param>
+		/// <param name="wheelTicks">
+		/// The <see cref="UInt16"/> indicating the wheel distance (meaninful only on MouseWheel event).
+		/// </param>
+		internal NativeWindowVirtualKeyArgs(DeviceContext deviceContext, IntPtr renderContext, VirtualKeys buttons) :
+			base(deviceContext, renderContext)
+		{
+			Buttons = buttons;
+		}
+
+		#endregion
+
+		#region Event Arguments
+
+		public readonly VirtualKeys Buttons;
 
 		#endregion
 	}

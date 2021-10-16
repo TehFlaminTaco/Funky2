@@ -119,7 +119,7 @@ namespace Funky{
             if(argumentIndex != Int32.MinValue && holder._num_args.ContainsKey(argumentIndex)){
                 Var o = holder._num_args[argumentIndex];
                 if((GetArgType(o)&argType)!=ArgType.UNKNOWN)
-                        return o;
+                    return o;
             }
             if(onFail != null)
                 throw onFail;

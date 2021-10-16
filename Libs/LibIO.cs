@@ -63,13 +63,15 @@ namespace Funky.Libs{
                 VarList file = new VarList();
 
                 FileStream fs = null;
+                FileAccess rw = FileAccess.Read;
+                if(flags.IndexOf("r")>=0 && flags.IndexOf("w")>=0)
+                    rw = FileAccess.ReadWrite;
+                else if(flags.IndexOf("w")>=0)
+                    rw = FileAccess.Write;
                 if(f.Exists()){
-                    FileAccess rw = FileAccess.Read;
-                    if(flags.IndexOf("r")>=0 && flags.IndexOf("w")>=0)
-                        rw = FileAccess.ReadWrite;
-                    else if(flags.IndexOf("w")>=0)
-                        rw = FileAccess.Write;
                     fs = new FileStream(f.realPath, FileMode.OpenOrCreate, rw);
+                }else{
+                    fs = new FileStream(dat.Get(0).Or("file").Required().GetString(), FileMode.OpenOrCreate, rw);
                 }
 
                 file["exists"] = new VarFunction(dat => f.Exists()?1:0);
@@ -81,6 +83,11 @@ namespace Funky.Libs{
                         line.Add((byte)b);
                     }
                     return Encoding.UTF8.GetString(line.ToArray());
+                });
+                file["write"] = new VarFunction(dat => {
+                    string text = dat.Get(0).Or("text").Required().GetString();
+                    fs.Write(Encoding.UTF8.GetBytes(text));
+                    return file;
                 });
                 file["close"] = new VarFunction(dat => {
                     fs.Close();

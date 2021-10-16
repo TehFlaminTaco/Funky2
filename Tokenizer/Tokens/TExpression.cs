@@ -42,7 +42,8 @@ namespace Funky.Tokens{
             TAssignment.LeftClaim(claimer, last_claim)      as TExpression ??
             TVariable.LeftClaim(claimer, last_claim)        as TExpression ??
             TLeftCrementor.LeftClaim(claimer, last_claim)   as TExpression ??
-            TArithmetic.LeftClaim(claimer, last_claim)      as TExpression;
+            TArithmetic.LeftClaim(claimer, last_claim)      as TExpression ??
+            TCached.LeftClaim(claimer, last_claim)          as TExpression;
         }
 
         public abstract Var Parse(Scope scope); // Although Expression requires a Parse function, it fails to implement it, because it shouldn't be possible to have a raw "TExpression" token.

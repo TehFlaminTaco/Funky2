@@ -86,8 +86,8 @@ namespace Funky.Libs{
                         fontTexture = Gl.GenTexture();
 
                         nw.Render += DrawWindow(nw, windowList);
-                        nw.KeyDown += OnKeyDown(nw, windowList);
-                        nw.KeyUp += OnKeyUp(nw, windowList);
+                        nw.OnVirtualKeyDown += OnKeyDown(nw, windowList);
+                        nw.OnVirtualKeyUp += OnKeyUp(nw, windowList);
                         nw.MouseDown += OnMouseDown(nw, windowList);
                         nw.MouseUp += OnMouseUp(nw, windowList);
                         nw.WorkingMouseWheel += OnMouseWheel(nw, windowList);
@@ -465,13 +465,25 @@ namespace Funky.Libs{
 
                 return pList;
             });
+            draw["bindTexture"] = new VarFunction(dat => {
+                var unit = dat.Get(0).Or("unit").Required().GetNumber();
+                var texture = dat.Get(1).Or("texture").Required().GetList();
+                if(textureLists.ContainsKey(texture)){
+                    Gl.ActiveTexture((TextureUnit)((uint)TextureUnit.Texture0 + (uint)unit.value));
+                    Gl.BindTexture(TextureTarget.Texture2d, textureLists[texture]);
+                    Gl.ActiveTexture(TextureUnit.Texture0);
+                }else{
+                    throw new FunkyException("Expected texture.");
+                }
+                return Var.nil;
+            });
             draw["sendToProgram"] = new VarFunction(dat => {
                 var program = dat.Get(0).Or("program").Required().GetList();
                 var name = dat.Get(1).Or("name").Required().GetString();
-                var value1 = dat.Get(2).Or("value").Otherwise(Var.nil).Get();
-                var value2 = dat.Get(3).Or("value").Otherwise(Var.nil).Get();
-                var value3 = dat.Get(4).Or("value").Otherwise(Var.nil).Get();
-                var value4 = dat.Get(5).Or("value").Otherwise(Var.nil).Get();
+                var value1 = dat.Get(2).Or("value").Or("valuex").Otherwise(Var.nil).Get();
+                var value2 = dat.Get(3).Or("valuey").Otherwise(Var.nil).Get();
+                var value3 = dat.Get(4).Or("valuez").Otherwise(Var.nil).Get();
+                var value4 = dat.Get(5).Or("valuew").Otherwise(Var.nil).Get();
 
                 if(!programLists.ContainsKey(program)){
                     throw new FunkyException("Expected valid shader program.");
@@ -486,6 +498,11 @@ namespace Funky.Libs{
                         }
                     }
                     Gl.Uniform1(uniformLocation, vals.ToArray());
+                }
+                if(value1 is VarList vl){
+                    if(textureLists.ContainsKey(vl)){
+                        Gl.Uniform1(uniformLocation, textureLists[vl]);
+                    }
                 }
                 if(value4 is VarNumber && value3 is VarNumber && value2 is VarNumber && value1 is VarNumber){
                     Gl.Uniform4(uniformLocation,
@@ -762,20 +779,20 @@ namespace Funky.Libs{
             };
         }
 
-        public static EventHandler<NativeWindowKeyEventArgs> OnKeyDown(NativeWindow window, VarList l){
-            return (object c_Sender, NativeWindowKeyEventArgs e)=>{
-                int keyCode = (int)e.Key;
-                string keyName = CodeToKey(e.Key);
+        public static EventHandler<NativeWindowVirtualKeyArgs> OnKeyDown(NativeWindow window, VarList l){
+            return (object c_Sender, NativeWindowVirtualKeyArgs e)=>{
+                int keyCode = (int)e.Buttons;
+                string keyName = CodeToKey(e.Buttons);
                 CallData cd = new CallData(keyCode, keyName);
                 cd._str_args["code"] = keyCode;
                 cd._str_args["key"] = keyName;
                 l.Get("onKeyDown").TryCall(cd);
             };
         }
-        public static EventHandler<NativeWindowKeyEventArgs> OnKeyUp(NativeWindow window, VarList l){
-            return (object c_Sender, NativeWindowKeyEventArgs e)=>{
-                int keyCode = (int)e.Key;
-                string keyName = CodeToKey(e.Key);
+        public static EventHandler<NativeWindowVirtualKeyArgs> OnKeyUp(NativeWindow window, VarList l){
+            return (object c_Sender, NativeWindowVirtualKeyArgs e)=>{
+                int keyCode = (int)e.Buttons;
+                string keyName = CodeToKey(e.Buttons);
                 CallData cd = new CallData(keyCode, keyName);
                 cd._str_args["code"] = keyCode;
                 cd._str_args["key"] = keyName;
@@ -889,9 +906,9 @@ namespace Funky.Libs{
                 Var key = d.Get(0).Required().Get();
 
                 if(key is VarString)
-                    return window.IsKeyPressed(KeyToCode(key.asString()))?1:0;
+                    return NativeWindowWinNTCustom.IsKeyDown((VirtualKeys)KeyToCode(key.asString()))?1:0;
                 else if(key is VarNumber)
-                    return window.IsKeyPressed((KeyCode)key.asNumber().value)?1:0;
+                    return NativeWindowWinNTCustom.IsKeyDown((VirtualKeys)key.asNumber().value)?1:0;
                 return Var.nil;
             });
 
@@ -909,11 +926,11 @@ namespace Funky.Libs{
             return meta;
         }
 
-        public static string CodeToKey(KeyCode code){
-            return Enum.GetName(typeof(KeyCode), code);
+        public static string CodeToKey(VirtualKeys code){
+            return Enum.GetName(typeof(VirtualKeys), code);
         }
-        public static KeyCode KeyToCode(string name){
-            KeyCode outCode = KeyCode.None;
+        public static VirtualKeys KeyToCode(string name){
+            VirtualKeys outCode = (VirtualKeys)0;
             Enum.TryParse(name, out outCode);
             return outCode;
         }
