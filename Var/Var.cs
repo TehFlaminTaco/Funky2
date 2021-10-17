@@ -159,6 +159,15 @@ namespace Funky{
             return new VarEvent();
         }
 
+        public virtual Var Dispose(){
+            Var callFunc = Meta.Get(this, "dispose");
+            if(!(callFunc is VarNull)){
+                Var outp = callFunc.Call(new CallData(this));
+                return outp;
+            }
+            return Var.nil;
+        }
+
         public static implicit operator Var(string v){
             return new VarString(v);
         }

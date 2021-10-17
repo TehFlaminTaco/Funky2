@@ -203,6 +203,14 @@ namespace Funky{
 
             lst["get"] = new VarFunction(dat => Globals.get()["list"].asList().ThisGet(dat.Get(1).Required().Get()));
 
+            lst["dispose"] = new VarFunction(dat => {
+                var lst = dat.Get(0).Get();
+                if(lst["dispose"] is Var dsps && !(dsps is VarNull))return dsps.Call(new CallData());
+                if(lst["destroy"] is Var dstry && !(dstry is VarNull))return dstry.Call(new CallData());
+                if(lst["close"] is Var cls && !(cls is VarNull))cls.Call(new CallData());
+                return Var.nil;
+            });
+
             return lst;
         }
 
