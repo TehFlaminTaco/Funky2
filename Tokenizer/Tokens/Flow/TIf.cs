@@ -51,5 +51,22 @@ namespace Funky.Tokens.Flow{
             Var should = condition.TryParse(scope);
             return (should.asBool()?action.TryParse(scope):otherwise?.TryParse(scope))??Var.nil;
         }
+
+        static char _ = RegisterTokenType('\x08', typeof(TIf));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, condition);
+            WriteToken(writer, action);
+            WriteToken(writer, otherwise);
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            condition = ReadToken(reader) as TExpression ?? throw new System.ArgumentException("Expected TExpression");
+            action = ReadToken(reader) as TExpression ?? throw new System.ArgumentException("Expected TExpression");
+            otherwise = ReadToken(reader) as TExpression;
+            return this;
+        }
     }
 }

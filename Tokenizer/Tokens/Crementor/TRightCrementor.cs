@@ -31,5 +31,20 @@ namespace Funky.Tokens{
             var.Set(scope, op.Parse(var.Get(scope), new VarNumber(1)));
             return var.Get(scope);
         }
+
+        static char _ = RegisterTokenType('\x02', typeof(TRightCrementor));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, var);
+            WriteToken(writer, op);
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            var = ReadToken(reader) as TVariable ?? throw new System.ArgumentException("Expected TVariable");
+            op = ReadToken(reader) as TOperator ?? throw new System.ArgumentException("Expected TOperator");
+            return this;
+        }
     }
 }

@@ -61,5 +61,24 @@ namespace Funky.Tokens.Flow{
 
             return ret;
         }
+
+        static char _ = RegisterTokenType('\x03', typeof(TFor));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, initial);
+            WriteToken(writer, condition);
+            WriteToken(writer, after);
+            WriteToken(writer, body);
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            initial = ReadToken(reader) as TExpression;
+            condition = ReadToken(reader) as TExpression;
+            after = ReadToken(reader) as TExpression;
+            body = ReadToken(reader) as TExpression;
+            return this;
+        }
     }
 }

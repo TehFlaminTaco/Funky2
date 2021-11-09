@@ -22,6 +22,7 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Funky.Tokens;
+using System.Linq;
 
 namespace Funky.Tokens.Flow{
     class TFunction : TExpression{
@@ -136,6 +137,23 @@ namespace Funky.Tokens.Flow{
             }
             return func;
         }
+
+        static char _ = RegisterTokenType('\x07', typeof(TFunction));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, body);
+            WriteToken(writer, name);
+            WriteToken(writer, args.Select(c=>c as Token).ToList());
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            body = ReadToken(reader) as TExpression ?? throw new System.ArgumentException("Expected TExpression");
+            name = ReadToken(reader) as TVariable;
+            args = ReadTokenList(reader).Select(c=>c as TArgNamer ?? throw new System.ArgumentException("Expected TArgNamer")).ToList();
+            return this;
+        }
     }
 
     abstract class TArgNamer : Token{
@@ -192,6 +210,19 @@ namespace Funky.Tokens.Flow{
             var.Set(scopetarget, vl);
             return index+i+1;
         }
+
+        static char _ = RegisterTokenType('\x06', typeof(TArgVariableSplat));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, var);
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            var = ReadToken(reader) as TIdentifier ?? throw new System.ArgumentException("Expected TIdentifer");
+            return this;
+        }
     }
 
     class TArgVariable : TArgNamer{
@@ -233,6 +264,21 @@ namespace Funky.Tokens.Flow{
                     var.Set(scopetarget, defValue.TryParse(scopetarget));
             }
             return ++index;
+        }
+
+        static char _ = RegisterTokenType('\x05', typeof(TArgVariable));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, var);
+            WriteToken(writer, defValue);
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            var = ReadToken(reader) as TIdentifier ?? throw new System.ArgumentException("Expected TIdentifier");
+            defValue = ReadToken(reader) as TExpression ?? throw new System.ArgumentException("Expected TExpression");
+            return this;
         }
     }
 }

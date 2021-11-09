@@ -131,5 +131,22 @@ namespace Funky.Tokens.Flow{
             return ret;
 
         }
+
+        static char _ = RegisterTokenType('\x04', typeof(TForIn));
+
+        public override void TokenToBinary(System.IO.BinaryWriter writer)
+        {
+            WriteToken(writer, inVar);
+            WriteToken(writer, iter);
+            WriteToken(writer, body);
+        }
+
+        public override Token BinaryToToken(System.IO.BinaryReader reader)
+        {
+            inVar = ReadToken(reader) as TVariable ?? throw new System.ArgumentException("Expected TVariable");
+            iter = ReadToken(reader) as TExpression ?? throw new System.ArgumentException("Expected TExpression");
+            body = ReadToken(reader) as TExpression ?? throw new System.ArgumentException("Expected TExpression");
+            return this;
+        }
     }
 }
