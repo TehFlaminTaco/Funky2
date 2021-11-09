@@ -25,11 +25,11 @@ using Funky.Tokens;
 
 namespace Funky.Tokens.Flow{
     class TFunction : TExpression{
-        private static Regex FUNCTION = new Regex(@"func(tion)?");
-        private static Regex POINTER = new Regex(@"=>");
-        private static Regex LEFT_BRACKET = new Regex(@"\(");
-        private static Regex RIGHT_BRACKET = new Regex(@"\)");
-        private static Regex COMMA = new Regex(@",");
+        private static Regex FUNCTION = new Regex(@"^func(tion)?");
+        private static Regex POINTER = new Regex(@"^=>");
+        private static Regex LEFT_BRACKET = new Regex(@"^\(");
+        private static Regex RIGHT_BRACKET = new Regex(@"^\)");
+        private static Regex COMMA = new Regex(@"^,");
 
         TExpression body;
         TVariable name;
@@ -149,7 +149,7 @@ namespace Funky.Tokens.Flow{
 
     class TArgVariableSplat : TArgNamer{
         TIdentifier var;
-        private static Regex SPLAT = new Regex(@"\.\.\.");
+        private static Regex SPLAT = new Regex(@"^\.\.\.");
 
         new public static TArgVariableSplat Claim(StringClaimer claimer){
             Claim fb = claimer.failPoint();
@@ -198,7 +198,7 @@ namespace Funky.Tokens.Flow{
         TIdentifier var;
         TExpression defValue = null;
 
-        private static Regex EQUALS = new Regex(@"=");
+        private static Regex EQUALS = new Regex(@"^=");
 
         new public static TArgVariable Claim(StringClaimer claimer){
             TIdentifier v = TIdentifier.Claim(claimer);

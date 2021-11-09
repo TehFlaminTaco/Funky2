@@ -7,8 +7,8 @@ namespace Funky.Tokens{
             this.nilType = nilType;
         }
 
-        private static Regex NIL = new Regex(@"nil");
-        private static Regex UNDEFINED = new Regex(@"undefined");
+        private static Regex NIL = new Regex(@"^nil");
+        private static Regex UNDEFINED = new Regex(@"^undefined");
 
         new public static TNil Claim(StringClaimer claimer){
             Claim c = claimer.Claim(NIL);

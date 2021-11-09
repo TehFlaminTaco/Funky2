@@ -6,7 +6,7 @@ namespace Funky.Tokens {
         public TExpression body;
         public Var stored = null;
         public bool hasStored = false;
-        private static Regex EXCLAIM = new Regex(@"\!");
+        private static Regex EXCLAIM = new Regex(@"^\!");
 
         public override Associativity GetAssociativity(){
             return Associativity.NA;

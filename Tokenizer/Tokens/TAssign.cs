@@ -7,7 +7,7 @@ namespace Funky.Tokens{
         TVariable var;
         TOperator op;
 
-        static Regex SET = new Regex(@"=");
+        static Regex SET = new Regex(@"^=");
 
         override public void SetLeft(TExpression newLeft){
             if(newLeft is TVariable v){

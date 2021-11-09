@@ -7,10 +7,10 @@ namespace Funky.Tokens{
         public TIdentifier catchTarget = null;
         public TExpression catchBody = null;
         
-        private static Regex TRY = new Regex(@"try");
-        private static Regex LEFT_BRACKET = new Regex(@"\(");
-        private static Regex RIGHT_BRACKET = new Regex(@"\)");
-        private static Regex CATCH = new Regex(@"catch");
+        private static Regex TRY = new Regex(@"^try");
+        private static Regex LEFT_BRACKET = new Regex(@"^\(");
+        private static Regex RIGHT_BRACKET = new Regex(@"^\)");
+        private static Regex CATCH = new Regex(@"^catch");
         new public static TTryCatch Claim(StringClaimer claimer){
             Claim c = claimer.Claim(TRY);
             if(!c.success)

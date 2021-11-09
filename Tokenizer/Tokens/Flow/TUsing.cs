@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Funky.Tokens.Flow{
     class TUsing : TExpression{
 
-        private static Regex USING = new Regex(@"using");
+        private static Regex USING = new Regex(@"^using");
 
         TExpression list;
         TExpression block;

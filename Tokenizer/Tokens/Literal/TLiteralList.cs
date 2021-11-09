@@ -7,9 +7,9 @@ using Funky.Tokens;
 namespace Funky.Tokens.Literal{
     class TLiteralList : TLiteral{
 
-        private static Regex LEFT_BRACKET = new Regex(@"\[");
-        private static Regex RIGHT_BRACKET = new Regex(@"\]");
-        private static Regex COMMA = new Regex(@",");
+        private static Regex LEFT_BRACKET = new Regex(@"^\[");
+        private static Regex RIGHT_BRACKET = new Regex(@"^\]");
+        private static Regex COMMA = new Regex(@"^,");
 
         List<TArgument> arguments = new List<TArgument>();
 

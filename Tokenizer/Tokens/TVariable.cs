@@ -35,9 +35,9 @@ namespace Funky.Tokens{
         TExpression indexed;
         TExpression index;
 
-        private static Regex LEFT_BRACKET = new Regex(@"\[");
-        private static Regex RIGHT_BRACKET = new Regex(@"\]");
-        private static Regex DOT = new Regex(@"[.:]");
+        private static Regex LEFT_BRACKET = new Regex(@"^\[");
+        private static Regex RIGHT_BRACKET = new Regex(@"^\]");
+        private static Regex DOT = new Regex(@"^[.:]");
 
         public bool curry = false;
 
@@ -110,7 +110,7 @@ namespace Funky.Tokens{
     class TIdentifier : TVariable{
         public string name;
         public bool isLocal = false;
-        static Regex LOCAL = new Regex(@"local|var|let");
+        static Regex LOCAL = new Regex(@"^local|^var|^let");
         static Regex IDENTIFIER = new Regex(@"^[a-zA-Z_]\w*");
 
         new public static TIdentifier Claim(StringClaimer claimer){

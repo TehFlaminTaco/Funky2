@@ -40,7 +40,7 @@ namespace Funky.Tokens{
         public int precedence;
 
         public SUnOperator(string regex, string name, int precedence){
-            this.regex = new Regex(regex);
+            this.regex = new Regex("^"+regex);
             this.name = name;
             this.precedence = precedence;
         }

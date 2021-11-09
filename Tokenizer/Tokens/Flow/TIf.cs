@@ -3,8 +3,8 @@ using System.Text.RegularExpressions;
 namespace Funky.Tokens.Flow{
     class TIf : TExpression{
 
-        private static Regex IF = new Regex(@"if");
-        private static Regex ELSE = new Regex(@"else");
+        private static Regex IF = new Regex(@"^if");
+        private static Regex ELSE = new Regex(@"^else");
 
         TExpression condition;
         TExpression action;

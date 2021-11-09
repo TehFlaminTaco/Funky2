@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
 namespace Funky.Tokens{
     class TDeoperator : TExpression {
-        private static Regex ATSYMBOL = new Regex(@"@");
+        private static Regex ATSYMBOL = new Regex(@"^@");
 
         TOperator operand;
         TExpression expr;

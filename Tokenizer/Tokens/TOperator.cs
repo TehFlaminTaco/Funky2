@@ -100,14 +100,14 @@ namespace Funky.Tokens{
 
         public Associativity associativity;
         public SOperator(string regex, string name, int precedence){
-            this.regex = new Regex(regex);
+            this.regex = new Regex("^"+regex);
             this.name = name;
             this.precedence = precedence;
             this.associativity = Associativity.LEFT_TO_RIGHT;
         }
 
         public SOperator(string regex, string name, int precedence, Associativity assoc){
-            this.regex = new Regex(regex);
+            this.regex = new Regex("^"+regex);
             this.name = name;
             this.precedence = precedence;
             this.associativity = assoc;

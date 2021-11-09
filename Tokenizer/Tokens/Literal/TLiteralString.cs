@@ -28,10 +28,10 @@ namespace Funky.Tokens.Literal{
 
     class TLiteralStringTemplate : TLiteral{
 
-        static Regex QOUTE = new Regex(@"`");
-        static Regex ANYTHING = new Regex(@"\\\[|\\`|[^`]");
-        static Regex LEFT_BRACKET = new Regex(@"\[");
-        static Regex RIGHT_BRACKET = new Regex(@"\]");
+        static Regex QOUTE = new Regex(@"^`");
+        static Regex ANYTHING = new Regex(@"^\\\[|^\\`|^[^`]");
+        static Regex LEFT_BRACKET = new Regex(@"^\[");
+        static Regex RIGHT_BRACKET = new Regex(@"^\]");
 
         List<string> chunks = new List<string>();
         List<TExpression> dats = new List<TExpression>();

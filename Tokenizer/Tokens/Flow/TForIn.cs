@@ -4,10 +4,10 @@ using System.Collections.Generic;
 
 namespace Funky.Tokens.Flow{
     class TForIn : TExpression{
-        private static Regex FOR = new Regex(@"for");
+        private static Regex FOR = new Regex(@"^for");
         private static Regex LEFT_BRACKET = new Regex(@"^\(");
         private static Regex RIGHT_BRACKET = new Regex(@"^\)");
-        private static Regex IN = new Regex(@"in");
+        private static Regex IN = new Regex(@"^in");
 
         TVariable inVar;
         TExpression iter;

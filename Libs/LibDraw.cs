@@ -491,6 +491,10 @@ namespace Funky.Libs{
                 uint programID = programLists[program];
                 int uniformLocation = Gl.GetUniformLocation(programID, name);
                 if(value1 is VarList l){
+                    if(textureLists.ContainsKey(l)){
+                        Gl.Uniform1(uniformLocation, textureLists[l]);
+                        return value1;
+                    }
                     List<float> vals = new List<float>();
                     for(int i=0; l.double_vars.ContainsKey(i); i++){
                         if(l.double_vars[i] is VarNumber n){
@@ -498,11 +502,6 @@ namespace Funky.Libs{
                         }
                     }
                     Gl.Uniform1(uniformLocation, vals.ToArray());
-                }
-                if(value1 is VarList vl){
-                    if(textureLists.ContainsKey(vl)){
-                        Gl.Uniform1(uniformLocation, textureLists[vl]);
-                    }
                 }
                 if(value4 is VarNumber && value3 is VarNumber && value2 is VarNumber && value1 is VarNumber){
                     Gl.Uniform4(uniformLocation,

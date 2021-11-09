@@ -38,6 +38,9 @@ namespace Funky{
 
             Match string_match = method.Match(to_claim.Substring(offset));
             if((!string_match.Success) || string_match.Index > 0){ // Incase I forget a ^ somewhere. Try not to forget a ^ somewhere, please taco.
+                if(string_match.Success && string_match.Index > 0){
+                    throw new Exception("TACO FORGOT TO ADD A ^ TO A REGEX:\n"+method.ToString());
+                }
                 return new Claim();
             }
             Claim newClaim = new Claim(method, string_match, this);

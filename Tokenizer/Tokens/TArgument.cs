@@ -32,7 +32,7 @@ namespace Funky.Tokens{
 
     class TArgSplat : TArgument {
         TExpression heldExp;
-        private static Regex SPLAT = new Regex(@"\.\.\.");
+        private static Regex SPLAT = new Regex(@"^\.\.\.");
 
 
         override public int AppendArguments(VarList argumentList, int index, Scope scope){
@@ -83,7 +83,7 @@ namespace Funky.Tokens{
         TIdentifier textVar;
         TExpression value;
 
-        private static Regex EQUALS = new Regex(@"=");
+        private static Regex EQUALS = new Regex(@"^=");
 
 
         override public int AppendArguments(VarList argumentList, int index, Scope scope){

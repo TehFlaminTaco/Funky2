@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace Funky.Tokens.Flow{
     class TWhen : TExpression{
 
-        private static Regex WITH = new Regex(@"when");
+        private static Regex WITH = new Regex(@"^when");
 
         TExpression evnt;
         TExpression block;

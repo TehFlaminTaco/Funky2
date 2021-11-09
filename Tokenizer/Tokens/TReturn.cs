@@ -1,8 +1,8 @@
 using System.Text.RegularExpressions;
 namespace Funky.Tokens{
     class TReturn : TExpression{
-        private static Regex RETURN = new Regex(@"return");
-        private static Regex BREAK = new Regex(@"break");
+        private static Regex RETURN = new Regex(@"^return");
+        private static Regex BREAK = new Regex(@"^break");
 
         TExpression exp;
         Escape escType;

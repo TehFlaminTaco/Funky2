@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Funky.Tokens.Flow{
     class TWith : TExpression{
 
-        private static Regex WITH = new Regex(@"with");
+        private static Regex WITH = new Regex(@"^with");
 
         TExpression list;
         TExpression block;

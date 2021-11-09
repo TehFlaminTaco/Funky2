@@ -5,9 +5,9 @@ namespace Funky.Tokens{
     class TBlock : TExpression {
         List<TExpression> expressions = new List<TExpression>();
 
-        private static Regex LEFT_BRACKET = new Regex(@"\{");
-        private static Regex RIGHT_BRACKET = new Regex(@"\}");
-        private static Regex SEMI_COLON = new Regex(@";");
+        private static Regex LEFT_BRACKET = new Regex(@"^\{");
+        private static Regex RIGHT_BRACKET = new Regex(@"^\}");
+        private static Regex SEMI_COLON = new Regex(@"^;");
 
         override public Var Parse(Scope scope){
             Var ret = Var.nil;

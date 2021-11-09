@@ -3,7 +3,7 @@ using System.Text.RegularExpressions;
 namespace Funky.Tokens.Flow{
     class TWhile : TExpression{
 
-        private static Regex WHILE = new Regex(@"while");
+        private static Regex WHILE = new Regex(@"^while");
 
         TExpression condition;
         TExpression action;
