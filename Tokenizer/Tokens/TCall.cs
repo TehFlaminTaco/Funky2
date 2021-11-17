@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using Funky.Tokens.Literal;
 namespace Funky.Tokens{
+    [TokenIdentifier('\x18')]
     class TCall : TLeftExpression{
-        TExpression caller;
-        List<TArgument> arguments = new List<TArgument>();
-        TExpression special_call;
+        [InBinary(optional = false)] TExpression caller;
+        [InBinary] List<TArgument> arguments = new List<TArgument>();
+        [InBinary] TExpression special_call;
 
         private static Regex LEFT_BRACKET = new Regex("^\\(");
         private static Regex RIGHT_BRACKET = new Regex("^\\)");

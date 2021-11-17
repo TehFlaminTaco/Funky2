@@ -31,6 +31,8 @@ namespace Funky{
     }
 
     public class FunkyFile : FunkyFS{
+        public string Extension => Path.GetExtension(realPath);
+
         public FunkyFile(string name) : base(name){}
 
         public FunkyFile(string name, string specialFolder, params string[] guessExtensions) : base(){

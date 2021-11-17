@@ -3,6 +3,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Text;
+using Funky.Tokens;
 
 namespace Funky.Libs{
     public static class LibString{
@@ -106,7 +107,22 @@ namespace Funky.Libs{
             });
             str["run"] = new VarFunction(dat => {
                 string text = dat.Get(0).Or("code").Required().GetString();
-                return Executor.ExecuteProgram(text, "<run>");
+                TExpression e;
+                StringClaimer claimer = new StringClaimer(text, "<run>");
+                Var last = Var.nil;
+                VarList scopeList = new VarList();
+                scopeList.parent = Globals.get();
+                scopeList.meta = new VarList();
+                Scope scope = new Scope(scopeList);
+                while((e=TExpression.Claim(claimer))!=null){
+                    claimer.Claim(Executor.SEMI_COLON);
+                    last = e.Parse(scope);
+                }
+                if(claimer.bestReach < claimer.to_claim.Length){
+                    string errorString = Executor.CLEAN_ERROR.Replace(claimer.to_claim.Substring(claimer.bestReach), "...");
+                    throw new FunkyException($"Unexpected symbol at {claimer.getLine(claimer.bestReach)}:{claimer.getChar(claimer.bestReach)} \"{errorString}\"");
+                }
+                return last;
             });
             return str;
         }

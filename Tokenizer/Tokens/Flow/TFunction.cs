@@ -22,8 +22,10 @@
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Funky.Tokens;
+using System.Linq;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x05')]
     class TFunction : TExpression{
         private static Regex FUNCTION = new Regex(@"^func(tion)?");
         private static Regex POINTER = new Regex(@"^=>");
@@ -31,9 +33,9 @@ namespace Funky.Tokens.Flow{
         private static Regex RIGHT_BRACKET = new Regex(@"^\)");
         private static Regex COMMA = new Regex(@"^,");
 
-        TExpression body;
-        TVariable name;
-        List<TArgNamer> args;
+        [InBinary(optional = false)] TExpression body;
+        [InBinary] TVariable name;
+        [InBinary] List<TArgNamer> args;
 
         new public static TFunction Claim(StringClaimer claimer){
             Claim failPoint = claimer.failPoint();
@@ -124,7 +126,13 @@ namespace Funky.Tokens.Flow{
                 Var o = body.TryParse(subscope);
                 if(subscope.escape.Count>0){
                     Escaper esc = subscope.escape.Peek();
-                    subscope.escape.Clear();
+                    if(subscope.escape.Any(c=>c.method == Escape.TIMEOUT)){
+                        var allTimeouts = subscope.escape.Where(c=>c.method == Escape.TIMEOUT).ToList();
+                        subscope.escape.Clear();
+                        allTimeouts.ForEach(c=>subscope.escape.Push(c));
+                    }else{
+                        subscope.escape.Clear();
+                    }
                     return esc.value;
                 }
                 return o;
@@ -147,8 +155,9 @@ namespace Funky.Tokens.Flow{
         public abstract int AppendToScope(int index, Scope called, CallData callData, Scope scopetarget);
     }
 
+    [TokenIdentifier('\x06')]
     class TArgVariableSplat : TArgNamer{
-        TIdentifier var;
+        [InBinary(optional = false)] TIdentifier var;
         private static Regex SPLAT = new Regex(@"^\.\.\.");
 
         new public static TArgVariableSplat Claim(StringClaimer claimer){
@@ -194,9 +203,10 @@ namespace Funky.Tokens.Flow{
         }
     }
 
+    [TokenIdentifier('\x07')]
     class TArgVariable : TArgNamer{
-        TIdentifier var;
-        TExpression defValue = null;
+        [InBinary(optional = false)] TIdentifier var;
+        [InBinary]TExpression defValue = null;
 
         private static Regex EQUALS = new Regex(@"^=");
 

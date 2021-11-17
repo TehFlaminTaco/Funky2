@@ -1,0 +1,7 @@
+print("Pre-timeout!");
+try{
+    timeout(3000, @{while(1){if(math.random(0,20000)>=19999){error("FUCK")}}});
+}catch e{
+    print(`Got an exception while running! [e]`);
+}
+print("Post-timeout!");

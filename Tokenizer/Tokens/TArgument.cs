@@ -13,8 +13,9 @@ namespace Funky.Tokens{
         } 
     }
 
+    [TokenIdentifier('\x11')]
     class TArgExpression : TArgument{
-        TExpression heldExp;
+        [InBinary(optional = false)] TExpression heldExp;
         override public int AppendArguments(VarList argumentList, int index, Scope scope){
             argumentList.double_vars[index] = heldExp.TryParse(scope);
             return index+1;
@@ -30,8 +31,9 @@ namespace Funky.Tokens{
         }
     }
 
+    [TokenIdentifier('\x12')]
     class TArgSplat : TArgument {
-        TExpression heldExp;
+        [InBinary(optional = false)] TExpression heldExp;
         private static Regex SPLAT = new Regex(@"^\.\.\.");
 
 
@@ -77,11 +79,12 @@ namespace Funky.Tokens{
             return splat;
         }
     }
-
+    
+    [TokenIdentifier('\x13')]
     class TArgAssign : TArgument{
-        TLiteral literalVar;
-        TIdentifier textVar;
-        TExpression value;
+        [InBinary] TLiteral literalVar;
+        [InBinary] TIdentifier textVar;
+        [InBinary(optional = false)] TExpression value;
 
         private static Regex EQUALS = new Regex(@"^=");
 

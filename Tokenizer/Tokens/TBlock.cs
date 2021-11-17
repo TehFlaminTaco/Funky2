@@ -2,8 +2,9 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace Funky.Tokens{
+    [TokenIdentifier('\x16')]
     class TBlock : TExpression {
-        List<TExpression> expressions = new List<TExpression>();
+        [InBinary(optional = false)] List<TExpression> expressions = new List<TExpression>();
 
         private static Regex LEFT_BRACKET = new Regex(@"^\{");
         private static Regex RIGHT_BRACKET = new Regex(@"^\}");

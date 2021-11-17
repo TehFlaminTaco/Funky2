@@ -1,12 +1,13 @@
 using System.Text.RegularExpressions;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x0D')]
     class TWith : TExpression{
 
         private static Regex WITH = new Regex(@"^with");
 
-        TExpression list;
-        TExpression block;
+        [InBinary(optional = false)] TExpression list;
+        [InBinary(optional = false)] TExpression block;
 
         new public static TWith Claim(StringClaimer claimer){
             Claim c = claimer.Claim(WITH);

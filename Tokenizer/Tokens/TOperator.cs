@@ -1,11 +1,15 @@
 using System.Text.RegularExpressions;
 using System.Text;
+using System.IO;
+using System.Linq;
+
 namespace Funky.Tokens{
 
     // Lower Operator Precedence is "More Sticky".
+    [TokenIdentifier('\x1B')]
     class TOperator : Token{
 
-        private static SOperator[] operators = {
+        public static SOperator[] operators = {
             new SOperator(@"\+", "add", 7),
             new SOperator(@"-", "sub", 7),
             new SOperator(@"\*", "mult", 6),
@@ -31,7 +35,7 @@ namespace Funky.Tokens{
             new SOperator(@"!=", "ne", 11)
         };
 
-        public SOperator op;
+        [InBinary] public SOperator op;
         public int GetPrecedence(){
             return op.precedence;
         }
@@ -93,7 +97,7 @@ namespace Funky.Tokens{
         }
     }
 
-    struct SOperator{
+    struct SOperator : IBinaryReadWritable{
         public Regex regex;
         public string name;
         public int precedence;
@@ -111,6 +115,27 @@ namespace Funky.Tokens{
             this.name = name;
             this.precedence = precedence;
             this.associativity = assoc;
+        }
+
+        public object Read(BinaryReader reader)
+        {
+            int id = reader.ReadInt32();
+            var op=TOperator.operators[id];
+            regex = op.regex;
+            name = op.name;
+            precedence = op.precedence;
+            return op;
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            string nm = name;
+            writer.Write(System.Array.FindIndex(TOperator.operators, c=>c.name==nm));
+        }
+
+        public static SOperator Make(BinaryReader reader){
+            int id = reader.ReadInt32();
+            return TOperator.operators[id];
         }
     }
 }

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System;
 
 namespace Funky.Tokens.Literal{
-
+    [TokenIdentifier('\x10')]
     class TLiteralString : TLiteral{
-        public VarString value;
+        [InBinary]public VarString value;
         static Regex STRING = new Regex(@"^(?<qoute>'|"")(?<text>(\\\\|\\[^\\]|[^\\])*?)\k<qoute>");
 
         new public static TLiteralString Claim(StringClaimer claimer){
@@ -26,6 +26,7 @@ namespace Funky.Tokens.Literal{
     }
 
 
+    [TokenIdentifier('\x22')]
     class TLiteralStringTemplate : TLiteral{
 
         static Regex QOUTE = new Regex(@"^`");
@@ -33,8 +34,8 @@ namespace Funky.Tokens.Literal{
         static Regex LEFT_BRACKET = new Regex(@"^\[");
         static Regex RIGHT_BRACKET = new Regex(@"^\]");
 
-        List<string> chunks = new List<string>();
-        List<TExpression> dats = new List<TExpression>();
+        [InBinary(optional = false)] List<string> chunks = new List<string>();
+        [InBinary(optional = false)] List<TExpression> dats = new List<TExpression>();
 
         new public static TLiteralStringTemplate Claim(StringClaimer claimer){
             Claim c = claimer.Claim(QOUTE);

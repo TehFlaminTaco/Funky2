@@ -1,8 +1,10 @@
+using System.IO;
 using System.Text.RegularExpressions;
 namespace Funky.Tokens{
 
+    [TokenIdentifier('\x1F')]
     class TUnaryOperator : Token{
-        private static SUnOperator[] operators = {
+        public static SUnOperator[] operators = {
             new SUnOperator(@"\+", "unp", 4),
             new SUnOperator(@"-", "unm", 4),
             new SUnOperator(@"!", "not", 4),
@@ -10,7 +12,7 @@ namespace Funky.Tokens{
             new SUnOperator(@"#", "len", 4),
             new SUnOperator(@"~", "bitnot", 4)
         };
-        public SUnOperator op;
+        [InBinary(optional = false)]public SUnOperator op;
 
         new public static TUnaryOperator Claim(StringClaimer claimer){
             for(int i = 0; i < operators.Length; i++){
@@ -34,7 +36,7 @@ namespace Funky.Tokens{
         }
     }
 
-    struct SUnOperator{
+    struct SUnOperator : IBinaryReadWritable{
         public Regex regex;
         public string name;
         public int precedence;
@@ -43,6 +45,26 @@ namespace Funky.Tokens{
             this.regex = new Regex("^"+regex);
             this.name = name;
             this.precedence = precedence;
+        }
+        public object Read(BinaryReader reader)
+        {
+            int id = reader.ReadInt32();
+            var op=TUnaryOperator.operators[id];
+            regex = op.regex;
+            name = op.name;
+            precedence = op.precedence;
+            return op;
+        }
+
+        public void Write(BinaryWriter writer)
+        {
+            string nm = name;
+            writer.Write(System.Array.FindIndex(TUnaryOperator.operators, c=>c.name==nm));
+        }
+
+        public static SUnOperator Make(BinaryReader reader){
+            int id = reader.ReadInt32();
+            return TUnaryOperator.operators[id];
         }
     }
 }

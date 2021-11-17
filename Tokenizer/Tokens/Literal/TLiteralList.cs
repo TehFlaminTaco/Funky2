@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System;
 using Funky.Tokens;
 namespace Funky.Tokens.Literal{
+    [TokenIdentifier('\x0E')]
     class TLiteralList : TLiteral{
 
         private static Regex LEFT_BRACKET = new Regex(@"^\[");
         private static Regex RIGHT_BRACKET = new Regex(@"^\]");
         private static Regex COMMA = new Regex(@"^,");
 
-        List<TArgument> arguments = new List<TArgument>();
+        [InBinary] List<TArgument> arguments = new List<TArgument>();
 
         new public static TLiteralList Claim(StringClaimer claimer){
             Claim c = claimer.Claim(LEFT_BRACKET);

@@ -2,10 +2,11 @@ using System.Text.RegularExpressions;
 using System.Text;
 
 namespace Funky.Tokens{
+    [TokenIdentifier('\x15')]
     class TAssignment : TLeftExpression {
-        TExpression value;
-        TVariable var;
-        TOperator op;
+        [InBinary(optional = false)] TExpression value;
+        [InBinary(optional = false)] TVariable var;
+        [InBinary] TOperator op;
 
         static Regex SET = new Regex(@"^=");
 

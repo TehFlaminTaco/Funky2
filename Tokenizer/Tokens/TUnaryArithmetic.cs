@@ -1,7 +1,8 @@
 namespace Funky.Tokens{
+    [TokenIdentifier('\x1E')]
     class TUnaryArithmetic : TExpression{
-        TUnaryOperator op = null;
-        TExpression arg = null;
+        [InBinary(optional=false)] TUnaryOperator op = null;
+        [InBinary(optional=false)] TExpression arg = null;
         new public static TExpression Claim(StringClaimer claimer){
             Claim failPoint = claimer.failPoint();
             TUnaryOperator op = TUnaryOperator.Claim(claimer);

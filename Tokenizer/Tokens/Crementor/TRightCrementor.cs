@@ -1,6 +1,9 @@
 namespace Funky.Tokens{
-    class TRightCrementor : TExpression{
+    [TokenIdentifier('\x02')]
+    class TRightCrementor : TExpression {
+        [InBinary(optional = false)]
         TVariable var;
+        [InBinary(optional = false)]
         TOperator op;
 
         new public static TRightCrementor Claim(StringClaimer claimer){

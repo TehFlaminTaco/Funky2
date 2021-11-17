@@ -1,12 +1,13 @@
 using Funky.Tokens;
 using System.Text.RegularExpressions;
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x0C')]
     class TWhile : TExpression{
 
         private static Regex WHILE = new Regex(@"^while");
 
-        TExpression condition;
-        TExpression action;
+        [InBinary(optional = false)] TExpression condition;
+        [InBinary(optional = false)] TExpression action;
 
         new public static TWhile Claim(StringClaimer claimer){
             Claim failpoint = claimer.failPoint();

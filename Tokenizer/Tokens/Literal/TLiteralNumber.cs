@@ -3,9 +3,9 @@ using System.Globalization;
 using System;
 
 namespace Funky.Tokens.Literal{
-
+    [TokenIdentifier('\x0F')]
     class TLiteralNumber : TLiteral{
-        VarNumber value;
+        [InBinary]VarNumber value;
         static Regex NUMBER = new Regex(@"^(?<negative>-?)(?:(?<integer>0(?:x(?<hex_val>[0-9A-Fa-f]+)|b(?<bin_val>[01]+)))|(?:(?<float>(?<int_comp>\d*)\.(?<float_comp>\d+))|(?<int>\d+))(?:e(?<expon>-?\d+))?)");
         new public static TLiteralNumber Claim(StringClaimer claimer){
             TLiteralNumber numb = new TLiteralNumber();

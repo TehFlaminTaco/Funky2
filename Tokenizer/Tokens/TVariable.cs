@@ -31,15 +31,16 @@ namespace Funky.Tokens{
         public abstract Var Set(Scope scope, Var value);
     }
 
+    [TokenIdentifier('\x20')]
     class TIndex : TVariable{
-        TExpression indexed;
-        TExpression index;
+        [InBinary(optional = false)] TExpression indexed;
+        [InBinary(optional = false)] TExpression index;
 
         private static Regex LEFT_BRACKET = new Regex(@"^\[");
         private static Regex RIGHT_BRACKET = new Regex(@"^\]");
         private static Regex DOT = new Regex(@"^[.:]");
 
-        public bool curry = false;
+        [InBinary(optional = false)] public bool curry = false;
 
         new public static TIndex LeftClaim(StringClaimer claimer, TExpression left){
             Claim c = claimer.Claim(LEFT_BRACKET);
@@ -107,9 +108,10 @@ namespace Funky.Tokens{
         }
     }
 
+    [TokenIdentifier('\x21')]
     class TIdentifier : TVariable{
-        public string name;
-        public bool isLocal = false;
+        [InBinary(optional = false)] public string name;
+        [InBinary(optional = false)] public bool isLocal = false;
         static Regex LOCAL = new Regex(@"^local|^var|^let");
         static Regex IDENTIFIER = new Regex(@"^[a-zA-Z_]\w*");
 

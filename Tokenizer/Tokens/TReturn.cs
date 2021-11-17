@@ -1,11 +1,12 @@
 using System.Text.RegularExpressions;
 namespace Funky.Tokens{
+    [TokenIdentifier('\x1D')]
     class TReturn : TExpression{
         private static Regex RETURN = new Regex(@"^return");
         private static Regex BREAK = new Regex(@"^break");
 
-        TExpression exp;
-        Escape escType;
+        [InBinary] TExpression exp;
+        [InBinary(optional = false)] Escape escType;
 
         new public static TReturn Claim(StringClaimer claimer){
             Claim c;

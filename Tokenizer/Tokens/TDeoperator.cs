@@ -1,10 +1,11 @@
 using System.Text.RegularExpressions;
 namespace Funky.Tokens{
+    [TokenIdentifier('\x19')]
     class TDeoperator : TExpression {
         private static Regex ATSYMBOL = new Regex(@"^@");
 
-        TOperator operand;
-        TExpression expr;
+        [InBinary] TOperator operand;
+        [InBinary] TExpression expr;
 
         override public Var Parse(Scope scope){
             if(operand != null){

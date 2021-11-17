@@ -1,10 +1,11 @@
 using System.Text;
 namespace Funky.Tokens{
+    [TokenIdentifier('\x14')]
     class TArithmetic : TLeftExpression{
 
-        TExpression leftArg;
-        TExpression rightArg;
-        TOperator op;
+        [InBinary(optional = false)]TExpression leftArg;
+        [InBinary(optional = false)]TExpression rightArg;
+        [InBinary(optional = false)]TOperator op;
 
          override public TExpression GetLeft(){
             return leftArg;

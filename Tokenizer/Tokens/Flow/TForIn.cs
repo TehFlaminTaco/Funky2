@@ -3,14 +3,18 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x04')]
     class TForIn : TExpression{
         private static Regex FOR = new Regex(@"^for");
         private static Regex LEFT_BRACKET = new Regex(@"^\(");
         private static Regex RIGHT_BRACKET = new Regex(@"^\)");
         private static Regex IN = new Regex(@"^in");
 
+        [InBinary]
         TVariable inVar;
+        [InBinary]
         TExpression iter;
+        [InBinary]
         TExpression body;
 
         new public static TForIn Claim(StringClaimer claimer){

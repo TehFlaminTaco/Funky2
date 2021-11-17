@@ -2,12 +2,13 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x0B')]
     class TWhen : TExpression{
 
         private static Regex WITH = new Regex(@"^when");
 
-        TExpression evnt;
-        TExpression block;
+        [InBinary(optional = false)]TExpression evnt;
+        [InBinary(optional = false)]TExpression block;
 
         new public static TWhen Claim(StringClaimer claimer){
             Claim c = claimer.Claim(WITH);

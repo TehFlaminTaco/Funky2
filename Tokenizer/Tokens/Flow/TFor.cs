@@ -3,15 +3,20 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x03')]
     class TFor : TExpression{
         private static Regex FOR = new Regex(@"^for");
         private static Regex LEFT_BRACKET = new Regex(@"^\(");
         private static Regex RIGHT_BRACKET = new Regex(@"^\)");
         private static Regex SEMI_COLON = new Regex(@"^;");
 
+        [InBinary]
         TExpression initial;
+        [InBinary]
         TExpression condition;
+        [InBinary]
         TExpression after;
+        [InBinary]
         TExpression body;
         
         new public static TFor Claim(StringClaimer claimer){

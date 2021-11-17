@@ -1,6 +1,9 @@
 namespace Funky.Tokens{
+    [TokenIdentifier('\x01')]
     class TLeftCrementor : TLeftExpression{
+        [InBinary(optional = false)]
         TVariable var;
+        [InBinary(optional = false)]
         TOperator op;
 
         override public void SetLeft(TExpression newLeft){

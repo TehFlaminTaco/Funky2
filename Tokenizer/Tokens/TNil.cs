@@ -1,10 +1,14 @@
 using System.Text.RegularExpressions;
 namespace Funky.Tokens{
+    [TokenIdentifier('\x1A')]
     class TNil : TExpression {
-        VarNull nilType;
+        [InBinary(optional=false)] VarNull nilType;
 
         public TNil(VarNull nilType){
             this.nilType = nilType;
+        }
+
+        public TNil(){
         }
 
         private static Regex NIL = new Regex(@"^nil");

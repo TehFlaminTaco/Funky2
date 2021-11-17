@@ -10,7 +10,7 @@ namespace Funky{
     }
 
     public enum Escape{
-        RETURN, BREAK
+        RETURN, BREAK, TIMEOUT
     }
 
     public struct Scope {

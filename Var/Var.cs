@@ -1,6 +1,8 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
+using Funky.Tokens;
 
 namespace Funky{
     public class Var{
@@ -168,6 +170,10 @@ namespace Funky{
             return Var.nil;
         }
 
+        public override string ToString(){
+            return asString().data;
+        }
+
         public static implicit operator Var(string v){
             return new VarString(v);
         }
@@ -177,7 +183,7 @@ namespace Funky{
         }
     }
 
-    public class VarNumber : Var{
+    public class VarNumber : Var, Tokens.IBinaryReadWritable{
         public double value;
 
         public static implicit operator double(VarNumber var){
@@ -193,9 +199,23 @@ namespace Funky{
         public override bool asBool(){
             return this!=0;
         }
+
+        public object Read(BinaryReader reader){
+            value = reader.ReadDouble();
+            return this;
+        }
+
+        public void Write(BinaryWriter writer){
+            writer.Write(value);
+        }
+
+        public static VarNumber Make(BinaryReader reader){
+            var vn = new VarNumber(reader.ReadDouble());
+            return vn;
+        }
     }
 
-    public class VarString : Var {
+    public class VarString : Var, Tokens.IBinaryReadWritable {
         public string data;
         public static implicit operator string(VarString var){
             return var.data;
@@ -208,12 +228,49 @@ namespace Funky{
         public override VarString asString(){
             return this;
         }
+
+        public object Read(BinaryReader reader){
+            data = reader.ReadString();
+            return this;
+        }
+
+        public void Write(BinaryWriter writer){
+            writer.Write(data);
+        }
+
+        public static VarString Make(BinaryReader reader){
+            var vn = new VarString(reader.ReadString());
+            return vn;
+        }
     }
 
-    public class VarNull : Var {
+    public class VarNull : Var, IBinaryReadWritable {
         public string id;
         public VarNull(string id){
             this.id = id;
+        }
+
+        public object Read(BinaryReader reader){
+            byte id = reader.ReadByte();
+            if(id == 0){
+                return Var.nil;
+            }
+            if(id == 1){
+                return Var.undefined;
+            }
+            return this;
+        }
+
+        public void Write(BinaryWriter writer){
+            writer.Write((byte)(this == Var.nil ? 0 : 1));
+        }
+
+        public static VarNull Make(BinaryReader reader){
+            byte id = reader.ReadByte();
+            if(id == 0){
+                return Var.nil;
+            }
+            return Var.undefined;
         }
     }
 }

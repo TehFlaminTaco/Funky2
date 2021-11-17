@@ -1,9 +1,10 @@
 using System.Text.RegularExpressions;
 
 namespace Funky.Tokens {
+    [TokenIdentifier('\x17')]
     class TCached : TLeftExpression
     {
-        public TExpression body;
+        [InBinary(optional = false)] public TExpression body;
         public Var stored = null;
         public bool hasStored = false;
         private static Regex EXCLAIM = new Regex(@"^\!");

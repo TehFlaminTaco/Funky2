@@ -1,12 +1,13 @@
 using System.Text.RegularExpressions;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x0A')]
     class TUsing : TExpression{
 
         private static Regex USING = new Regex(@"^using");
 
-        TExpression list;
-        TExpression block;
+        [InBinary(optional = false)] TExpression list;
+        [InBinary(optional = false)] TExpression block;
 
         new public static TUsing Claim(StringClaimer claimer){
             Claim c = claimer.Claim(USING);

@@ -1,11 +1,12 @@
 using System.Text.RegularExpressions;
 using System.Text;
 namespace Funky.Tokens{
+    [TokenIdentifier('\x1C')]
     class TParenExpression : TExpression{
         private static Regex LEFT_BRACKET = new Regex("^\\(");
         private static Regex RIGHT_BRACKET = new Regex("^\\)");
 
-        TExpression realExpression;
+        [InBinary(optional = false)] TExpression realExpression;
 
         new public static TParenExpression Claim(StringClaimer claimer){
             Claim lb = claimer.Claim(LEFT_BRACKET);

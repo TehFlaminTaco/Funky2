@@ -1,14 +1,15 @@
 using System.Text.RegularExpressions;
 
 namespace Funky.Tokens.Flow{
+    [TokenIdentifier('\x08')]
     class TIf : TExpression{
 
         private static Regex IF = new Regex(@"^if");
         private static Regex ELSE = new Regex(@"^else");
 
-        TExpression condition;
-        TExpression action;
-        TExpression otherwise;
+        [InBinary(optional = false)]TExpression condition;
+        [InBinary(optional = false)]TExpression action;
+        [InBinary]TExpression otherwise;
 
         new public static TIf Claim(StringClaimer claimer){
             Claim failpoint = claimer.failPoint();

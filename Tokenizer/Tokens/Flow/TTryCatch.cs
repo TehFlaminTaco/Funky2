@@ -2,10 +2,11 @@ using Funky;
 using System.Text.RegularExpressions;
 
 namespace Funky.Tokens{
+    [TokenIdentifier('\x09')]
     class TTryCatch : TExpression{
-        public TExpression body = null;
-        public TIdentifier catchTarget = null;
-        public TExpression catchBody = null;
+        [InBinary(optional = false)] public TExpression body = null;
+        [InBinary] public TIdentifier catchTarget = null;
+        [InBinary] public TExpression catchBody = null;
         
         private static Regex TRY = new Regex(@"^try");
         private static Regex LEFT_BRACKET = new Regex(@"^\(");
