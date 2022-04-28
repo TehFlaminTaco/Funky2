@@ -4,9 +4,65 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq.Expressions;
+using System.Runtime.InteropServices;
 
 namespace Funky.Libs{
     public static class LibIO{
+        private static Type FromString(string s){
+            return s.ToLower() switch {
+                "str" or "string" => typeof(string),
+                "int64" or "long" => typeof(long),
+                "uint64" or "ulong" => typeof(ulong),
+                "int" or "int32" => typeof(int),
+                "uint" or "uint32" => typeof(uint),
+                "short" => typeof(short),
+                "ushort" => typeof(ushort),
+                "char" or "sbyte" => typeof(sbyte),
+                "uchar" or "byte" => typeof(byte),
+                "float" => typeof(float),
+                "double" => typeof(double),
+                "ptr" or "intptr" => typeof(IntPtr),
+                _ => typeof(int)
+            };
+        }
+
+        private static object FromVar(string typstring, Var v){
+            return typstring.ToLower() switch {
+                "str" or "string" => v.asString().data,
+                "int64" or "long" => (long)v.asNumber().value,
+                "uint64" or "ulong" => (ulong)v.asNumber().value,
+                "int" or "int32" => (int)v.asNumber().value,
+                "uint" or "uint32" => (uint)v.asNumber().value,
+                "short" => (short)v.asNumber().value,
+                "ushort" => (ushort)v.asNumber().value,
+                "char" or "sbyte" => (sbyte)v.asNumber().value,
+                "uchar" or "byte" => (byte)v.asNumber().value,
+                "float" => (float)v.asNumber().value,
+                "double" => (double)v.asNumber().value,
+                "ptr" or "intptr" => (IntPtr)v.asNumber().value,
+                _ => null
+            };
+        }
+
+        private static Var ToVar(string typstring, object o){
+            return typstring.ToLower() switch {
+                "str" or "string" => new VarString((string)o),
+                "int64" or "long" => new VarNumber((long)o),
+                "uint64" or "ulong" => new VarNumber((ulong)o),
+                "int" or "int32" => new VarNumber((int)o),
+                "uint" or "uint32" => new VarNumber((uint)o),
+                "short" => new VarNumber((short)o),
+                "ushort" => new VarNumber((ushort)o),
+                "char" or "sbyte" => new VarNumber((sbyte)o),
+                "uchar" or "byte" => new VarNumber((byte)o),
+                "float" => new VarNumber((float)o),
+                "double" => new VarNumber((double)o),
+                "ptr" or "intptr" => new VarNumber((int)(IntPtr)o),
+                _ => null
+            };
+        }
+        
         public static VarList Generate(){
             VarList io = new VarList();
 
@@ -96,6 +152,43 @@ namespace Funky.Libs{
 
 
                 return file;
+            });
+            io["loaddll"] = new VarFunction(dat => {
+                string dll = dat.Get(0).Or("dll").Required().GetString();
+                string func = dat.Get(1).Or("func").Required().GetString();
+                string returnType = dat.Get(2).Or("type").Required().GetString();
+                Type retType = FromString(returnType);
+                List<Type> args = new();
+                for(int i=3; dat._num_args.ContainsKey(i); i++){
+                    string t = dat._num_args[i].asString();
+                    args.Add(FromString(t));
+                }
+                args.Add(retType);
+                var lib = FunkyHelpers.LoadLibrary(dll.ToString());
+                if(lib==IntPtr.Zero){
+                    switch(Marshal.GetLastWin32Error()){
+                        case(0x7E):{
+                            throw new Exception("DLL not found");
+                        }
+                        default:{
+                            throw new Exception("Unknown error");
+                        }
+                    }
+                }
+                Console.WriteLine(lib);
+                var method = FunkyHelpers.GetProcAddress(lib, func);
+                Console.WriteLine(method);
+                var methodType = Expression.GetDelegateType(args.ToArray());
+                var delg = Marshal.GetDelegateForFunctionPointer(method, methodType);
+                return new VarFunction(cd=>{
+                    object[] convertedArgs = new object[args.Count-1];
+                    for(int i=0; i < convertedArgs.Length; i++){
+                        if(cd._num_args.ContainsKey(i)){
+                            convertedArgs[i] = FromVar(dat._num_args[3+i].asString(), cd._num_args[i]);
+                        }
+                    }
+                    return ToVar(returnType,delg.DynamicInvoke(convertedArgs));
+                });
             });
             io["stdin"] = new VarList();
             return io;

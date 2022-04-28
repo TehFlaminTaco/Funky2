@@ -29,5 +29,11 @@ namespace Funky{
         public static extern IntPtr SetCursor(IntPtr hCursor);
         [DllImport("user32.dll")]
         public static extern IntPtr LoadCursor(IntPtr hInstance, int lpCursorName);
+
+        [DllImport("kernel32", SetLastError=true, CharSet = CharSet.Ansi)]
+        public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName); 
     }
 }
