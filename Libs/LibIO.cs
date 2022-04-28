@@ -4,12 +4,16 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 
 namespace Funky.Libs{
     public static class LibIO{
         private static Type FromString(string s){
+            if(s.ToLower().StartsWith("proc") || s.ToLower().StartsWith("function")){
+                return typeof(IntPtr);
+            }
             return s.ToLower() switch {
                 "str" or "string" => typeof(string),
                 "int64" or "long" => typeof(long),
@@ -23,11 +27,29 @@ namespace Funky.Libs{
                 "float" => typeof(float),
                 "double" => typeof(double),
                 "ptr" or "intptr" => typeof(IntPtr),
+                "function" => typeof(IntPtr),
                 _ => typeof(int)
             };
         }
 
         private static object FromVar(string typstring, Var v){
+            if(typstring.ToLower().StartsWith("proc") || typstring.ToLower().StartsWith("function")){
+                var match = Regex.Match(typstring, @"^(proc|function)\(([^\)]*)\) -> (.*)$");
+                if(!match.Success){
+                    throw new FunkyException($"Invalid signature for {typstring}");
+                }
+                var args = match.Groups[2].Value.Split(',');
+                var ret = match.Groups[3].Value;
+                var retType = FromString(ret);
+                var argTypes = new List<Type>();
+                foreach (var arg in args){
+                    argTypes.Add(FromString(arg));
+                }
+                var delgType = DelegateCreator.NewDelegateType(retType, argTypes.ToArray());
+                // Wrap v.asFunction().action as an Expression.Lambda and run ToVar on its arguments
+                
+                return Marshal.GetFunctionPointerForDelegate(v.asFunction().action);
+            }
             return typstring.ToLower() switch {
                 "str" or "string" => v.asString().data,
                 "int64" or "long" => (long)v.asNumber().value,
