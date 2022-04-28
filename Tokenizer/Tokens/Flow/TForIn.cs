@@ -28,7 +28,7 @@ namespace Funky.Tokens.Flow{
                 c.Fail();
                 return null;
             }
-
+ 
             if(!claimer.Claim(IN).success){
                 c.Fail();
                 return null;

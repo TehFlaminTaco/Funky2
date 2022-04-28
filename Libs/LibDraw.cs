@@ -629,8 +629,8 @@ namespace Funky.Libs{
                     if(destroyed)return Var.nil;
                     int x           = (int)d.Get(0).Or("x").Otherwise(0).GetNumber();
                     int y           = (int)d.Get(1).Or("y").Otherwise(0).GetNumber();
-                    x = (int)Math.Clamp(x, 0, map.Width);
-                    y = (int)Math.Clamp(y, 0, map.Height);
+                    x = (int)Math.Clamp(x, 0, map.Width-1);
+                    y = (int)Math.Clamp(y, 0, map.Height-1);
                     int col = map.GetPixel(x, y).ToArgb();
                     int a = (col>>3*8)&0xFF;
                     int r = (col>>2*8)&0xFF;
@@ -664,8 +664,8 @@ namespace Funky.Libs{
                     g = Math.Clamp(g, 0.0f, 1.0f);
                     b = Math.Clamp(b, 0.0f, 1.0f);
                     a = Math.Clamp(a, 0.0f, 1.0f);
-                    x = (int)Math.Clamp(x, 0, map.Width);
-                    y = (int)Math.Clamp(y, 0, map.Height);
+                    x = (int)Math.Clamp(x, 0, map.Width-1);
+                    y = (int)Math.Clamp(y, 0, map.Height-1);
                     map.SetPixel(x, y, Color.FromArgb((int)(255*a), (int)(255*r), (int)(255*g), (int)(255*b)));
                     return dataList;
                 });

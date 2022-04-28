@@ -1,6 +1,7 @@
+using System.Collections;
 using System.Collections.Generic;
 namespace Funky{
-    public class VarList : Var{
+    public class VarList : Var {
         public Dictionary<string, Var> string_vars = new Dictionary<string, Var>();
         public List<string> defined = new List<string>();
         public Dictionary<double, Var> double_vars = new Dictionary<double, Var>();
@@ -24,7 +25,7 @@ namespace Funky{
 
         public override Var Get(Var key){
             Var t = ThisGet(key);
-            if(t == Var.nil){
+            if(t == Var.undefined){
                 if (readParent != null){
                     Var parVal = readParent.Get(key);
                     if(!(parVal is VarNull))
@@ -37,12 +38,12 @@ namespace Funky{
 
         public Var ThisGet(Var key){
             if(key is VarNumber n){
-                return double_vars.ContainsKey(n) ? double_vars[n] : Var.nil;
+                return double_vars.ContainsKey(n) ? double_vars[n] : Var.undefined;
             }
             if(key is VarString s){
-                return string_vars.ContainsKey(s) ? string_vars[s] : Var.nil;
+                return string_vars.ContainsKey(s) ? string_vars[s] : Var.undefined;
             }
-            return other_vars.ContainsKey(key) ? other_vars[key] : Var.nil;
+            return other_vars.ContainsKey(key) ? other_vars[key] : Var.undefined;
         }
 
         public override Var Set(Var key, Var val){
@@ -56,7 +57,7 @@ namespace Funky{
                 assignHere = true;
             else if (key is VarString s && defined.Contains(s))
                 assignHere = true;
-            else if ((ThisGet(key)??Var.nil) != Var.nil) // We ?? just incase. Because, /shrug.
+            else if ((ThisGet(key)??Var.undefined) != Var.undefined) // We ?? just incase. Because, /shrug.
                 assignHere = true;
             
             if(assignHere){
@@ -79,6 +80,19 @@ namespace Funky{
                 return string_vars[s] = val;
             }
             return other_vars[key] = val;
+        }
+
+        public IEnumerable<KeyValuePair<Var, Var>> AllVars()
+        {
+            foreach(var kv in double_vars){
+                yield return new KeyValuePair<Var, Var>(kv.Key, kv.Value);
+            }
+            foreach(var kv in string_vars){
+                yield return new KeyValuePair<Var, Var>(kv.Key, kv.Value);
+            }
+            foreach(var kv in other_vars){
+                yield return new KeyValuePair<Var, Var>(kv.Key, kv.Value);
+            }
         }
     }
 }

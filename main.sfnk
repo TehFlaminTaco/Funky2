@@ -1,7 +1,50 @@
-print("Pre-timeout!");
-try{
-    timeout(3000, @{while(1){if(math.random(0,20000)>=19999){error("FUCK")}}});
-}catch e{
-    print(`Got an exception while running! [e]`);
+var _number = list.getmeta(3);
+var _list = list.getmeta(list);
+
+function diceGetter(n, key){
+    if type(n) == "number" {
+        n = [n];
+    }
+    var isDice = key:match("^d(\\d+)$")
+    if(isDice){
+        var outDice = [];
+        for var index in n {
+            for var i = 0; i < n[index]; i++ {
+                outDice[#outDice] = math.random(1, tonumber(isDice[1])+1)
+            }
+        }
+        return outDice;
+    }
+
+    var keep = key:match("^k(h|l)?(\\d+)$");
+    if(keep){
+        if(!keep[1])
+            keep[1] = "h"
+        var holdList = [];
+        var sorted = n:sort@-
+        for(var i=0; i < tonumber(keep[2]) && i<#sorted; i++){
+            holdList[#holdList] = sorted[i];
+        }
+        return holdList;
+    }
+
+    var drop = key:match("^d(h|l)(\\d+)$");
+    for(drop){
+        var holdList = [];
+        var sorted = n:sort@-
+        for(var i=0; i<(#sorted - tonumber(drop[2])); i++){
+            holdList[#holdList] = sorted[i];
+        }
+        return holdList;
+    }
 }
-print("Post-timeout!");
+
+_number.get = diceGetter;
+var oldListGet = _list.get!; $ Better safe than sorry.
+_list.get = function(n, key){
+    return oldListGet(n, key)||diceGetter(n, key)
+}
+
+print(3.d6.kh1)
+print(3.d6.k2)
+print(3.d6.dl1)

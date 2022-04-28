@@ -56,6 +56,11 @@ namespace Funky.Libs{
                     return rng.NextDouble();
                 }
             });
+            math["randomseed"] = new VarFunction(dat => {
+                var n = dat.Get(0).Or("seed").Required().GetNumber();
+                rng = new Random((int)n);
+                return n;
+            });
             math["abs"] = new VarFunction(dat => Math.Abs(dat.Get(0).Required().GetNumber()));
             math["deg"] = new VarFunction(dat => dat.Get(0).Required().GetNumber() * (180.0d / Math.PI));
             math["rad"] = new VarFunction(dat => Math.PI * dat.Get(0).Required().GetNumber() / 180.0d);

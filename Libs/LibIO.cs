@@ -97,7 +97,11 @@ namespace Funky.Libs{
 
                 return file;
             });
-            io["stdin"] = new VarList();
+            var stdin = io["stdin"] = new VarList();
+            stdin["readline"] = new VarFunction(dat => {
+                return Console.ReadLine();
+            });
+
             return io;
         }
     }

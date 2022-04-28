@@ -3,6 +3,7 @@ using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Funky.Libs{
     public static class LibList{
@@ -179,6 +180,95 @@ namespace Funky.Libs{
                     outList.double_vars[leftListLen+pivotListLen+i]=rightList.double_vars[i];
                 }
                 return outList;
+            });
+            list["map"] = new VarFunction(dat => {
+                VarList mappable = dat.Get(0).Required().GetList();
+                VarFunction callable = dat.Get(1).Required().Get().asFunction();
+                VarList mapped = new VarList();
+                foreach(var kv in mappable.AllVars()){
+                    var cd = new CallData();
+                    cd._num_args[0] = kv.Value;
+                    cd._num_args[1] = kv.Key;
+                    cd._num_args[2] = mappable;
+                    cd._str_args["k"] = cd._str_args["key"] = kv.Key;
+                    cd._str_args["v"] = cd._str_args["value"] = kv.Value;
+                    cd._str_args["l"] = cd._str_args["list"] = mappable;
+                    mapped[kv.Key] = callable.Call(cd);
+                }
+                return mapped;
+            });
+            list["fold"] = new VarFunction(dat => {
+                VarList foldable = dat.Get(0).Required().GetList();
+                VarFunction callable = dat.Get(1).Required().Get().asFunction();
+                VarList folded = new VarList();
+                if(!foldable.double_vars.ContainsKey(0))return folded;
+                Var last = foldable[0];
+                for(int i = 1; foldable.double_vars.ContainsKey(i); i++){
+                    var cd = new CallData();
+                    cd._num_args[0] = last;
+                    last = cd._num_args[1] = foldable.double_vars[i];
+
+                    folded[i-1] = callable.Call(cd);
+                }
+                return folded;
+            });
+            list["reduce"] = new VarFunction(dat => {
+                VarList reducable = dat.Get(0).Required().GetList();
+                VarFunction callable = dat.Get(1).Required().Get().asFunction();
+                if(!reducable.double_vars.ContainsKey(0))return Var.nil;
+                Var last = reducable[0];
+                for(int i = 1; reducable.double_vars.ContainsKey(i); i++){
+                    var cd = new CallData();
+                    cd._num_args[0] = last;
+                    cd._num_args[1] = reducable.double_vars[i];
+
+                    last = callable.Call(cd);
+                }
+                return last;
+            });
+            list["cumulate"] = new VarFunction(dat => {
+                VarList cumulatable = dat.Get(0).Required().GetList();
+                VarFunction callable = dat.Get(1).Required().Get().asFunction();
+                VarList cumulated = new VarList();
+                if(!cumulatable.double_vars.ContainsKey(0))return cumulated;
+                Var last = cumulated[0] = cumulatable[0];
+                
+                for(int i = 1; cumulatable.double_vars.ContainsKey(i); i++){
+                    var cd = new CallData();
+                    cd._num_args[0] = last;
+                    cd._num_args[1] = cumulatable.double_vars[i];
+
+                    last = cumulated[i] = callable.Call(cd);
+                }
+                return cumulated;
+            });
+            list["where"] = new VarFunction(dat => {
+                VarList searchable = dat.Get(0).Required().GetList();
+                Var callable = dat.Get(1).Get();
+                VarList searched = new VarList();
+                int c = 0;
+                for(int i = 0; searchable.double_vars.ContainsKey(i); i++){
+                    var cd = new CallData();
+                    Var v = searchable.double_vars[i];
+                    cd._num_args[0] = v;
+                    if(callable is VarNull ? !(v is VarNull) : callable.Call(cd).asBool()) searched[c++] = v;
+                }
+                return searched;
+            });
+            VarFunction cloneFunc = null;
+            list["clone"] = cloneFunc = new VarFunction(dat => {
+                VarList clonable = dat.Get(0).Or("list").Required().GetList();
+                bool deepClone = dat.Get(1).Or("deep").Otherwise(0).Get().asBool();
+                VarList newList = new VarList();
+                newList.meta = clonable.meta;
+                foreach(var kv in clonable.AllVars()){
+                    if(deepClone && kv.Value is VarList){
+                        newList[kv.Key] = cloneFunc.Call(new CallData(kv.Value, 1));
+                    }else{
+                        newList[kv.Key] = kv.Value;
+                    }
+                }
+                return newList;
             });
             return list;
         }

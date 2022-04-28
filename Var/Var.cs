@@ -58,7 +58,7 @@ namespace Funky{
             Var callFunc = Meta.Get(this, "get", $"key({key.type})");
             if(!(callFunc is VarNull))
                 return callFunc.Call(new CallData(this, key));
-            return nil;
+            return Var.undefined;
         }
 
         public virtual Var Set(Var key, Var val){
