@@ -1,5 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Reflection;
+using System.Linq.Expressions;
 namespace Funky{
     public static class FunkyHelpers{
 
@@ -33,7 +35,23 @@ namespace Funky{
         [DllImport("kernel32", SetLastError=true, CharSet = CharSet.Ansi)]
         public static extern IntPtr LoadLibrary([MarshalAs(UnmanagedType.LPStr)]string lpFileName);
 
-        [DllImport("kernel32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr GetProcAddress(IntPtr hModule, string lpProcName); 
+        [DllImport("kernel32", CharSet=CharSet.Ansi, ExactSpelling=true, SetLastError=true)]
+        public static extern IntPtr GetProcAddress(IntPtr hModule, string procName);
     }
 }
+
+static class DelegateCreator {
+    public static readonly Func<Type[], Type> MakeNewCustomDelegate = (Func<Type[], Type>) Delegate.CreateDelegate(
+      typeof(Func<Type[], Type>),
+      typeof(Expression).Assembly.GetType("System.Linq.Expressions.Compiler.DelegateHelpers").GetMethod(
+        "MakeNewCustomDelegate",
+        BindingFlags.NonPublic | BindingFlags.Static
+      )
+    );
+    public static Type NewDelegateType(Type ret, params Type[] parameters) {
+      var offset = parameters.Length;
+      Array.Resize(ref parameters, offset + 1);
+      parameters[offset] = ret;
+      return MakeNewCustomDelegate(parameters);
+    }
+  }

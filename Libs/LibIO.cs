@@ -163,7 +163,6 @@ namespace Funky.Libs{
                     string t = dat._num_args[i].asString();
                     args.Add(FromString(t));
                 }
-                args.Add(retType);
                 var lib = FunkyHelpers.LoadLibrary(dll.ToString());
                 if(lib==IntPtr.Zero){
                     switch(Marshal.GetLastWin32Error()){
@@ -171,17 +170,26 @@ namespace Funky.Libs{
                             throw new Exception("DLL not found");
                         }
                         default:{
-                            throw new Exception("Unknown error");
+                            throw new Exception($"Unknown error ({Marshal.GetLastWin32Error():x8})");
                         }
                     }
                 }
-                Console.WriteLine(lib);
-                var method = FunkyHelpers.GetProcAddress(lib, func);
-                Console.WriteLine(method);
-                var methodType = Expression.GetDelegateType(args.ToArray());
+                var method = FunkyHelpers.GetProcAddress(lib, func.ToString());
+                if(method==IntPtr.Zero){
+                    switch(Marshal.GetLastWin32Error()){
+                        case(0x7F):{
+                            throw new Exception("Proc not found");
+                        }
+                        default:{
+                            throw new Exception($"Unknown error ({Marshal.GetLastWin32Error():x8})");
+                        }
+                    }
+                }
+                
+                var methodType = DelegateCreator.NewDelegateType(retType, args.ToArray());
                 var delg = Marshal.GetDelegateForFunctionPointer(method, methodType);
                 return new VarFunction(cd=>{
-                    object[] convertedArgs = new object[args.Count-1];
+                    object[] convertedArgs = new object[args.Count];
                     for(int i=0; i < convertedArgs.Length; i++){
                         if(cd._num_args.ContainsKey(i)){
                             convertedArgs[i] = FromVar(dat._num_args[3+i].asString(), cd._num_args[i]);
