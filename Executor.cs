@@ -47,6 +47,7 @@ namespace Funky
                 argList.double_vars[i] = args[i];
             }
             ExecuteProgram(argList);
+            
         }
 
         public static bool DYNAMIC_RECOMPILE = false;

@@ -1,4 +1,6 @@
+using System.Collections.Generic;
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Linq.Expressions;
@@ -48,10 +50,17 @@ static class DelegateCreator {
         BindingFlags.NonPublic | BindingFlags.Static
       )
     );
+    static HashSet<(Type ret, Type[] parms, Type t)> knownTypes = new HashSet<(Type ret, Type[] parms, Type t)>();
     public static Type NewDelegateType(Type ret, params Type[] parameters) {
+      if(knownTypes.Any(e=>e.ret==ret && e.parms.SequenceEqual(parameters))){
+        return knownTypes.First(e=>e.ret==ret && e.parms.SequenceEqual(parameters)).t;
+      }
       var offset = parameters.Length;
+      var oldParams = parameters.ToList().ToArray();
       Array.Resize(ref parameters, offset + 1);
       parameters[offset] = ret;
-      return MakeNewCustomDelegate(parameters);
+      var delg = MakeNewCustomDelegate(parameters);
+      knownTypes.Add((ret, oldParams, delg));
+      return delg;
     }
   }

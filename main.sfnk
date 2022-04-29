@@ -1,3 +1,11 @@
-yelp = io.loaddll("user32.dll", "MessageBoxA", "int", "intptr", "string", "string", "uint")
-
-yelp(0,"AHH!","FUCK",0x0)
+j = ""
+function yell(a,b,c){
+    j += '!'
+    print(`HELLO, WORLD! [a] [b] [c]`)
+}
+SetWindowsHookExA = io.loaddll("user32.dll", "SetWindowsHookExA", "intptr", "int", "proc(int,intptr,intptr) -> intptr", "intptr", "uint");
+SetWindowsHookExA(13, yell, 0, 0);
+print("START")
+os.sleep(8000)
+print("END")
+print(j)

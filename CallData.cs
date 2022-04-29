@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 
 namespace Funky{
@@ -26,6 +27,10 @@ namespace Funky{
         }
         public ArgumentGetter Get(string s){
             return new ArgumentGetter(this).Or(s);
+        }
+
+        public static CallData FromVars(params Var[] args){
+            return new(args.ToArray());
         }
     }
 

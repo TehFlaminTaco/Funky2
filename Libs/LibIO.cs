@@ -12,6 +12,16 @@ namespace Funky.Libs{
     public static class LibIO{
         private static Type FromString(string s){
             if(s.ToLower().StartsWith("proc") || s.ToLower().StartsWith("function")){
+                /*var match = Regex.Match(s, @"^(proc|function)\(([^\)]*)\) -> (.*)$");
+                if(!match.Success){
+                    throw new FunkyException($"Invalid signature for {s}");
+                }
+                var args = match.Groups[2].Value.Split(',');
+                var ret = match.Groups[3].Value;
+                var retType = FromString(ret);
+                var argTypes = args.Select(c=>FromString(c));
+                var custType = DelegateCreator.NewDelegateType(retType, argTypes.ToArray());
+                return custType;*/
                 return typeof(IntPtr);
             }
             return s.ToLower() switch {
@@ -41,14 +51,27 @@ namespace Funky.Libs{
                 var args = match.Groups[2].Value.Split(',');
                 var ret = match.Groups[3].Value;
                 var retType = FromString(ret);
-                var argTypes = new List<Type>();
-                foreach (var arg in args){
-                    argTypes.Add(FromString(arg));
-                }
-                var delgType = DelegateCreator.NewDelegateType(retType, argTypes.ToArray());
+                var argTypes = args.Select(c=>FromString(c));
                 // Wrap v.asFunction().action as an Expression.Lambda and run ToVar on its arguments
+                var prms = argTypes.Select((e,k)=>Expression.Parameter(e, $"arg{k}")).ToArray();
+                var stc = System.Reflection.BindingFlags.Static;
+                var privateStatic = System.Reflection.BindingFlags.NonPublic | stc;
+                var mthd = v.asFunction().action;
                 
-                return Marshal.GetFunctionPointerForDelegate(v.asFunction().action);
+                var parmasAsVars = prms.Select((c,k)=>Expression.Call(null, typeof(LibIO).GetMethod("ToVar", privateStatic), Expression.Constant(args[k++]), Expression.Convert(c, typeof(object))));
+                
+                var makeCallData = Expression.Call(null, typeof(CallData).GetMethod("FromVars", System.Reflection.BindingFlags.Public | stc), Expression.NewArrayInit(typeof(Var), parmasAsVars));
+                var custType = DelegateCreator.NewDelegateType(retType, argTypes.ToArray());
+                var lambdExpr = Expression.Lambda(custType,
+                    Expression.Convert(
+                        Expression.Call(null,
+                            typeof(LibIO).GetMethod("FromVar", privateStatic),
+                            Expression.Constant(ret),
+                            Expression.Call(Expression.Constant(mthd.Target), mthd.Method, makeCallData)
+                        ),
+                    retType),
+                prms);
+                return Marshal.GetFunctionPointerForDelegate(lambdExpr.Compile(true));
             }
             return typstring.ToLower() switch {
                 "str" or "string" => v.asString().data,
@@ -80,7 +103,7 @@ namespace Funky.Libs{
                 "uchar" or "byte" => new VarNumber((byte)o),
                 "float" => new VarNumber((float)o),
                 "double" => new VarNumber((double)o),
-                "ptr" or "intptr" => new VarNumber((int)(IntPtr)o),
+                "ptr" or "intptr" => new VarNumber((long)(IntPtr)o),
                 _ => null
             };
         }
