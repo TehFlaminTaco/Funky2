@@ -1,0 +1,53 @@
+write("\e[33m")
+print("Funky2 by ATaco! (c) 2023")
+print("This program is unlisenced and free to use.")
+write("\e[0m")
+
+$$ This is the main loop
+while (1) {
+    write("\e[32m> \e[0m");
+    input = io.stdin.readline();
+    if (input == "exit") {
+        break;
+    }
+    else if (input == "help") {
+        write("\e[33m")
+        print("Funky2 by ATaco! (c) 2023");
+        print("This program is unlisenced and free to use.");
+        print("Commands:");
+        print("exit - Exits the program");
+        print("help - Shows this message");
+        print("clear - Clears the screen");
+        write("\e[0m")
+    }
+    else if (input == "clear") {
+        io.stdout.write("\e[2J");
+    }
+    else {
+        while(input[#input-1] == '\\'){
+            input = input:sub(1, #input-2) .. "\n"
+            input = input .. io.stdin.readline();
+        }
+        var fnc;
+        try {
+            fnc = input:load();
+        }catch e{
+            if(e)
+                print(`\e\[31m[e:gsub("at repl\..?fnk.*\n", "")]\e\[0m`);
+            else
+                print("\e[31mUnknown Error!\e[0m");
+            break;
+        }
+        if(fnc){
+            try {
+                print(`\e\[33m[fnc()]\e\[0m`);
+            }catch e {
+                if(e)
+                    print(`\e\[31m[e:gsub("at repl\..?fnk.*\n", "")]\e\[0m`);
+                else
+                    print("\e[31mUnknown Error!\e[0m");
+            }
+        }
+        fnc = nil;
+    }
+}

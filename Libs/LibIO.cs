@@ -9,7 +9,7 @@ namespace Funky.Libs{
     public static class LibIO{
         public static VarList Generate(){
             VarList io = new VarList();
-
+            io["cwd"] = new VarFunction(dat => Directory.GetCurrentDirectory());
             io["entries"] = new VarFunction(dat => {
                 VarString path = dat.Get(0).Or("folder").Otherwise("").GetString();
                 FunkyFolder folder = new FunkyFolder(path);
@@ -89,7 +89,7 @@ namespace Funky.Libs{
                     fs.Write(Encoding.UTF8.GetBytes(text));
                     return file;
                 });
-                file["close"] = new VarFunction(dat => {
+                file["dispose"] = file["close"] = new VarFunction(dat => {
                     fs.Close();
                     return Var.nil;
                 });
@@ -97,6 +97,31 @@ namespace Funky.Libs{
 
                 return file;
             });
+
+            io["readall"] = new VarFunction(dat => {
+                FunkyFile f = new FunkyFile(dat.Get(0).Or("file").Required().GetString());
+                return f.ReadAllText();
+            });
+            io["readline"] = new VarFunction(dat => {
+                FunkyFile f = new FunkyFile(dat.Get(0).Or("file").Required().GetString());
+                var fs = new FileStream(f.realPath, FileMode.OpenOrCreate, FileAccess.Read);
+                List<byte> line = new List<byte>();
+                int b;
+                while(fs.Position<fs.Length && (b=fs.ReadByte())!=10){
+                    line.Add((byte)b);
+                }
+                fs.Close();
+                return Encoding.UTF8.GetString(line.ToArray());
+            });
+            io["write"] = new VarFunction(dat => {
+                FunkyFile f = new FunkyFile(dat.Get(0).Or("file").Required().GetString());
+                string text = dat.Get(1).Or("text").Required().GetString();
+                var fs = new FileStream(f.realPath, FileMode.OpenOrCreate, FileAccess.Write);
+                fs.Write(Encoding.UTF8.GetBytes(text));
+                fs.Close();
+                return Var.nil;
+            });
+
             var stdin = io["stdin"] = new VarList();
             stdin["readline"] = new VarFunction(dat => {
                 return Console.ReadLine();

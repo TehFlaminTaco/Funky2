@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Reflection;
+using System.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
 using Funky.Tokens;
@@ -33,9 +34,27 @@ namespace Funky
             var fileTarget = args.FirstOrDefault();
             FunkyFile file;
             if(fileTarget is null){
-                file = new FunkyFile("main", "funky", ".fnk", ".sfnk", ".cfnk");
-            }else{
-                file = new FunkyFile(fileTarget, "funky", ".fnk", ".sfnk", ".cfnk");
+                // Get repl.cfnk
+                var replFile = Assembly.GetExecutingAssembly().GetManifestResourceNames().FirstOrDefault(x => x.EndsWith("repl.cfnk"));
+                var binaryStream = new BinaryReader(Assembly.GetExecutingAssembly().GetManifestResourceStream(replFile));
+                IBinaryReadWritable.ReadHeader(binaryStream);
+                var expressions = IBinaryReadWritable.ReadProgram(binaryStream);
+                Meta.GetMeta();
+                Scope scope;
+                VarList scopeList = new VarList();
+                scopeList.parent = Globals.get();
+                scopeList.meta = new VarList();
+                scope = new Scope(scopeList);
+
+                Var last = Var.nil;
+                foreach(var expression in expressions){
+                    expression.Parse(scope);
+                }
+                return;
+            }
+            file = new FunkyFile(fileTarget, "funky", ".fnk", ".sfnk", ".cfnk");
+            if(file.IsDirectory()){
+                file = new FunkyFile(Path.Combine(fileTarget, "main"), "funky", ".fnk", ".sfnk", ".cfnk");
             }
             if(!file.Exists()){
                 Console.WriteLine("Please specify a valid file.");

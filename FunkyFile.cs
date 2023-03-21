@@ -60,6 +60,10 @@ namespace Funky{
                 throw new FileNotFoundException();
             return File.ReadAllText(realPath);
         }
+
+        public bool IsDirectory(){
+            return Directory.Exists(realPath);
+        }
     }
 
     public class FunkyFolder : FunkyFS {
